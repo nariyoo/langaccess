@@ -1,0 +1,9 @@
+# The accuracy figure is bound to a sha256 of src/langaccess/core.py, so a checkout has to
+# produce the same bytes on every platform. Without this, a clone on Windows under the common
+# core.autocrlf=true setting writes CRLF and the recorded hash does not reproduce.
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.pptx binary
+*.gz binary
+*.parquet binary

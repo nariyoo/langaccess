@@ -1,0 +1,1869 @@
+{
+ "archive_page_only": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 0
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 0
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://archive.example/past-events/fiesta"
+   }
+  ],
+  "languages": [],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12,
+   13
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "attribute_greater_than_in_the_prose": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "acompana a las familias recien llegadas del condado. Nuestro equipo explica como pedir una cita en la clinica, como inscribir a los ninos en la escuela y que documentos hay que",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://casabuena2.example/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "HTTP 403 on the home page, 13-character body (home page read with a plain HTTP fetch)",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "attribute_greater_than_over_the_floor": {
+  "authorship": "none",
+  "by_language": {},
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [],
+  "machine_translation": "",
+  "note": "HTTP 404 on the home page, 0-character body (home read retried once)",
+  "pages_read": 0,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 0,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "unreachable"
+ },
+ "authored_spanish_page": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://authored.example/servicios"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "bilingual_notice": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 2
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "with you at the office. Si necesita ayuda en otro idioma, puede llamar a nuestra oficina y nosotros podemos buscar un interprete para usted.",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 2,
+    "url": "https://notice.example/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 2,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "bot_wall": {
+  "authorship": "none",
+  "by_language": {},
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [],
+  "machine_translation": "",
+  "note": "bot wall",
+  "pages_read": 0,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 0,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "unreachable"
+ },
+ "chinese_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "Chinese": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Chinese",
+    "mechanism": "translated_page",
+    "quote": "本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://zh.example/cn"
+   }
+  ],
+  "languages": [
+   "Chinese",
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "client_widget_output": {
+  "authorship": "client_widget",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "client_widget",
+    "sufficiency": 0
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "client_widget",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://rendered.example/es/servicios"
+   }
+  ],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "Google Translate",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12,
+   14
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "machine_translate"
+ },
+ "directory_profile": {
+  "authorship": "none",
+  "by_language": {},
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [],
+  "machine_translation": "",
+  "note": "a third-party directory profile, not the organization's own website",
+  "pages_read": 0,
+  "read_quality": {},
+  "rules": [],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "unreachable"
+ },
+ "english_only": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "google_widget_only": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "Google Translate",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12,
+   14
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "machine_translate"
+ },
+ "granicus_lang_update": {
+  "authorship": "client_widget",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "client_widget",
+    "sufficiency": 0
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "client_widget",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana.",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://granicus-city.example/home?lang_update=639212242815969751"
+   }
+  ],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "Google Translate",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12,
+   14
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "machine_translate"
+ },
+ "japanese_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Japanese": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Japanese",
+    "mechanism": "translated_page",
+    "quote": "当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://ja.example/jp"
+   }
+  ],
+  "languages": [
+   "English",
+   "Japanese"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "locale_route_returns_english": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "GTranslate",
+  "note": "locale route returned English",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12,
+   14,
+   15
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "locale_tree_wider_than_the_slice": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 4
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "El centro ofrece asesoria legal, ayuda con la vivienda y clases para adultos que han llegado recientemente al condado. Nuestro personal esta disponible por telefono durante",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://tree.example/es/voluntarios"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 31,
+  "read_quality": {
+   "budget_exhausted": true,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 31,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": false,
+   "sufficient": true,
+   "unread": 49,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "offsite_alternate_only": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 1,
+   "languages": [
+    "Turkish"
+   ]
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [
+   "Turkish"
+  ],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "onsite_alternate_declares": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://declares.example/es/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [
+   "Spanish"
+  ],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "own_target_translate_link": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "Google Translate",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12,
+   14
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "machine_translate"
+ },
+ "parked_domain": {
+  "authorship": "none",
+  "by_language": {},
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [],
+  "machine_translation": "",
+  "note": "a parked or expired domain, not the organization's own website",
+  "pages_read": 0,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 0,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   2
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "unreachable"
+ },
+ "persian_mission_page": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Persian": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Persian",
+    "mechanism": "translated_page",
+    "quote": "انجمن فرهنگی ایرانیان یک سازمان غیرانتفاعی و غیرسیاسی است که به نگهداری و گسترش میراث فرهنگی ما اختصاص دارد. ما هر شنبه کلاس زبان فارسی برای",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://persian.example/fa"
+   }
+  ],
+  "languages": [
+   "English",
+   "Persian"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "platform_locale_mirrors": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://mirrors.example/es/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 6,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 6,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": false,
+   "sufficient": true,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12,
+   17
+  ],
+  "sufficiency": 4,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "machine_translate"
+ },
+ "server_plugin_page": {
+  "authorship": "server_plugin",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "server_plugin",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "none",
+    "language": "",
+    "mechanism": "translation_plugin",
+    "quote": "sitepress",
+    "rules": [
+     11
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 0,
+    "url": "https://plugin.example/"
+   },
+   {
+    "authorship": "server_plugin",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": true,
+    "sufficiency": 3,
+    "url": "https://plugin.example/es/servicios"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "skip_link_target_wrapper": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "El Centro de Bienvenida de Riverside ayuda a las familias que acaban de llegar al condado. Nuestro personal se reune con los padres sobre la inscripcion escolar, con los",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://skiptarget.example/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "social_page_for_a_website": {
+  "authorship": "none",
+  "by_language": {},
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [],
+  "machine_translation": "",
+  "note": "a social media page, not the organization's own website",
+  "pages_read": 0,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 0,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   1
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "unreachable"
+ },
+ "spanish_section": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 4
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://section.example/servicios"
+   },
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://section.example/recursos"
+   },
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://section.example/citas"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 4,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 4,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": false,
+   "sufficient": true,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 4,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "swahili_word_gate": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Swahili": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Swahili",
+    "mechanism": "translated_page",
+    "quote": "Shirika letu la jamii linatoa msaada wa sheria na makazi kwa familia zote katika mji wetu kila wiki bila malipo yoyote na wafanyakazi wetu",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://swahili-services.example/huduma"
+   }
+  ],
+  "languages": [
+   "English",
+   "Swahili"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "switcher_menu": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [
+   "Chinese",
+   "Spanish",
+   "Vietnamese"
+  ],
+  "switcher_unresolved": 1,
+  "verdict": "english_only"
+ },
+ "ukrainian_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Ukrainian": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Ukrainian",
+    "mechanism": "translated_page",
+    "quote": "Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://uk.example/ua"
+   }
+  ],
+  "languages": [
+   "English",
+   "Ukrainian"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "unique_word_outside_the_window": {
+  "authorship": "authored",
+  "by_language": {
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 2
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "entrance faces the street. El programa que ofrecemos para cada familia esta en el centro, y para todos los padres que llegan cada semana. Entre las familias que llegan cada mes,",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 2,
+    "url": "https://window.example/"
+   }
+  ],
+  "languages": [
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 2,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "unnamed_translate_control": {
+  "authorship": "unknown_widget",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "unterminated_style_block": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "HTTP 403 on the home page, 13-character body (home page read with a plain HTTP fetch)",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "urdu_arabic_full_stop": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Urdu": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Urdu",
+    "mechanism": "translated_page",
+    "quote": "یہاں انٹرنیشنل ریفیوجی ریلیف سینٹر میں، ہم جانتے ہیں کہ بعض اوقات دنیا کو بدلنے کے لیے صرف ایک چھوٹی سی مدد کی ضرورت ہوتی ہے اور اسی یقین کے",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://urdu.example/ur"
+   }
+  ],
+  "languages": [
+   "English",
+   "Urdu"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "widget_over_authored_page": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "translated_page",
+    "quote": "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso,",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://both.example/servicios"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "Google Translate",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12,
+   14
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ }
+}

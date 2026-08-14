@@ -1,0 +1,39 @@
+# Citation File Format 1.2.0. https://citation-file-format.github.io/
+#
+# There is deliberately no .zenodo.json beside this file. Zenodo reads both, and where both are
+# present only .zenodo.json is used and this file is ignored entirely
+# (https://help.zenodo.org/docs/github/describe-software/).
+#
+# `doi` and `date-released` are absent on purpose. Both are known only once a GitHub Release has
+# been archived by Zenodo, and a placeholder in either would be an invalid value rather than a
+# missing one. Add the VERSION doi, not the concept doi: a verdict is the output of one rule set, so
+# a citation that does not name the version has not said which instrument produced its numbers.
+cff-version: 1.2.0
+message: "If you use this software, cite the specific version you ran."
+type: software
+title: langaccess
+abstract: >-
+  langaccess audits the language accessibility of a website. The tool renders the site in a
+  headless browser and classifies, for each language present, the access provided: English-only
+  content, a machine-translation widget, or text authored by the site itself. Each classification
+  is returned with its supporting evidence, the URL and quoted text that decided it, and the
+  numbered classification rules that were applied.
+authors:
+  - family-names: Yoo
+    given-names: Nari
+    orcid: "https://orcid.org/0000-0002-8467-7048"
+    email: nariyoo@umich.edu
+    affiliation: University of Michigan School of Social Work
+version: 0.1.0
+repository-code: "https://github.com/nariyoo/langaccess"
+license:
+  - MIT
+  - CC-BY-SA-3.0
+keywords:
+  - language access
+  - multilingual
+  - website audit
+  - machine translation
+  - limited English proficiency
+  - health equity
+  - web measurement

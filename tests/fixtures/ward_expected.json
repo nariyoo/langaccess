@@ -1,0 +1,157 @@
+{
+ "a_contact_page_with_the_recaptcha_footer": {
+  "chars": 800,
+  "parked": false,
+  "wall": false
+ },
+ "a_default_server_page": {
+  "chars": 69,
+  "parked": false,
+  "wall": true
+ },
+ "a_domain_bound_to_no_site": {
+  "chars": 58,
+  "parked": true,
+  "wall": false
+ },
+ "a_domain_sales_page_behind_a_security_check": {
+  "chars": 79,
+  "parked": true,
+  "wall": true
+ },
+ "a_gated_server_error_above_a_whole_site": {
+  "chars": 2012,
+  "parked": false,
+  "wall": false
+ },
+ "a_gated_server_error_on_a_short_page": {
+  "chars": 53,
+  "parked": false,
+  "wall": true
+ },
+ "a_gateway_status_on_a_short_page": {
+  "chars": 59,
+  "parked": false,
+  "wall": true
+ },
+ "a_history_page_that_was_sparked_by_something": {
+  "chars": 743,
+  "parked": false,
+  "wall": false
+ },
+ "a_host_that_cannot_resolve_the_address": {
+  "chars": 75,
+  "parked": false,
+  "wall": true
+ },
+ "a_hosting_account_that_lapsed": {
+  "chars": 92,
+  "parked": false,
+  "wall": true
+ },
+ "a_live_page_announcing_something_coming_soon": {
+  "chars": 512,
+  "parked": false,
+  "wall": false
+ },
+ "a_login_wall_at_a_mail_provider": {
+  "chars": 62,
+  "parked": false,
+  "wall": true
+ },
+ "a_maintenance_line_above_a_whole_site": {
+  "chars": 2037,
+  "parked": false,
+  "wall": false
+ },
+ "a_maintenance_notice_and_nothing_else": {
+  "chars": 54,
+  "parked": false,
+  "wall": true
+ },
+ "a_not_found_status_and_nothing_else": {
+  "chars": 64,
+  "parked": false,
+  "wall": true
+ },
+ "a_not_found_string_on_a_live_page": {
+  "chars": 502,
+  "parked": false,
+  "wall": false
+ },
+ "a_page_demanding_that_a_captcha_be_solved": {
+  "chars": 60,
+  "parked": false,
+  "wall": true
+ },
+ "a_parked_wording_past_the_parked_window": {
+  "chars": 1400,
+  "parked": false,
+  "wall": false
+ },
+ "a_placeholder_and_nothing_else": {
+  "chars": 12,
+  "parked": true,
+  "wall": false
+ },
+ "a_registrar_sales_page": {
+  "chars": 82,
+  "parked": true,
+  "wall": false
+ },
+ "a_registrar_sales_page_with_a_long_body": {
+  "chars": 2045,
+  "parked": true,
+  "wall": false
+ },
+ "a_service_status_word_inside_a_whole_page": {
+  "chars": 2075,
+  "parked": false,
+  "wall": false
+ },
+ "a_spanish_organization_page": {
+  "chars": 466,
+  "parked": false,
+  "wall": false
+ },
+ "a_stale_403_banner_above_a_spanish_site": {
+  "chars": 2165,
+  "parked": false,
+  "wall": false
+ },
+ "a_wall_wording_past_the_wall_window": {
+  "chars": 925,
+  "parked": false,
+  "wall": false
+ },
+ "an_empty_read": {
+  "chars": 0,
+  "parked": false,
+  "wall": false
+ },
+ "an_expired_domain_notice": {
+  "chars": 85,
+  "parked": true,
+  "wall": false
+ },
+ "an_expired_word_on_a_substantial_page": {
+  "chars": 2107,
+  "parked": false,
+  "wall": false
+ },
+ "an_ordinary_organization_page": {
+  "chars": 666,
+  "parked": false,
+  "wall": false
+ },
+ "an_ungated_interstitial": {
+  "chars": 76,
+  "parked": false,
+  "wall": true
+ },
+ "an_ungated_interstitial_on_a_substantial_page": {
+  "chars": 2040,
+  "parked": false,
+  "wall": true
+ }
+}

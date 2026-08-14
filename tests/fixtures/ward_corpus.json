@@ -1,0 +1,157 @@
+[
+ {
+  "name": "an_ordinary_organization_page",
+  "why": "The base case, and the one every widening costs. A live page of an organization carrying none of the two vocabularies is read, and both answers are false.",
+  "text": "The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_spanish_organization_page",
+  "why": "The same page in Spanish. Every wording in both families is English, and the pages they must not reach are not all English; a marker screen built out of English site furniture was rejected during the wall pass for exactly this reason.",
+  "text": "Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. "
+ },
+ {
+  "name": "an_empty_read",
+  "why": "Nothing was read at all. Both functions return false on an empty string and `_audit_async` answers this case before either of them, so this page pins that neither invents a catch.",
+  "text": ""
+ },
+ {
+  "name": "an_ungated_interstitial",
+  "why": "Cloudflare wording no organization page carries in its own furniture, on a short page. The first line of WALL_UNGATED_RX and the ordinary case it is written for.",
+  "text": "Just a moment... Please enable cookies while your request is being verified."
+ },
+ {
+  "name": "an_ungated_interstitial_on_a_substantial_page",
+  "why": "The same wording on a page well past PAGE_IS_SUBSTANTIAL. Ungated means ungated: this stays a wall at any length, and a change that quietly put the ungated list behind the length gate would show here and nowhere else in the suite.",
+  "text": "Just a moment... Verifying you are human. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_gated_server_error_on_a_short_page",
+  "why": "A gated wording deciding on a page that carries nothing else, which is the case the gate leaves open.",
+  "text": "Server Error 500. The request could not be completed."
+ },
+ {
+  "name": "a_gated_server_error_above_a_whole_site",
+  "why": "The measured case the gate was moved for. An ASP.NET stack trace from an embedded login control sat above one organization's whole site in Ukrainian, and `server error` ungated called the site unreachable. Past 1,500 characters the wording decides nothing.",
+  "text": "Server Error. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_stale_403_banner_above_a_spanish_site",
+  "why": "The four sites the wall pass had to protect: a stale forbidden banner above the organization's own site in Spanish, Korean and Portuguese. W7's wording is gated because ungated it was wrong on six of its 110 sites, and all six were pages like this one.",
+  "text": "403 - Forbidden. You don't have permission to access this resource. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. Nuestro centro ofrece clases de inglés los fines de semana, asesoría legal los martes y una despensa de alimentos abierta a cualquier residente del condado. El personal atiende la recepción de nueve de la mañana a cinco de la tarde. "
+ },
+ {
+  "name": "a_not_found_status_and_nothing_else",
+  "why": "A not-found status at the recorded address on a page under WALL_NOTFOUND_MAX. The tightest gate in the family, at 300 characters, because live pages print a 404 string in a search box or a footer.",
+  "text": "404 - Page Not Found. The requested url /es/ could not be found."
+ },
+ {
+  "name": "a_not_found_string_on_a_live_page",
+  "why": "The reason that gate is 300 and not 1,500. A live page mentioning its own 404 handling is read, and the same words on a page of nothing are not.",
+  "text": "Page not found errors are logged and reviewed each month. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_registrar_sales_page",
+  "why": "PARKED_RX at its ordinary length: a registrar has the address and there is no site here.",
+  "text": "This domain name is for sale. Inquire about this domain, or buy this domain today."
+ },
+ {
+  "name": "a_registrar_sales_page_with_a_long_body",
+  "why": "PARKED_RX is ungated, and the two substantial catches the measurement accepted knowingly were for-sale pages with a whole marketing page under them. This holds that decision.",
+  "text": "This domain name is for sale. Buy this domain. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "an_expired_domain_notice",
+  "why": "PARKED_EXPIRED_RX under its gate: a registration that lapsed, and nothing behind it.",
+  "text": "This domain has expired. You may need to extend your registration to restore service."
+ },
+ {
+  "name": "an_expired_word_on_a_substantial_page",
+  "why": "The same wording released by length. `expired` is ordinary English and a page that carries a whole site under it is a site.",
+  "text": "Our grant funding for this program has expired. Domain is expired notices are handled by the office manager. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_placeholder_and_nothing_else",
+  "why": "PARKED_SOON_RX under the tightest gate in the file, 200 characters. Its ungated form was one of three candidates measured and rejected: it caught 390 sites and was wrong on 227.",
+  "text": "Coming soon."
+ },
+ {
+  "name": "a_live_page_announcing_something_coming_soon",
+  "why": "The 227. Fifty-eight percent of what the ungated form reached was a live organization page announcing a future event, which is this page.",
+  "text": "Coming soon: our autumn festival, on the first Saturday of October. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_wall_wording_past_the_wall_window",
+  "why": "WALL_WINDOW is 600 characters and this page carries the wording after it. A wall is at the top of a page by construction; wording this far down is the page talking about something.",
+  "text": "The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. Just a moment, we will call you back."
+ },
+ {
+  "name": "a_parked_wording_past_the_parked_window",
+  "why": "PARKED_WINDOW is 1,200 characters, and the same argument one window further out.",
+  "text": "The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. Ask the board whether we should buy this domain for the new program."
+ },
+ {
+  "name": "a_domain_sales_page_behind_a_security_check",
+  "why": "Both families on one page, which is what a HugeDomains sales page is: ten of the eighteen corpus pages carrying the word captcha were these, and `security check` is what reaches them.",
+  "text": "Security check. HugeDomains is verifying your request before the listing loads."
+ },
+ {
+  "name": "a_login_wall_at_a_mail_provider",
+  "why": "W10, and 25 of its 29 rows are records whose stored website is an email address, so the browser lands on a mail provider's sign-in screen and no organization page exists at all.",
+  "text": "Please login to continue. Sign in to continue to your mailbox."
+ },
+ {
+  "name": "a_maintenance_notice_and_nothing_else",
+  "why": "W11 under its gate: an interstitial that has replaced the site.",
+  "text": "We'll be back soon. This site is down for maintenance."
+ },
+ {
+  "name": "a_maintenance_line_above_a_whole_site",
+  "why": "The same wording on a page that is still a site. W11 is gated because a whole navigation bar above `we are currently updating our website` is a site, not a placeholder.",
+  "text": "We are currently updating our website. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_default_server_page",
+  "why": "W8, a server that answers and has no site configured on it.",
+  "text": "Welcome to nginx! This page is automatically generated by the system."
+ },
+ {
+  "name": "a_host_that_cannot_resolve_the_address",
+  "why": "W9, the other half of the same shape: the platform answers and says there is nothing at this address.",
+  "text": "This site can't be reached. DNS address could not be found. Site not found."
+ },
+ {
+  "name": "a_contact_page_with_the_recaptcha_footer",
+  "why": "The reCAPTCHA defect as a page. The footer sentence every GoDaddy, Wix and Squarespace contact page prints left 64 live organization pages unreachable at a median home read of 627 characters, and this page is read.",
+  "text": "Send us a message using the form below. This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_page_demanding_that_a_captcha_be_solved",
+  "why": "The wording that replaced the bare word, and the one page in 44,284 it reaches. The demand to solve one is the wall; the word on its own is furniture.",
+  "text": "Please solve this CAPTCHA to request unblock to the website."
+ },
+ {
+  "name": "a_history_page_that_was_sparked_by_something",
+  "why": "The `sparked by` defect as a page. Two live organization sites of about 3,000 characters were reported unreachable on this sentence, and the word boundary in PARKED_RX is what holds this page readable.",
+  "text": "Our first food pantry was sparked by a fire at the community centre in 1998. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ },
+ {
+  "name": "a_domain_bound_to_no_site",
+  "why": "P2, a builder that has the name and no site under it. 32 rows, 32 sites, none wrong.",
+  "text": "This domain isn't connected to a site. Domain not claimed."
+ },
+ {
+  "name": "a_hosting_account_that_lapsed",
+  "why": "W6, a suspended or expired hosting account, under its gate.",
+  "text": "Account has been suspended. This account has expired and the website is no longer available."
+ },
+ {
+  "name": "a_gateway_status_on_a_short_page",
+  "why": "W3, the gateway and capacity statuses, which are the commonest thing a host answers with when it is the host and not the site that failed.",
+  "text": "Bad gateway. The service is unavailable. Too many requests."
+ },
+ {
+  "name": "a_service_status_word_inside_a_whole_page",
+  "why": "The other direction of W3. `the service is unavailable` on a substantial page is a sentence an organization wrote about its own service.",
+  "text": "The service is unavailable on public holidays and during the winter closure. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment. Volunteers staff the front desk from nine in the morning until five. "
+ }
+]

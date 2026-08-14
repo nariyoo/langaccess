@@ -1,0 +1,101 @@
+name: docs
+
+# The documentation site: the landing page, and the API reference generated from the docstrings.
+# The live check is not part of this. GitHub Pages serves static files and cannot start a browser,
+# so the page looks for an audit endpoint at build time and, finding none, explains how to run the
+# same check locally instead of pretending to offer one.
+#
+# PUBLISHING IS BEHIND A SWITCH, AND THE SWITCH IS CURRENTLY OFF. GitHub Pages is not enabled on
+# this repository, and `actions/deploy-pages` answers 404 to a repository with no
+# Pages site. Building the site is still worth doing on every push, because pdoc parses
+# every docstring in the package and a docstring that breaks it is a real defect, so `build` runs
+# unconditionally and only `deploy` is gated.
+#
+# TO PUBLISH. Two things, in this order. Turn Pages on at
+# https://github.com/nariyoo/langaccess/settings/pages with Source set to GitHub Actions. Then set
+# the repository variable PAGES_ENABLED to `true`, under Settings, Secrets and variables, Actions,
+# Variables, or with `gh variable set PAGES_ENABLED --body true`. The deploy job runs from the next
+# push. A repository has to be public for Pages unless the account carries a plan that serves a
+# private site.
+#
+# The variable is deliberately a second switch rather than a probe of whether Pages is on. Publishing
+# a documentation site is a decision, and it should be made by someone flipping something rather
+# than by a workflow noticing that a setting changed.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      api_base:
+        description: 'Base URL of a running langaccess-web service, if there is one'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the package and pdoc
+        run: |
+          python -m pip install --upgrade pip
+          pip install . pdoc
+
+      - name: Build the site
+        env:
+          API_BASE: ${{ github.event.inputs.api_base }}
+        run: |
+          mkdir -p _site
+          cp -r web/static/. _site/
+          python -m pdoc --output-directory _site/api-reference --no-show-source langaccess
+          # the page reads this at load; LIVE=false means the form explains itself instead of failing
+          if [ -n "$API_BASE" ]; then LIVE=true; else LIVE=false; fi
+          printf "window.LANGACCESS_API_BASE='%s';window.LANGACCESS_LIVE=%s;" "$API_BASE" "$LIVE"             > _site/config.js
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      # Why the run ends here, in the run's own summary, so that a green docs run with no site
+      # behind it does not read as a site that published.
+      - name: Say whether the site will be published
+        env:
+          PAGES_ENABLED: ${{ vars.PAGES_ENABLED }}
+        run: |
+          say() { echo "$1"; echo "$1" >> "$GITHUB_STEP_SUMMARY"; }
+          if [ "$PAGES_ENABLED" = "true" ]; then
+            say "PAGES_ENABLED is true, so the built site goes to GitHub Pages in the deploy job."
+          else
+            say "The site was built and not published. GitHub Pages is off for this repository and"
+            say "the repository variable PAGES_ENABLED is not set to true, so the deploy job is"
+            say "skipped. The built site is attached to this run as the github-pages artifact."
+            say "The comment at the top of .github/workflows/pages.yml says what to turn on when"
+            say "Pages is turned on."
+          fi
+
+  deploy:
+    needs: build
+    # Off until Pages is enabled on the repository. An unset variable is not 'true', so this job is
+    # skipped, and a skipped job does not fail the run. See the comment at the top of the file.
+    if: vars.PAGES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

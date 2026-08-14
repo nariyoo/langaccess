@@ -1,0 +1,79 @@
+name: test
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install langaccess and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
+
+      # No browser is installed here on purpose. The live tests are the only ones that open one and
+      # they are deselected by default, so downloading Chromium cost two to three minutes per cell
+      # and nothing used it.
+
+      - name: Run tests (unit tests only; live/browser tests are skipped by default)
+        run: pytest -v
+  # The editable install above resolves everything from the source tree, so a packaging
+  # regression (the model dropped from the wheel, a module left out, a broken entry point)
+  # passed every matrix cell green. This job exercises the artifact a user actually gets.
+  build-and-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check dist/*
+      - run: pip install dist/*.whl
+      - run: |
+          cd /tmp
+          langaccess --version
+          python - <<'PY'
+          import langaccess, os, inspect
+          pkg = os.path.dirname(inspect.getsourcefile(langaccess))
+          d = os.path.join(pkg, "data")
+          assert os.path.exists(os.path.join(d, "lid.176.ftz")), "the model is not in the wheel"
+          # the type marker: without it a consumer's type checker treats this package as untyped,
+          # so a wheel that drops it silently downgrades everyone who imports it
+          assert os.path.exists(os.path.join(pkg, "py.typed")), "py.typed is not in the wheel"
+          # the license travelled with the metadata, so a redistributor has the terms in hand
+          from importlib import metadata
+          md = metadata.metadata("langaccess")
+          assert md.get("License-Expression") or md.get("License"), "no license in the wheel metadata"
+          missing = [n for n in langaccess.__all__ if not hasattr(langaccess, n)]
+          assert not missing, missing
+          PY
+
+  # the declared floors are the versions every accuracy figure is bound to, and the matrix
+  # above resolves the newest; this one cell runs the suite on the floors themselves
+  floors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -e ".[test]" "playwright==1.60" "fasttext-predict==0.9.2.4"
+      - run: pytest -q
+

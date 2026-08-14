@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="416.376pt" height="110.88pt" viewBox="0 0 416.376 110.88" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-08-08T00:51:08.661685</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.6, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 110.88 
+L 416.376 110.88 
+L 416.376 0 
+L 0 0 
+L 0 110.88 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 74.448 60.192 
+L 74.448 95.04 
+L 39.6 95.04 
+z
+M 55.44 90.684 
+L 71.28 90.684 
+L 71.28 80.388 
+L 55.44 80.388 
+z
+" clip-path="url(#pca07ba556a)" style="fill: #6f82c8"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 11.088 95.04 
+L 74.448 95.04 
+L 74.448 15.84 
+L 11.088 15.84 
+L 11.088 95.04 
+z
+" clip-path="url(#pca07ba556a)" style="fill: none; stroke: #f2f3f5; stroke-width: 5.544; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 20.592 30.096 
+L 64.944 30.096 
+" clip-path="url(#pca07ba556a)" style="fill: none; stroke: #f2f3f5; stroke-width: 7.128"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 20.592 44.352 
+L 64.944 44.352 
+" clip-path="url(#pca07ba556a)" style="fill: none; stroke: #f2f3f5; stroke-width: 7.128"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 20.592 58.608 
+L 50.688 58.608 
+" clip-path="url(#pca07ba556a)" style="fill: none; stroke: #f2f3f5; stroke-width: 7.128"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 74.448 60.192 
+L 39.6 95.04 
+" clip-path="url(#pca07ba556a)" style="fill: none; stroke: #f2f3f5; stroke-width: 5.544"/>
+   </g>
+   <g id="text_1">
+    <!-- langaccess -->
+    <g style="fill: #f2f3f5" transform="translate(98.208 76.117) scale(0.62 -0.62)">
+     <defs>
+      <path id="FranklinGothic-Demi-6c" d="M 384 0 
+L 384 4266 
+L 1316 4266 
+L 1316 0 
+L 384 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="FranklinGothic-Demi-61" d="M 3141 0 
+L 2238 0 
+Q 2194 188 2194 494 
+Q 1956 156 1720 45 
+Q 1484 -66 1184 -66 
+Q 741 -66 467 175 
+Q 194 416 194 822 
+Q 194 1119 353 1369 
+Q 513 1619 866 1761 
+Q 1219 1903 2153 1972 
+L 2153 2153 
+Q 2153 2613 1694 2613 
+Q 1203 2613 1147 2153 
+L 288 2234 
+Q 372 2772 797 2997 
+Q 1222 3222 1759 3222 
+Q 2081 3222 2365 3147 
+Q 2650 3072 2809 2922 
+Q 2969 2772 3025 2605 
+Q 3081 2438 3081 2022 
+L 3081 591 
+Q 3081 178 3141 0 
+z
+M 2153 1513 
+Q 1175 1416 1175 922 
+Q 1175 756 1278 636 
+Q 1381 516 1572 516 
+Q 1819 516 1986 720 
+Q 2153 925 2153 1225 
+L 2153 1513 
+z
+" transform="scale(0.015625)"/>
+      <path id="FranklinGothic-Demi-6e" d="M 3128 0 
+L 2197 0 
+L 2197 1772 
+Q 2197 2094 2172 2212 
+Q 2147 2331 2050 2414 
+Q 1953 2497 1806 2497 
+Q 1316 2497 1316 1772 
+L 1316 0 
+L 384 0 
+L 384 3156 
+L 1250 3156 
+L 1250 2622 
+Q 1466 3003 1675 3112 
+Q 1884 3222 2128 3222 
+Q 2578 3222 2853 2980 
+Q 3128 2738 3128 2028 
+L 3128 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="FranklinGothic-Demi-67" d="M 3538 3084 
+Q 3391 3116 3291 3116 
+Q 2981 3116 2928 2841 
+Q 3181 2575 3181 2241 
+Q 3181 1794 2807 1528 
+Q 2434 1263 1731 1263 
+Q 1481 1263 1244 1309 
+Q 1084 1216 1084 1069 
+Q 1084 906 1218 853 
+Q 1353 800 1866 775 
+Q 2594 738 2869 684 
+Q 3144 631 3331 428 
+Q 3519 225 3519 -78 
+Q 3519 -513 3117 -813 
+Q 2716 -1113 1694 -1113 
+Q 734 -1113 400 -905 
+Q 66 -697 66 -378 
+Q 66 44 606 191 
+Q 206 391 206 753 
+Q 206 1206 838 1459 
+Q 278 1691 278 2231 
+Q 278 2672 664 2947 
+Q 1050 3222 1731 3222 
+Q 2163 3222 2566 3084 
+Q 2594 3353 2723 3526 
+Q 2853 3700 3275 3700 
+Q 3413 3700 3538 3675 
+L 3538 3084 
+z
+M 1725 2719 
+Q 1484 2719 1348 2589 
+Q 1213 2459 1213 2247 
+Q 1213 1766 1728 1766 
+Q 1978 1766 2120 1906 
+Q 2263 2047 2263 2247 
+Q 2263 2434 2128 2576 
+Q 1994 2719 1725 2719 
+z
+M 1103 22 
+Q 1047 22 961 -53 
+Q 875 -128 875 -234 
+Q 875 -447 1147 -500 
+Q 1419 -553 1784 -553 
+Q 2263 -553 2455 -481 
+Q 2647 -409 2647 -250 
+Q 2647 -128 2486 -62 
+Q 2325 3 1628 3 
+L 1441 0 
+Q 1269 0 1209 9 
+Q 1144 22 1103 22 
+z
+" transform="scale(0.015625)"/>
+      <path id="FranklinGothic-Demi-63" d="M 3159 1184 
+Q 3106 625 2717 279 
+Q 2328 -66 1713 -66 
+Q 1044 -66 623 376 
+Q 203 819 203 1559 
+Q 203 2300 633 2761 
+Q 1063 3222 1781 3222 
+Q 2359 3222 2739 2875 
+Q 3119 2528 3159 2006 
+L 2291 1956 
+Q 2247 2525 1797 2525 
+Q 1244 2525 1244 1619 
+Q 1244 1016 1398 853 
+Q 1553 691 1775 691 
+Q 2206 691 2291 1238 
+L 3159 1184 
+z
+" transform="scale(0.015625)"/>
+      <path id="FranklinGothic-Demi-65" d="M 3219 1422 
+L 1188 1422 
+Q 1184 1338 1184 1275 
+Q 1184 938 1364 766 
+Q 1544 594 1794 594 
+Q 2259 594 2353 1091 
+L 3197 1028 
+Q 2844 -66 1763 -66 
+Q 1291 -66 961 123 
+Q 631 313 417 675 
+Q 203 1038 203 1544 
+Q 203 2297 633 2759 
+Q 1063 3222 1738 3222 
+Q 2347 3222 2783 2792 
+Q 3219 2363 3219 1422 
+z
+M 1184 1963 
+L 2306 1963 
+Q 2263 2613 1772 2613 
+Q 1247 2613 1184 1963 
+z
+" transform="scale(0.015625)"/>
+      <path id="FranklinGothic-Demi-73" d="M 2747 2394 
+L 2069 2213 
+Q 1950 2641 1453 2641 
+Q 984 2641 984 2356 
+Q 984 2244 1070 2176 
+Q 1156 2109 1519 2063 
+Q 2059 1991 2318 1897 
+Q 2578 1803 2729 1581 
+Q 2881 1359 2881 1034 
+Q 2881 547 2511 240 
+Q 2141 -66 1475 -66 
+Q 269 -66 34 869 
+L 819 984 
+Q 916 559 1519 559 
+Q 1750 559 1909 642 
+Q 2069 725 2069 866 
+Q 2069 1084 1716 1125 
+Q 759 1244 457 1492 
+Q 156 1741 156 2184 
+Q 156 2634 506 2928 
+Q 856 3222 1488 3222 
+Q 1988 3222 2288 3025 
+Q 2588 2828 2747 2394 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#FranklinGothic-Demi-6c"/>
+     <use xlink:href="#FranklinGothic-Demi-61" transform="translate(26.513672 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-6e" transform="translate(80.664062 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-67" transform="translate(135.546875 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-61" transform="translate(190.869141 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-63" transform="translate(245.019531 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-63" transform="translate(296.191406 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-65" transform="translate(347.363281 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-73" transform="translate(400.830078 0)"/>
+     <use xlink:href="#FranklinGothic-Demi-73" transform="translate(448.144531 0)"/>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pca07ba556a">
+   <rect x="0" y="0" width="416.376" height="110.88"/>
+  </clipPath>
+ </defs>
+</svg>

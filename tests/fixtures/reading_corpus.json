@@ -1,0 +1,783 @@
+[
+ {
+  "name": "english_only",
+  "pages": {
+   "https://en-only.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/services\">Services</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://en-only.example/services": [
+    "<html><body>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </body></html>",
+    "Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://en-only.example/",
+  "why": "The ordinary negative case. An English site with an interior page, nothing else on it, and no widget."
+ },
+ {
+  "name": "authored_spanish_page",
+  "pages": {
+   "https://authored.example/": [
+    "<html><head><title>Centro</title></head><body><a href=\"/servicios\">Servicios</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://authored.example/servicios": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://authored.example/servicios": "<html><body><p>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </p></body></html>"
+  },
+  "url": "https://authored.example/",
+  "why": "A whole interior page the organization wrote in Spanish behind an English home page. The page rung of the sufficiency ladder and the plainest true_multilingual there is."
+ },
+ {
+  "name": "bilingual_notice",
+  "pages": {
+   "https://notice.example/": [
+    "<html><body>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office.  Si necesita ayuda en otro idioma, puede llamar a nuestra oficina y nosotros podemos buscar un interprete para usted.</body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office.  Si necesita ayuda en otro idioma, puede llamar a nuestra oficina y nosotros podemos buscar un interprete para usted.",
+    200
+   ]
+  },
+  "plain": {
+   "https://notice.example/": "<html><body><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office.  Si necesita ayuda en otro idioma, puede llamar a nuestra oficina y nosotros podemos buscar un interprete para usted.</p></body></html>"
+  },
+  "url": "https://notice.example/",
+  "why": "One Spanish sentence inside an English page. Codebook rule 17 and the notice rung, which is where a class turns over."
+ },
+ {
+  "name": "google_widget_only",
+  "pages": {
+   "https://widget.example/": [
+    "<html><head><title>Center</title><script src=\"//translate.google.com/translate_a/element.js\"></script></head><body><div id=\"google_translate_element\"></div><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://widget.example/",
+  "why": "An English site carrying the Google Translate loader and no translated text anywhere. Codebook rule 4: a widget that never renders is still a widget."
+ },
+ {
+  "name": "widget_over_authored_page",
+  "pages": {
+   "https://both.example/": [
+    "<html><head><title>Centro</title><script src=\"//translate.google.com/translate_a/element.js\"></script></head><body><a href=\"/servicios\">Servicios</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://both.example/servicios": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://both.example/servicios": "<html><body><p>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </p></body></html>"
+  },
+  "url": "https://both.example/",
+  "why": "A widget on the home page and a whole page of the organization writing in Spanish behind it, confirmed in the server document. Authorship and machine_translation disagree here on purpose."
+ },
+ {
+  "name": "bot_wall",
+  "pages": {
+   "http://wall.example/": [
+    "<html><body>Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.</body></html>",
+    "Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.",
+    200
+   ],
+   "http://www.wall.example/": [
+    "<html><body>Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.</body></html>",
+    "Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.",
+    200
+   ],
+   "https://wall.example/": [
+    "<html><body>Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.</body></html>",
+    "Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.",
+    200
+   ],
+   "https://www.wall.example/": [
+    "<html><body>Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.</body></html>",
+    "Please verify you are a human. Complete the captcha below to continue. Access to this site is protected.",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://wall.example/",
+  "why": "A challenge screen served in place of the site, on every address variant. Unreachable and not english_only, which is the class boundary the codebook cares most about."
+ },
+ {
+  "name": "client_widget_output",
+  "pages": {
+   "https://rendered.example/": [
+    "<html><head><title>Center</title><script src=\"//translate.google.com/translate_a/element.js\"></script></head><body><a href=\"/es/servicios\">Servicios</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://rendered.example/es/servicios": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://rendered.example/es/servicios": "<html><body><p>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </p></body></html>"
+  },
+  "url": "https://rendered.example/",
+  "why": "Spanish in the rendered document of a locale address and English in the server document under a client-side widget. The one shape that produces client_widget authorship."
+ },
+ {
+  "name": "server_plugin_page",
+  "pages": {
+   "https://plugin.example/": [
+    "<html><head><title>Centro</title><link rel=\"stylesheet\" href=\"/wp-content/plugins/sitepress-multilingual-cms/x.css\"></head><body><a href=\"/es/servicios\">Servicios</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://plugin.example/es/servicios": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://plugin.example/es/servicios": "<html><head><link rel=\"stylesheet\" href=\"/wp-content/plugins/sitepress-multilingual-cms/x.css\"></head><body><p>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </p></body></html>"
+  },
+  "url": "https://plugin.example/",
+  "why": "A CMS translation plugin marker in the server document beside a whole page of Spanish. Codebook rule 8, and the server_plugin arm of the authorship axis."
+ },
+ {
+  "name": "directory_profile",
+  "pages": {
+   "https://www.guidestar.org/profile/12-3456789": [
+    "<html><body>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://www.guidestar.org/profile/12-3456789",
+  "why": "A third-party directory profile rather than the organization's own site. Codebook rule 5, answered before a browser is started."
+ },
+ {
+  "name": "locale_route_returns_english",
+  "pages": {
+   "https://route.example/": [
+    "<html><head><title>Center</title><script src=\"/wp-content/plugins/gtranslate/js/base.js\"></script></head><body><a href=\"/es/\">Espanol</a><a href=\"/services\">Services</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://route.example/es": [
+    "<html><body>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://route.example/services": [
+    "<html><body>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </body></html>",
+    "Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://route.example/",
+  "why": "A locale route the site advertises that returns the English page word for word, under a route-style widget. Codebook rule 6, the rule the switcher timing constants can suppress."
+ },
+ {
+  "name": "parked_domain",
+  "pages": {
+   "https://parked.example/": [
+    "<html><body>This domain is for sale. Buy this domain today. The domain parked free courtesy of the registrar.</body></html>",
+    "This domain is for sale. Buy this domain today. The domain parked free courtesy of the registrar.",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://parked.example/",
+  "why": "A registrar placeholder. Codebook rule 13, and the pattern that had to grow a word boundary so that `sparked by` stopped reading as parked."
+ },
+ {
+  "name": "japanese_pages",
+  "pages": {
+   "https://ja.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/jp\">Japanese</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://ja.example/jp": [
+    "<html><body>当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。</body></html>",
+    "当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。",
+    200
+   ]
+  },
+  "plain": {
+   "https://ja.example/jp": "<html><body><p>当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。当センターは日本語を母語とする家族のために、日本語学校と生活相談の窓口を運営しています。毎週土曜日に授業を行っており、新入生の登録を受け付けています。ご相談はいつでも受け付けておりますので、お気軽にお問い合わせください。</p></body></html>"
+  },
+  "url": "https://ja.example/",
+  "why": "A non-Latin script read through SCRIPTS, SCRIPT_RUN and SCRIPT_FUNC, and the kana test that separates Japanese from Chinese."
+ },
+ {
+  "name": "chinese_pages",
+  "pages": {
+   "https://zh.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/cn\">Chinese</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://zh.example/cn": [
+    "<html><body>本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。</body></html>",
+    "本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。",
+    200
+   ]
+  },
+  "plain": {
+   "https://zh.example/cn": "<html><body><p>本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。本中心为新移民家庭提供免费的法律咨询和翻译服务，我们的工作人员可以帮助您填写各种表格。如果您需要预约，请打电话给我们的办公室，我们会安排时间与您见面。我们每个星期都会举办社区讲座，欢迎大家参加。</p></body></html>"
+  },
+  "url": "https://zh.example/",
+  "why": "The other side of the kana test. Han characters with no kana are Chinese."
+ },
+ {
+  "name": "ukrainian_pages",
+  "pages": {
+   "https://uk.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/ua\">Ukrainian</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://uk.example/ua": [
+    "<html><body>Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.</body></html>",
+    "Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.",
+    200
+   ]
+  },
+  "plain": {
+   "https://uk.example/ua": "<html><body><p>Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.Наша організація допомагає родинам іммігрантів з юридичними питаннями та перекладом. Ми проводимо безкоштовні консультації щотижня, і ви можете записатися на зустріч. Наші працівники говорять українською мовою і завжди готові допомогти вам.</p></body></html>"
+  },
+  "url": "https://uk.example/",
+  "why": "Cyrillic, which is one script and six languages, so CYR_FUNC is what decides the name."
+ },
+ {
+  "name": "unique_word_outside_the_window",
+  "pages": {
+   "https://window.example/": [
+    "<html><head><title>Centro</title></head><body><nav>Inicio Servicios Contacto</nav><p>The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. </p><p>El programa que ofrecemos para cada familia esta en el centro, y para todos los padres que llegan cada semana. Entre las familias que llegan cada mes, todos reciben una carta como esta, y cada carta esta escrita para que todos sepan como llegar al centro y como hablar con el equipo que trabaja para la ciudad.</p></body></html>",
+    "Inicio Servicios Contacto The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street.  El programa que ofrecemos para cada familia esta en el centro, y para todos los padres que llegan cada semana. Entre las familias que llegan cada mes, todos reciben una carta como esta, y cada carta esta escrita para que todos sepan como llegar al centro y como hablar con el equipo que trabaja para la ciudad.",
+    200
+   ]
+  },
+  "plain": {
+   "https://window.example/": "<html><body>Inicio Servicios Contacto The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street. The office is open on weekday mornings and closes at four in the afternoon. Parking is available behind the building and the entrance faces the street.  El programa que ofrecemos para cada familia esta en el centro, y para todos los padres que llegan cada semana. Entre las familias que llegan cada mes, todos reciben una carta como esta, y cada carta esta escrita para que todos sepan como llegar al centro y como hablar con el equipo que trabaja para la ciudad.</body></html>"
+  },
+  "url": "https://window.example/",
+  "why": "The fixture the constant gate cannot stand in for. The Spanish paragraph carries only words Spanish shares with Portuguese, so the reading rests entirely on the unique word `servicios`, which sits in the navigation far outside the window the four function words fired in. Scoping the unique-word test to that window moves no constant and loses this reading."
+ },
+ {
+  "name": "spanish_section",
+  "pages": {
+   "https://section.example/": [
+    "<html><head><title>Centro</title></head><body><a href=\"/servicios\">Servicios</a><a href=\"/recursos\">Recursos</a><a href=\"/citas\">Citas</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://section.example/citas": [
+    "<html><body>Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. </body></html>",
+    "Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. ",
+    200
+   ],
+   "https://section.example/recursos": [
+    "<html><body>Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. </body></html>",
+    "Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. ",
+    200
+   ],
+   "https://section.example/servicios": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://section.example/citas": "<html><body><p>Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. Puede hacer una cita con nosotros por telefono o en la oficina cada semana. Nuestros trabajadores hablan espanol y pueden ayudarle con sus preguntas sobre los servicios que ofrecemos para las familias de la comunidad. </p></body></html>",
+   "https://section.example/recursos": "<html><body><p>Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. Nuestros recursos para los padres estan disponibles cada semana en la oficina. Tenemos informacion sobre la escuela, la vivienda y el trabajo, y usted puede pedir una cita cuando lo necesite. Tambien ofrecemos ayuda con los formularios. </p></body></html>",
+   "https://section.example/servicios": "<html><body><p>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </p></body></html>"
+  },
+  "url": "https://section.example/",
+  "why": "Three interior pages in Spanish, which is the section rung and the top of the ladder."
+ },
+ {
+  "name": "social_page_for_a_website",
+  "pages": {
+   "https://www.facebook.com/somecenter": [
+    "<html><body>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://www.facebook.com/somecenter",
+  "why": "A social media page recorded as the organization's website. Codebook rule 11."
+ },
+ {
+  "name": "platform_locale_mirrors",
+  "pages": {
+   "https://mirrors.example/": [
+    "<html><head><title>Platform</title></head><body><a href=\"/es/\">Espanol</a><a href=\"/fr/\">Francais</a><a href=\"/de/\">Deutsch</a><a href=\"/it/\">Italiano</a><a href=\"/pt/\">Portugues</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://mirrors.example/de": [
+    "<html><body>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </body></html>",
+    "Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. ",
+    200
+   ],
+   "https://mirrors.example/es": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ],
+   "https://mirrors.example/fr": [
+    "<html><body>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </body></html>",
+    "Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. ",
+    200
+   ],
+   "https://mirrors.example/it": [
+    "<html><body>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </body></html>",
+    "Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. ",
+    200
+   ],
+   "https://mirrors.example/pt": [
+    "<html><body>Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. </body></html>",
+    "Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. Our services include immigration legal screening, interpretation at appointments, and a weekly class on tenant rights. Appointments are made by telephone. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://mirrors.example/es": "<html><body><p>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </p></body></html>"
+  },
+  "url": "https://mirrors.example/",
+  "why": "Five locale roots advertised at the front door with one of them carrying real Spanish. What separates a site with locale paths from a platform mirror. The count was three until 2026-08-10, when the threshold was measured on the validation capture and raised to five; the fixture demonstrates the rule and not the number."
+ },
+ {
+  "name": "archive_page_only",
+  "pages": {
+   "https://archive.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/past-events/fiesta\">Past events</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://archive.example/past-events/fiesta": [
+    "<html><body>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </body></html>",
+    "Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://archive.example/past-events/fiesta": "<html><body><p>Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita con nosotros. Nuestra oficina esta abierta cada semana y usted puede llamar cuando quiera. Tambien tenemos talleres para los padres y para los jovenes que estudian en la escuela de la ciudad. </p></body></html>"
+  },
+  "url": "https://archive.example/",
+  "why": "The only Spanish on the site is on an archive path, so the evidence is on the record and does not carry the reading. Codebook rule 18."
+ },
+ {
+  "name": "switcher_menu",
+  "pages": {
+   "https://switcher.example/": [
+    "<html><head><title>Center</title></head><body><select id=\"lang\"><option value=\"en\">English</option><option value=\"es\">Espanol</option><option value=\"vi\">Tieng Viet</option><option value=\"zh\">中文</option><option value=\"xx\">Chin (Hakha)</option></select><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://switcher.example/",
+  "why": "A language menu the site draws itself, including one label this package has no name for. It fills switcher_languages and switcher_unresolved and must move no verdict."
+ },
+ {
+  "dom": true,
+  "name": "skip_link_target_wrapper",
+  "pages": {
+   "https://skiptarget.example/": [
+    "<html><head><title>Riverside Welcome Center</title></head><body><a class=\"skip-link screen-reader-text\" href=\"#wp--skip-link--target\">Skip to content</a><nav><a href=\"/\">Home</a> <a href=\"/services\">Services</a> <a href=\"/contact\">Contact</a></nav><main id=\"wp--skip-link--target\"><p>The Riverside Welcome Center helps families who have just arrived in the county. Our staff meets with parents about school enrollment, with tenants about repairs their landlord has not made, and with workers about unpaid wages. Every appointment is free and nobody is asked about immigration status at the door.</p><p>El Centro de Bienvenida de Riverside ayuda a las familias que acaban de llegar al condado. Nuestro personal se reune con los padres sobre la inscripcion escolar, con los inquilinos sobre las reparaciones que el propietario no ha hecho, y con los trabajadores sobre los salarios que no les han pagado. Cada cita es gratuita y en la puerta nadie pregunta por el estado migratorio de nadie.</p></main><footer><p>Riverside Welcome Center, 12 Mill Street.</p></footer></body></html>",
+    "Skip to content\nHome Services Contact\nThe Riverside Welcome Center helps families who have just arrived in the county. Our staff meets with parents about school enrollment, with tenants about repairs their landlord has not made, and with workers about unpaid wages. Every appointment is free and nobody is asked about immigration status at the door.\nEl Centro de Bienvenida de Riverside ayuda a las familias que acaban de llegar al condado. Nuestro personal se reune con los padres sobre la inscripcion escolar, con los inquilinos sobre las reparaciones que el propietario no ha hecho, y con los trabajadores sobre los salarios que no les han pagado. Cada cita es gratuita y en la puerta nadie pregunta por el estado migratorio de nadie.\nRiverside Welcome Center, 12 Mill Street.",
+    200
+   ]
+  },
+  "plain": {
+   "https://skiptarget.example": "<html><head><title>Riverside Welcome Center</title></head><body><a class=\"skip-link screen-reader-text\" href=\"#wp--skip-link--target\">Skip to content</a><nav><a href=\"/\">Home</a> <a href=\"/services\">Services</a> <a href=\"/contact\">Contact</a></nav><main id=\"wp--skip-link--target\"><p>The Riverside Welcome Center helps families who have just arrived in the county. Our staff meets with parents about school enrollment, with tenants about repairs their landlord has not made, and with workers about unpaid wages. Every appointment is free and nobody is asked about immigration status at the door.</p><p>El Centro de Bienvenida de Riverside ayuda a las familias que acaban de llegar al condado. Nuestro personal se reune con los padres sobre la inscripcion escolar, con los inquilinos sobre las reparaciones que el propietario no ha hecho, y con los trabajadores sobre los salarios que no les han pagado. Cada cita es gratuita y en la puerta nadie pregunta por el estado migratorio de nadie.</p></main><footer><p>Riverside Welcome Center, 12 Mill Street.</p></footer></body></html>"
+  },
+  "url": "https://skiptarget.example/",
+  "why": "A document wrapped in the element a WordPress block theme gives its skip link as a target, id=\"wp--skip-link--target\" on the <main> that holds the whole page. This is the one fixture read through a browser that answers the chrome-removal script, so _main_text decides what is read here instead of declining to answer. A skip selector written without the leading a matches the wrapper, hides the entire document and reads the site as having no language at all, English included."
+ },
+ {
+  "name": "persian_mission_page",
+  "pages": {
+   "https://persian.example/": [
+    "<html><head><title>Persian Cultural Association</title></head><body><p>The Persian Cultural Association keeps a library, runs a Saturday language school for children, and holds a Nowruz gathering every spring. The office is open on weekday afternoons and anybody in the county is welcome to come in and ask a question.</p><p><a href=\"/fa\">فارسی</a></p></body></html>",
+    "The Persian Cultural Association keeps a library, runs a Saturday language school for children, and holds a Nowruz gathering every spring. The office is open on weekday afternoons and anybody in the county is welcome to come in and ask a question.\nفارسی",
+    200
+   ],
+   "https://persian.example/fa": [
+    "<html><head><title>انجمن فرهنگی</title></head><body><p>انجمن فرهنگی ایرانیان یک سازمان غیرانتفاعی و غیرسیاسی است که به نگهداری و گسترش میراث فرهنگی ما اختصاص دارد. ما هر شنبه کلاس زبان فارسی برای کودکان برگزار می کنیم و کتابخانه ما هر روز بعد از ظهر باز است. هدف ما این است که مردم با پیشینه های گوناگون را از راه موسیقی، هنر و ادبیات ایرانی به یکدیگر نزدیک کنیم.</p></body></html>",
+    "انجمن فرهنگی ایرانیان یک سازمان غیرانتفاعی و غیرسیاسی است که به نگهداری و گسترش میراث فرهنگی ما اختصاص دارد. ما هر شنبه کلاس زبان فارسی برای کودکان برگزار می کنیم و کتابخانه ما هر روز بعد از ظهر باز است. هدف ما این است که مردم با پیشینه های گوناگون را از راه موسیقی، هنر و ادبیات ایرانی به یکدیگر نزدیک کنیم.",
+    200
+   ]
+  },
+  "plain": {
+   "https://persian.example/fa": "<html><head><title>انجمن فرهنگی</title></head><body><p>انجمن فرهنگی ایرانیان یک سازمان غیرانتفاعی و غیرسیاسی است که به نگهداری و گسترش میراث فرهنگی ما اختصاص دارد. ما هر شنبه کلاس زبان فارسی برای کودکان برگزار می کنیم و کتابخانه ما هر روز بعد از ظهر باز است. هدف ما این است که مردم با پیشینه های گوناگون را از راه موسیقی، هنر و ادبیات ایرانی به یکدیگر نزدیک کنیم.</p></body></html>"
+  },
+  "url": "https://persian.example/",
+  "why": "Persian prose in the Arabic script, on the locale page an Iranian cultural association publishes its mission at. Two of the Arabic function words the script test holds, ما and من, are ordinary Persian words, so the script test fires on Persian and what it then names is the reading. No Arabic-script language was in this corpus before."
+ },
+ {
+  "name": "urdu_arabic_full_stop",
+  "pages": {
+   "https://urdu.example/": [
+    "<html><head><title>International Refugee Relief Center</title></head><body><p>The International Refugee Relief Center resettles newly arrived families, enrolls their children in school, and runs a weekly clinic on tenant rights. Volunteers meet new arrivals every week and walk them through the paperwork in their own language.</p><p><a href=\"/ur\">اردو</a></p></body></html>",
+    "The International Refugee Relief Center resettles newly arrived families, enrolls their children in school, and runs a weekly clinic on tenant rights. Volunteers meet new arrivals every week and walk them through the paperwork in their own language.\nاردو",
+    200
+   ],
+   "https://urdu.example/ur": [
+    "<html><head><title>انٹرنیشنل</title></head><body><p>یہاں انٹرنیشنل ریفیوجی ریلیف سینٹر میں، ہم جانتے ہیں کہ بعض اوقات دنیا کو بدلنے کے لیے صرف ایک چھوٹی سی مدد کی ضرورت ہوتی ہے اور اسی یقین کے ساتھ ہم ہر روز کام کرتے ہیں۔ ہم ایک غیر منفعتی تنظیم ہیں جو پناہ گزینوں کو امریکہ میں آباد ہونے میں مدد دیتی ہے اور ان کے خاندانوں کے لیے تعلیم، رہائش اور صحت کی خدمات تک رسائی فراہم کرتی ہے۔ ہمارے رضاکار ہر ہفتے نئے آنے والوں سے ملتے ہیں اور ان کی اپنی زبان میں ان کی رہنمائی کرتے ہیں تاکہ وہ اپنے حقوق اور دستیاب خدمات کو بہتر طور پر سمجھ سکیں۔</p></body></html>",
+    "یہاں انٹرنیشنل ریفیوجی ریلیف سینٹر میں، ہم جانتے ہیں کہ بعض اوقات دنیا کو بدلنے کے لیے صرف ایک چھوٹی سی مدد کی ضرورت ہوتی ہے اور اسی یقین کے ساتھ ہم ہر روز کام کرتے ہیں۔ ہم ایک غیر منفعتی تنظیم ہیں جو پناہ گزینوں کو امریکہ میں آباد ہونے میں مدد دیتی ہے اور ان کے خاندانوں کے لیے تعلیم، رہائش اور صحت کی خدمات تک رسائی فراہم کرتی ہے۔ ہمارے رضاکار ہر ہفتے نئے آنے والوں سے ملتے ہیں اور ان کی اپنی زبان میں ان کی رہنمائی کرتے ہیں تاکہ وہ اپنے حقوق اور دستیاب خدمات کو بہتر طور پر سمجھ سکیں۔",
+    200
+   ]
+  },
+  "plain": {
+   "https://urdu.example/ur": "<html><head><title>انٹرنیشنل</title></head><body><p>یہاں انٹرنیشنل ریفیوجی ریلیف سینٹر میں، ہم جانتے ہیں کہ بعض اوقات دنیا کو بدلنے کے لیے صرف ایک چھوٹی سی مدد کی ضرورت ہوتی ہے اور اسی یقین کے ساتھ ہم ہر روز کام کرتے ہیں۔ ہم ایک غیر منفعتی تنظیم ہیں جو پناہ گزینوں کو امریکہ میں آباد ہونے میں مدد دیتی ہے اور ان کے خاندانوں کے لیے تعلیم، رہائش اور صحت کی خدمات تک رسائی فراہم کرتی ہے۔ ہمارے رضاکار ہر ہفتے نئے آنے والوں سے ملتے ہیں اور ان کی اپنی زبان میں ان کی رہنمائی کرتے ہیں تاکہ وہ اپنے حقوق اور دستیاب خدمات کو بہتر طور پر سمجھ سکیں۔</p></body></html>"
+  },
+  "url": "https://urdu.example/",
+  "why": "An Urdu page whose only sentence terminator is U+06D4, the Arabic full stop, which is the whole of Urdu sentence punctuation. The auxiliary reader asks for two blocks and split them on Latin punctuation alone, so a page carrying no full stop was one block however long it was and a language that fills the page could never be claimed."
+ },
+ {
+  "name": "unterminated_style_block",
+  "pages": {
+   "https://stylesheet.example/": [
+    "<html><body>403 Forbidden</body></html>",
+    "403 Forbidden",
+    403
+   ]
+  },
+  "plain": {
+   "https://stylesheet.example": "<html><head><title>Maple Ridge High School</title></head><body><p>Maple Ridge High School enrolls students from the whole township and keeps a family resource room beside the main office. The counselling staff meets parents about course selection, attendance and graduation requirements, and the room is open on the first Tuesday of every month for anybody who wants to come in without an appointment. Athletic schedules, lunch menus and the school calendar are posted in the same room and on this page every week of the year.</p><style>@charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} @charset \"UTF-8\"; @import url(\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700\"); .site-header{-webkit-transition:all .3s ease-in-out;color:#222;font-weight:700} .site-footer a:hover{text-decoration:underline;color:#0b5f3a} .masthead{-moz-box-shadow:none;-webkit-box-shadow:none;overflow:hidden} @media screen and (max-width:782px){.masthead{min-height:48px}} <footer><p>El personal de orientacion se reune con los padres sobre la eleccion de cursos, la asistencia y los requisitos para graduarse. La sala de recursos para las familias esta abierta el primer martes de cada mes y no hace falta pedir una cita para entrar. Los horarios deportivos, los menus del comedor y el calendario escolar se publican en la misma sala y en esta pagina todas las semanas del año.</p></footer></body></html>"
+  },
+  "url": "https://stylesheet.example/",
+  "why": "A document whose <style> element is never closed, so a browser reads the rest of the file as stylesheet and shows nothing after it. The browser is refused here with a short 403 and the plain HTTP fetch is the only reading the site has, which is where the extractor decides what the document says. The Spanish footer sits after the unterminated element, so no visitor can read it and a reading that reports it is reporting stylesheet."
+ },
+ {
+  "name": "locale_tree_wider_than_the_slice",
+  "url": "https://tree.example/",
+  "why": "A site that publishes twenty Spanish addresses under /es and keeps its only Spanish on the twentieth. `_interior` keeps INTERIOR_LIMIT links of the /es page, so four of the twenty never reached the queue, and a queue is all escalation could reorder: the site read english_only with unread_locale_links of zero, which reads as a tree that was followed to its end. Measured on two stored captures, 46.8 and 52.0 per cent of the declared locale addresses a crawl finds and does not read are cut this way.",
+  "plain": {},
+  "pages": {
+   "https://tree.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/es\">Espanol</a><a href=\"/about\">about</a><a href=\"/contact\">contact</a><a href=\"/events\">events</a><a href=\"/board\">board</a><a href=\"/employment\">employment</a><a href=\"/donate\">donate</a><a href=\"/membership\">membership</a><a href=\"/volunteer\">volunteer</a><a href=\"/programs\">programs</a><a href=\"/classes\">classes</a><a href=\"/housing\">housing</a><a href=\"/legal\">legal</a><a href=\"/health\">health</a><a href=\"/news\">news</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office and there is no charge for an appointment. ",
+    200
+   ],
+   "https://tree.example/es": [
+    "<html><body><a href=\"/es/pagina00\">pagina00</a><a href=\"/es/pagina01\">pagina01</a><a href=\"/es/pagina02\">pagina02</a><a href=\"/es/pagina03\">pagina03</a><a href=\"/es/pagina04\">pagina04</a><a href=\"/es/pagina05\">pagina05</a><a href=\"/es/pagina06\">pagina06</a><a href=\"/es/pagina07\">pagina07</a><a href=\"/es/pagina08\">pagina08</a><a href=\"/es/pagina09\">pagina09</a><a href=\"/es/pagina10\">pagina10</a><a href=\"/es/pagina11\">pagina11</a><a href=\"/es/pagina12\">pagina12</a><a href=\"/es/pagina13\">pagina13</a><a href=\"/es/pagina14\">pagina14</a><a href=\"/es/pagina15\">pagina15</a><a href=\"/es/pagina16\">pagina16</a><a href=\"/es/pagina17\">pagina17</a><a href=\"/es/pagina18\">pagina18</a><a href=\"/es/voluntarios\">voluntarios</a><p>Centro</p></body></html>",
+    "Centro",
+    200
+   ],
+   "https://tree.example/about": [
+    "<html><body>The about page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The about page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/contact": [
+    "<html><body>The contact page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The contact page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/events": [
+    "<html><body>The events page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The events page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/board": [
+    "<html><body>The board page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The board page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/employment": [
+    "<html><body>The employment page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The employment page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/donate": [
+    "<html><body>The donate page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The donate page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/membership": [
+    "<html><body>The membership page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The membership page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/volunteer": [
+    "<html><body>The volunteer page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The volunteer page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/programs": [
+    "<html><body>The programs page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The programs page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/classes": [
+    "<html><body>The classes page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The classes page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/housing": [
+    "<html><body>The housing page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The housing page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/legal": [
+    "<html><body>The legal page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The legal page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/health": [
+    "<html><body>The health page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The health page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/news": [
+    "<html><body>The news page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.</body></html>",
+    "The news page of the center, with an address, a telephone number and the hours the office is open to visitors during the week.",
+    200
+   ],
+   "https://tree.example/es/pagina00": [
+    "<html><body>The pagina00 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina00 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina01": [
+    "<html><body>The pagina01 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina01 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina02": [
+    "<html><body>The pagina02 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina02 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina03": [
+    "<html><body>The pagina03 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina03 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina04": [
+    "<html><body>The pagina04 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina04 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina05": [
+    "<html><body>The pagina05 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina05 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina06": [
+    "<html><body>The pagina06 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina06 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina07": [
+    "<html><body>The pagina07 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina07 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina08": [
+    "<html><body>The pagina08 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina08 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina09": [
+    "<html><body>The pagina09 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina09 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina10": [
+    "<html><body>The pagina10 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina10 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina11": [
+    "<html><body>The pagina11 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina11 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina12": [
+    "<html><body>The pagina12 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina12 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina13": [
+    "<html><body>The pagina13 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina13 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina14": [
+    "<html><body>The pagina14 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina14 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina15": [
+    "<html><body>The pagina15 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina15 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina16": [
+    "<html><body>The pagina16 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina16 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina17": [
+    "<html><body>The pagina17 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina17 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/pagina18": [
+    "<html><body>The pagina18 page of the center, which has not been written yet and carries only a heading and a link back to the front door.</body></html>",
+    "The pagina18 page of the center, which has not been written yet and carries only a heading and a link back to the front door.",
+    200
+   ],
+   "https://tree.example/es/voluntarios": [
+    "<html><body>El centro ofrece asesoria legal, ayuda con la vivienda y clases para adultos que han llegado recientemente al condado. Nuestro personal esta disponible por telefono durante el horario de oficina y atendemos a cualquier persona que necesite ayuda con una solicitud o una referencia para otros servicios de la comunidad. Tambien acompanamos a las familias que buscan escuela para sus hijos.</body></html>",
+    "El centro ofrece asesoria legal, ayuda con la vivienda y clases para adultos que han llegado recientemente al condado. Nuestro personal esta disponible por telefono durante el horario de oficina y atendemos a cualquier persona que necesite ayuda con una solicitud o una referencia para otros servicios de la comunidad. Tambien acompanamos a las familias que buscan escuela para sus hijos.",
+    200
+   ]
+  }
+ },
+ {
+  "name": "own_target_translate_link",
+  "pages": {
+   "https://ownlink.example/": [
+    "<html><head><title>Center</title></head><body><p><strong>Translate this site:</strong> <a href=\"https://translate.google.com/translate?hl=en&amp;sl=en&amp;tl=es&amp;u=https://ownlink.example/\">Espanol</a></p><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://ownlink.example/",
+  "why": "A Google Translate hyperlink whose u= target is this site's own address, and no other translation machinery anywhere. Named off the ADDRESS and not off a byte pattern, so the reading depends on the site's own URL reaching widget_name; a change that stops passing it turns this site back into english_only. Codebook rule 4, by the half of it MT_ADDRESS_NAME carries."
+ },
+ {
+  "name": "unnamed_translate_control",
+  "pages": {
+   "https://unnamedcontrol.example/": [
+    "<html><head><title>Center</title></head><body><button id=\"t\" type=\"button\">Translate</button><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://unnamedcontrol.example/",
+  "why": "A control whose whole label is the word Translate, with no vendor marker and no non-English text anywhere. The authorship axis has to read unknown_widget and the verdict has to stay exactly where it was, which is the whole of what that value promises: it hands the site to a person and moves no class."
+ },
+ {
+  "name": "offsite_alternate_only",
+  "url": "https://lapsed.example/",
+  "why": "The declaration that names a language for somebody else. An address whose only `hreflang` alternate points at another registered domain used to be read for its LANGUAGE while its address was dropped as off-site, so the site was recorded as offering a language it does not publish. One county is the case: its own domain has lapsed and now answers with a Turkish gambling page whose one alternate is `hreflang=\"tr\" href=\"https://tr.gambling-mirror11.example/\"`, and the county read as declaring Turkish with no root at all. No fixture in this corpus carried an `hreflang` alternate of any kind before 2026-08-05, so the change was invisible to this gate until this page and the one below were written.",
+  "plain": {},
+  "pages": {
+   "https://lapsed.example/": [
+    "<html><head><title>Center</title><link rel=\"alternate\" hreflang=\"tr\" href=\"https://tr.betting.example/\"/><link rel=\"alternate\" hreflang=\"x-default\" href=\"https://tr.betting.example/\"/></head><body><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ]
+  }
+ },
+ {
+  "name": "onsite_alternate_declares",
+  "url": "https://declares.example/",
+  "why": "The other half of the same rule, so that a refusal cannot quietly widen into every alternate. This site declares its Spanish at an address on its own domain, the declaration names Spanish in `switcher_languages`, and the crawl reads the page it points at. A change that refused an alternate without asking whose site it is on would move this fixture and not the one above.",
+  "plain": {},
+  "pages": {
+   "https://declares.example/": [
+    "<html><head><title>Center</title><link rel=\"alternate\" hreflang=\"es\" href=\"https://declares.example/es/\"/><link rel=\"alternate\" hreflang=\"en\" href=\"https://declares.example/\"/></head><body><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://declares.example/es/": [
+    "<html><head><title>Center</title></head><body><p>Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. </p></body></html>",
+    "Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina. ",
+    200
+   ]
+  }
+ },
+ {
+  "name": "attribute_greater_than_over_the_floor",
+  "url": "https://casabuena.example/",
+  "pages": {
+   "https://casabuena.example/": [
+    "<html><body>403 Forbidden</body></html>",
+    "403 Forbidden",
+    403
+   ]
+  },
+  "plain": {
+   "https://casabuena.example": "<html><head><title>Casa Buena</title></head><body><section data-section-id=\"100\" data-current-styles=\"{&quot;imageFocalPoint&quot;:{&quot;x&quot;:0.5,&quot;y&quot;:0.5},&quot;backgroundColor&quot;:&quot;white&quot;,&quot;sectionTheme&quot;:&quot;white&quot;,&quot;imageEffect&quot;:&quot;none&quot;,&quot;selector&quot;:&quot;.section-background > img&quot;}\" data-controller=\"SectionWrapperController\" class=\"page-section full-bleed-section\"><p>Casa Buena. Oficina abierta de lunes a viernes.</p></section><section data-section-id=\"101\" data-current-styles=\"{&quot;imageFocalPoint&quot;:{&quot;x&quot;:0.5,&quot;y&quot;:0.5},&quot;backgroundColor&quot;:&quot;white&quot;,&quot;sectionTheme&quot;:&quot;white&quot;,&quot;imageEffect&quot;:&quot;none&quot;,&quot;selector&quot;:&quot;.section-background > img&quot;}\" data-controller=\"SectionWrapperController\" class=\"page-section full-bleed-section\"><p>Horario: 9 a 17.</p></section><section data-section-id=\"102\" data-current-styles=\"{&quot;imageFocalPoint&quot;:{&quot;x&quot;:0.5,&quot;y&quot;:0.5},&quot;backgroundColor&quot;:&quot;white&quot;,&quot;sectionTheme&quot;:&quot;white&quot;,&quot;imageEffect&quot;:&quot;none&quot;,&quot;selector&quot;:&quot;.section-background > img&quot;}\" data-controller=\"SectionWrapperController\" class=\"page-section full-bleed-section\"><p>Telefono en la puerta.</p></section><section data-section-id=\"103\" data-current-styles=\"{&quot;imageFocalPoint&quot;:{&quot;x&quot;:0.5,&quot;y&quot;:0.5},&quot;backgroundColor&quot;:&quot;white&quot;,&quot;sectionTheme&quot;:&quot;white&quot;,&quot;imageEffect&quot;:&quot;none&quot;,&quot;selector&quot;:&quot;.section-background > img&quot;}\" data-controller=\"SectionWrapperController\" class=\"page-section full-bleed-section\"><p>Direccion en el mapa.</p></section></body></html>"
+  },
+  "why": "A served document whose section wrappers carry a CSS selector with a child combinator in an attribute, which is what Squarespace writes and what fired on 50 of 1,365 live sites. The prose on the page is 120 characters and the leaked markup was 364 more, so the leak alone carried the document over PLAIN_FETCH_MIN_TEXT and the rescue reported a reading of a page it had not read. Nothing else in the corpus holds a literal greater-than sign inside an attribute value."
+ },
+ {
+  "name": "attribute_greater_than_in_the_prose",
+  "url": "https://casabuena2.example/",
+  "pages": {
+   "https://casabuena2.example/": [
+    "<html><body>403 Forbidden</body></html>",
+    "403 Forbidden",
+    403
+   ]
+  },
+  "plain": {
+   "https://casabuena2.example": "<html><head><title>Casa Buena</title></head><body><section data-section-id=\"100\" data-current-styles=\"{&quot;imageFocalPoint&quot;:{&quot;x&quot;:0.5,&quot;y&quot;:0.5},&quot;backgroundColor&quot;:&quot;white&quot;,&quot;sectionTheme&quot;:&quot;white&quot;,&quot;imageEffect&quot;:&quot;none&quot;,&quot;selector&quot;:&quot;.section-background > img&quot;}\" data-controller=\"SectionWrapperController\" class=\"page-section full-bleed-section\"><p>Casa Buena walks with newly arrived families in the county. Our staff explains how to ask for a clinic appointment, how to enroll children in school and which papers to bring to the housing office. There is a tenant rights class on Thursday afternoons and a free lawyer consultation on the first Monday of every month.</p></section><section data-section-id=\"101\" data-current-styles=\"{&quot;imageFocalPoint&quot;:{&quot;x&quot;:0.5,&quot;y&quot;:0.5},&quot;backgroundColor&quot;:&quot;white&quot;,&quot;sectionTheme&quot;:&quot;white&quot;,&quot;imageEffect&quot;:&quot;none&quot;,&quot;selector&quot;:&quot;.section-background > img&quot;}\" data-controller=\"SectionWrapperController\" class=\"page-section full-bleed-section\"><p>Casa Buena acompana a las familias recien llegadas del condado. Nuestro equipo explica como pedir una cita en la clinica, como inscribir a los ninos en la escuela y que documentos hay que llevar a la oficina de vivienda. Tambien hay una clase de derechos del inquilino los jueves por la tarde y una consulta gratuita con un abogado el primer lunes de cada mes.</p></section></body></html>"
+  },
+  "why": "The same leak on a page with real prose on it, which is the commoner half and the one no length floor sees. The Spanish is a whole page of Spanish, and the leaked markup is English-looking attribute text that dilutes it: `language_coverage` falls under PAGE_COVERAGE and the rung drops from a page to a notice. The verdict does not move, which is why a gate over classes alone would not have caught this."
+ },
+ {
+  "name": "granicus_lang_update",
+  "pages": {
+   "https://granicus-city.example/": [
+    "<html><head><title>City</title><script src=\"//translate.google.com/translate_a/element.js\"></script></head><body><div id=\"google_translate_element\"></div><a href=\"/home?lang_update=639212242815969751\">Espanol</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Espanol Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://granicus-city.example/home?lang_update=639212242815969751": [
+    "<html><head><title>Ciudad</title></head><body><p>Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. </p></body></html>",
+    "Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. ",
+    200
+   ]
+  },
+  "plain": {
+   "https://granicus-city.example/": "<html><head><title>City</title><script src=\"//translate.google.com/translate_a/element.js\"></script></head><body><div id=\"google_translate_element\"></div><a href=\"/home?lang_update=639212242815969751\">Espanol</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+   "https://granicus-city.example/home?lang_update=639212242815969751": "<html><head><title>Ciudad</title></head><body><p>Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana. Nuestro personal puede reunirse con usted en la oficina para revisar su caso y explicar cada paso del proceso. </p></body></html>"
+  },
+  "url": "https://granicus-city.example/",
+  "why": "The Granicus shape: a Google Translate widget whose output is rendered on the server and served at ?lang_update=<ticks>, so the Spanish IS in the plain fetch. Server-side delivery of a translation system's output is not authorship, and the route outranks the confirmation. Before 2026-08-06 this read true_multilingual with Spanish credited authored; three city sites were the measured cases."
+ },
+ {
+  "name": "swahili_word_gate",
+  "pages": {
+   "https://swahili-services.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/huduma\">Huduma kwa Kiswahili</a><p>Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. </p></body></html>",
+    "Huduma kwa Kiswahili Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. Welcome to our community center. We help families with legal questions, housing and school enrollment every day of the week. Our staff can meet with you at the office. ",
+    200
+   ],
+   "https://swahili-services.example/huduma": [
+    "<html><head><title>Huduma</title></head><body><p>Shirika letu la jamii linatoa msaada wa sheria na makazi kwa familia zote katika mji wetu kila wiki bila malipo yoyote na wafanyakazi wetu wanazungumza lugha yako.</p><p>Tafadhali wasiliana nasi kwa simu au barua pepe ili kupanga miadi na mshauri wetu kuhusu huduma za makazi elimu na afya kwa wakazi wote wapya katika eneo letu.</p></body></html>",
+    "Shirika letu la jamii linatoa msaada wa sheria na makazi kwa familia zote katika mji wetu kila wiki bila malipo yoyote na wafanyakazi wetu wanazungumza lugha yako. Tafadhali wasiliana nasi kwa simu au barua pepe ili kupanga miadi na mshauri wetu kuhusu huduma za makazi elimu na afya kwa wakazi wote wapya katika eneo letu.",
+    200
+   ]
+  },
+  "plain": {},
+  "url": "https://swahili-services.example/",
+  "why": "Real Swahili prose on an ordinary address with no widget anywhere. Swahili is langid's to find and plain ASCII, so the 2026-08-06 word gate is the only thing between it and silence: the blocks carry kwa, katika, kila, bila, wetu and kuhusu, clear the two-distinct-items bar with room, and the reading survives. The gate's negative side is unit-tested on _script_allows, where langid's n-gram caprice is not in the loop."
+ }
+]

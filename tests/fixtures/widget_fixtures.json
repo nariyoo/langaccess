@@ -1,0 +1,792 @@
+[
+ {
+  "id": "google_element_consent_gate",
+  "case": "wf-01",
+  "why": "The Google element loader is in the SERVER document and no goog-te node exists in the rendered document either, so the widget never drew a control. Rule 4: a widget that never appears is still a widget. The Haitian Creole on this site is in the server response, so rule 3 and rule 16 decide the class, not the widget.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://wf-01.example/",
+    "matched_bytes": "translate.google.com/translate_a/element",
+    "context": "tTbqSn3EbBBVI6PLixdjn/Gn2F+e6XFr2rq5NnV7Hz+RE4OS'></script>\n<script id=\"google-translate-js\" src=\"//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit&#038;ver=16.1-a.2\"></script>\n<script crossorigin='anonymous' type="
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://wf-01.example/2021/06/05/we_remember/",
+    "matched_bytes": "translate.google.com/translate_a/element",
+    "context": "qVan2mUKPmKxjE4voBEuS8yPfH9ud+vdZrtZrfsjeNCdwg=='></script>\n<script id=\"google-translate-js\" src=\"//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit&#038;ver=16.1-a.2\"></script>\n<script id=\"sharing-js-js-extra\">\nvar"
+   }
+  ],
+  "languages": {
+   "server:home": [
+    "Haitian Creole"
+   ],
+   "rendered:render": []
+  },
+  "url": "wf-01"
+ },
+ {
+  "id": "google_loader_only_no_runtime",
+  "case": "wf-02",
+  "why": "Loader in the server document, no runtime node in the rendered document, no non-English text: machine_translate under rule 4. MT_NAME must name it from the loader alone.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-02.example/",
+    "matched_bytes": "translate.google.com/translate_a/element",
+    "context": "('script');\n                        iwt_translate_script.src =\n                            'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2';\n                        document.body.appendChild(iwt_translate"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-02.example/about-us/",
+    "matched_bytes": "translate.google.com/translate_a/element",
+    "context": "('script');\n                        iwt_translate_script.src =\n                            'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2';\n                        document.body.appendChild(iwt_translate"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-02.example/",
+    "matched_bytes": "translate.google.com/translate_a/element",
+    "context": "('script');\n                        iwt_translate_script.src =\n                            'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2';\n                        document.body.appendChild(iwt_translate"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://www.wf-02.example/",
+    "matched_bytes": "translate.google.com/translate_a/element",
+    "context": "('script');\n                        iwt_translate_script.src =\n                            'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2';\n                        document.body.appendChild(iwt_translate"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-02"
+ },
+ {
+  "id": "google_runtime_render_only",
+  "case": "wf-03",
+  "why": "The Google runtime script and the skiptranslate class exist only in the rendered document. Nothing here may be read as the organization's own writing.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-03.example/",
+    "matched_bytes": "translate.googleapis.com/_/translate_http",
+    "context": "1RvRdG4PDmq889IXXRnXixFQ/m=el_main_css\"><script type=\"text/javascript\" charset=\"UTF-8\" src=\"https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.Qm6zfyAGhvw.O/am=BIAABw/d=1/exm=el_conf/ed=1/rs=AN8SPfolnSA1iF5EK06x"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://www.wf-03.example/",
+    "matched_bytes": "translate.googleapis.com/_/translate_http",
+    "context": "vXbFD2WhpIdS-DPbQSwnZZjQ/m=el_main_css\"><script type=\"text/javascript\" charset=\"UTF-8\" src=\"https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.WJ6taWUkgmg.O/am=BIAABw/d=1/exm=el_conf/ed=1/rs=AN8SPfrJI5tIwXaFCdcd"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-03"
+ },
+ {
+  "id": "wpml_with_authored_content",
+  "case": "wf-04",
+  "why": "A server-side plugin marker WITH non-English text in the same server response. Authorship is server_plugin, not client_widget; rule 8 makes the marker count only alongside content, and the content is there in both documents.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-04.example/",
+    "matched_bytes": "wpml",
+    "context": "d/assets/dist/css/design-system/foundation.css?ver=1.2.0' media='all' />\n<link rel='stylesheet' id='wpml-legacy-horizontal-list-0-css' href='https://www.wf-04.example/wp-content/plugins/sitepress-multilingual-"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-04.example/about-us/",
+    "matched_bytes": "wpml",
+    "context": "d/assets/dist/css/design-system/foundation.css?ver=1.2.0' media='all' />\n<link rel='stylesheet' id='wpml-legacy-horizontal-list-0-css' href='https://www.wf-04.example/wp-content/plugins/sitepress-multilingual-"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-04.example/",
+    "matched_bytes": "wpml",
+    "context": "ild/assets/dist/css/design-system/foundation.css?ver=1.2.0\" media=\"all\">\n<link rel=\"stylesheet\" id=\"wpml-legacy-horizontal-list-0-css\" href=\"https://www.wf-04.example/wp-content/plugins/sitepress-multilingual-"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://www.wf-04.example/",
+    "matched_bytes": "wpml",
+    "context": "ild/assets/dist/css/design-system/foundation.css?ver=1.2.0\" media=\"all\">\n<link rel=\"stylesheet\" id=\"wpml-legacy-horizontal-list-0-css\" href=\"https://www.wf-04.example/wp-content/plugins/sitepress-multilingual-"
+   }
+  ],
+  "languages": {
+   "server:home": [
+    "Chinese",
+    "Spanish"
+   ],
+   "rendered:render": [
+    "Chinese",
+    "Spanish"
+   ],
+   "rendered_recapture:render": [
+    "Chinese",
+    "Spanish"
+   ]
+  },
+  "url": "wf-04"
+ },
+ {
+  "id": "wpml_chinese_both_documents",
+  "case": "wf-05",
+  "why": "Polylang, the other server-side plugin, with Chinese in the server response. Same shape as the WPML case above on a different plugin.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://wf-05.example/en/welcome",
+    "matched_bytes": "polylang",
+    "context": "xtwidget\"></div>\n\t\t</div><!-- .widget-wrap --></section><!-- #widget-default-search --><section id=\"polylang-6\" class=\"widget widget_polylang\"><div class=\"widget-wrap\"><ul>\n\t<li class=\"lang-item lang-item-2 l"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://wf-05.example/en/programs",
+    "matched_bytes": "polylang",
+    "context": "xtwidget\"></div>\n\t\t</div><!-- .widget-wrap --></section><!-- #widget-default-search --><section id=\"polylang-6\" class=\"widget widget_polylang\"><div class=\"widget-wrap\"><ul>\n\t<li class=\"lang-item lang-item-2 l"
+   },
+   {
+    "document": "server",
+    "channel": "altlang",
+    "page": "https://wf-05.example/zh/%e6%ad%a1%e8%bf%8e",
+    "matched_bytes": "polylang",
+    "context": "xtwidget\"></div>\n\t\t</div><!-- .widget-wrap --></section><!-- #widget-default-search --><section id=\"polylang-6\" class=\"widget widget_polylang\"><div class=\"widget-wrap\"><ul>\n\t<li class=\"lang-item lang-item-5 l"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://wf-05.example/en/welcome",
+    "matched_bytes": "polylang",
+    "context": "xtwidget\"></div>\n\t\t</div><!-- .widget-wrap --></section><!-- #widget-default-search --><section id=\"polylang-6\" class=\"widget widget_polylang\"><div class=\"widget-wrap\"><ul>\n\t<li class=\"lang-item lang-item-2 l"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://wf-05.example/en/welcome",
+    "matched_bytes": "polylang",
+    "context": "xtwidget\"></div>\n\t\t</div><!-- .widget-wrap --></section><!-- #widget-default-search --><section id=\"polylang-6\" class=\"widget widget_polylang\"><div class=\"widget-wrap\"><ul>\n\t<li class=\"lang-item lang-item-2 l"
+   }
+  ],
+  "languages": {
+   "server:home": [
+    "Chinese"
+   ],
+   "rendered:render": [
+    "Chinese"
+   ],
+   "rendered_recapture:render": [
+    "Chinese"
+   ]
+  },
+  "url": "wf-05"
+ },
+ {
+  "id": "weglot_injected_client_side",
+  "case": "wf-06",
+  "why": "Weglot appears only in the rendered document, so it was injected by another script. A detector that reads only the server response names no widget here and would fall through to english_only.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://wf-06.example/",
+    "matched_bytes": "weglot",
+    "context": "al/scripts-compressed/../styles-compressed/8308d1793f387442-min.en-US.css\"><script src=\"https://cdn.weglot.com/weglot_squarespace-12.3.1.min.js?api_key=REDACTED\" crossorigin=\"ano"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://wf-06.example/",
+    "matched_bytes": "weglot",
+    "context": "al/scripts-compressed/../styles-compressed/8308d1793f387442-min.en-US.css\"><script src=\"https://cdn.weglot.com/weglot_squarespace-12.3.1.min.js?api_key=REDACTED\" crossorigin=\"ano"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-06"
+ },
+ {
+  "id": "weglot_in_server_document",
+  "case": "wf-07",
+  "why": "Weglot in the server response, no non-English text found. Weglot can run as a server-side proxy, so it must not be bucketed with the browser-rewriting widgets; CLIENT_SIDE_WIDGET already excludes it.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-07.example/",
+    "matched_bytes": "weglot",
+    "context": "d/assets/dist/css/design-system/foundation.css?ver=1.2.0' media='all' />\n<link rel='stylesheet' id='weglot-css-css' href='https://www.wf-07.example/wp-content/plugins/weglot/dist/css/front-css.css?ver=6.1"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-07.example/about-us/",
+    "matched_bytes": "weglot",
+    "context": "d/assets/dist/css/design-system/foundation.css?ver=1.2.0' media='all' />\n<link rel='stylesheet' id='weglot-css-css' href='https://www.wf-07.example/wp-content/plugins/weglot/dist/css/front-css.css?ver=6.1"
+   },
+   {
+    "document": "server",
+    "channel": "altlang",
+    "page": "https://www.wf-07.example/es/",
+    "matched_bytes": "weglot",
+    "context": "d/assets/dist/css/design-system/foundation.css?ver=1.2.0' media='all' />\n<link rel='stylesheet' id='weglot-css-css' href='https://www.wf-07.example/wp-content/plugins/weglot/dist/css/front-css.css?ver=6.1"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-07.example/",
+    "matched_bytes": "weglot",
+    "context": "ild/assets/dist/css/design-system/foundation.css?ver=1.2.0\" media=\"all\">\n<link rel=\"stylesheet\" id=\"weglot-css-css\" href=\"https://www.wf-07.example/wp-content/plugins/weglot/dist/css/front-css.css?ver=6.1"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": []
+  },
+  "url": "wf-07"
+ },
+ {
+  "id": "proxy_and_bare_link",
+  "case": "wf-08",
+  "why": "A translate.goog proxy address and an ordinary translate.google.com hyperlink on the same site, and no MT_NAME marker at all. The proxy is machine translation under authorship_of; the bare hyperlink is deliberately NOT a widget.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-08.example/",
+    "matched_bytes": "translate.goog",
+    "context": "                       <p class=\"action-link\"><strong>Translate this site:</strong> <a href=\"http://translate.google.com/translate?u=www.wf-08.example/&amp;hl=en&amp;ie=UTF-8&amp;sl=en&amp;tl=es\">Español</a>,\n     "
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-08.example/about/",
+    "matched_bytes": "translate.goog",
+    "context": "                       <p class=\"action-link\"><strong>Translate this site:</strong> <a href=\"http://translate.google.com/translate?u=www.wf-08.example/about/&amp;hl=en&amp;ie=UTF-8&amp;sl=en&amp;tl=es\">Español</a>,"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-08.example/",
+    "matched_bytes": "translate.goog",
+    "context": "                       <p class=\"action-link\"><strong>Translate this site:</strong> <a href=\"http://translate.google.com/translate?u=www.wf-08.example/&amp;hl=en&amp;ie=UTF-8&amp;sl=en&amp;tl=es\">Español</a>,\n     "
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": []
+  },
+  "url": "wf-08"
+ },
+ {
+  "id": "wix_locale_mirrors_no_marker",
+  "case": "wf-09",
+  "why": "Eight locale subdomains advertised by hreflang, spanning Afrikaans, Somali and Sundanese, with no vendor marker anywhere. This is the platform translator rule 15 was written for; the count of advertised locale roots is the only thing that catches it.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-09.example/",
+    "matched_bytes": "<link rel=\"alternate\"",
+    "context": "/\",\"@type\":\"WebSite\",\"name\":\"Marion Halstead Ctr\",\"url\":\"https://www.wf-09.example\"}</script>\n  <link rel=\"alternate\" href=\"https://www.wf-09.example/\" hreflang=\"x-default\">\n  <link rel=\"alternate\" href=\"https://a"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "home",
+    "page": "https://www.wf-09.example/",
+    "matched_bytes": "<link rel=\"alternate\"",
+    "context": "/\",\"@type\":\"WebSite\",\"name\":\"Marion Halstead Ctr\",\"url\":\"https://www.wf-09.example\"}</script>\n  <link rel=\"alternate\" href=\"https://www.wf-09.example/\" hreflang=\"x-default\">\n  <link rel=\"alternate\" href=\"https://a"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "interior",
+    "page": "https://www.wf-09.example/about",
+    "matched_bytes": "<link rel=\"alternate\"",
+    "context": "perty=\"og:site_name\" content=\"Marion Halstead Ctr\">\n  <meta property=\"og:type\" content=\"website\">\n  <link rel=\"alternate\" href=\"https://www.wf-09.example/about\" hreflang=\"x-default\">\n  <link rel=\"alternate\" href=\"http"
+   }
+  ],
+  "languages": {
+   "rendered:render": [],
+   "server_via_browser:home": []
+  },
+  "url": "wf-09"
+ },
+ {
+  "id": "locale_mirrors_unknown_platform",
+  "case": "wf-10",
+  "why": "Fourteen locale paths advertised by hreflang, no vendor marker, no generator meta, platform unidentified. The corpus cannot say what serves these; rule 15 still classes it.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-10.example/",
+    "matched_bytes": "<link rel=\"alternate\" hreflang",
+    "context": "en;\n    }\n\n    \n</style>\n\n\n\n\n\n<!-- End render the required css and JS in the head section -->\n\n\n\n\n\n\n<link rel=\"alternate\" hreflang=\"ja\" href=\"https://www.wf-10.example/ja\" />\n\n<link rel=\"alternate\" hreflang=\"zh\" href=\"https://ww"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-10.example/about",
+    "matched_bytes": "<link rel=\"alternate\" hreflang",
+    "context": "en;\n    }\n\n    \n</style>\n\n\n\n\n\n<!-- End render the required css and JS in the head section -->\n\n\n\n\n\n\n<link rel=\"alternate\" hreflang=\"zh-tw\" href=\"https://www.wf-10.example/zh-tw\" />\n\n<link rel=\"alternate\" hreflang=\"tl\" href=\"http"
+   },
+   {
+    "document": "server",
+    "channel": "altlang",
+    "page": "https://www.wf-10.example/ja",
+    "matched_bytes": "<link rel=\"alternate\" hreflang",
+    "context": ": hidden;\n  }\n\n</style>\n\n\n\n\n\n\n<!-- End render the required css and JS in the head section -->\n\n\n\n\n\n\n<link rel=\"alternate\" hreflang=\"km\" href=\"https://www.wf-10.example/km\" />\n\n<link rel=\"alternate\" hreflang=\"tl\" href=\"https://ww"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-10.example/",
+    "matched_bytes": "<link rel=\"alternate\" hreflang",
+    "context": "en;\n    }\n\n    \n</style>\n\n\n\n\n\n<!-- End render the required css and JS in the head section -->\n\n\n\n\n\n\n<link rel=\"alternate\" hreflang=\"ja\" href=\"https://www.wf-10.example/ja\">\n\n<link rel=\"alternate\" hreflang=\"th\" href=\"https://www."
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://www.wf-10.example/",
+    "matched_bytes": "<link rel=\"alternate\" hreflang",
+    "context": "en;\n    }\n\n    \n</style>\n\n\n\n\n\n<!-- End render the required css and JS in the head section -->\n\n\n\n\n\n\n<link rel=\"alternate\" hreflang=\"he\" href=\"https://www.wf-10.example/he\">\n\n<link rel=\"alternate\" hreflang=\"zh-hk\" href=\"https://w"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-10"
+ },
+ {
+  "id": "widget_marker_no_nonenglish",
+  "case": "wf-11",
+  "why": "GTranslate and the Google element both appear, in the RENDERED document only, and not one word of non-English text is in either document. machine_translate, and the verdict names no language. A detector reading only the server response names no widget here at all.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-11.example/",
+    "matched_bytes": "gtranslate",
+    "context": "tent/uploads/complianz/css/banner-1-optout.css?v=31\" type=\"text/css\" rel=\"stylesheet\"><style class=\"gtranslate_css\">div.skiptranslate,#google_translate_element2{display:none!important}body{top:0!important}font "
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": []
+  },
+  "url": "wf-11"
+ },
+ {
+  "id": "motionpoint_server_proxy",
+  "case": "wf-12",
+  "why": "MotionPoint TransMotion, a server-side translation proxy with no pattern in langaccess and none in webappanalyzer. Its output IS in the server response, so it must be kind machine_translate and NOT client_widget.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-12.example/",
+    "matched_bytes": "motionpoint",
+    "context": "qd4Pa0IKi8kAnCmIVSdyCc9-_rf-VZZSv0ADQhTtg\"></script>\n<script src=\"/modules/custom/org_international_motionpoint_language_toggle/js/mp_linkcode.js?thgodj\"></script>\n\n    <meta http-equiv=\"X-UA-Compatible\" content"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-12.example/about-us",
+    "matched_bytes": "motionpoint",
+    "context": "qd4Pa0IKi8kAnCmIVSdyCc9-_rf-VZZSv0ADQhTtg\"></script>\n<script src=\"/modules/custom/org_international_motionpoint_language_toggle/js/mp_linkcode.js?thgodj\"></script>\n\n    <meta http-equiv=\"X-UA-Compatible\" content"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-12.example/",
+    "matched_bytes": "motionpoint",
+    "context": "qd4Pa0IKi8kAnCmIVSdyCc9-_rf-VZZSv0ADQhTtg\"></script>\n<script src=\"/modules/custom/org_international_motionpoint_language_toggle/js/mp_linkcode.js?thgodj\"></script>\n\n    <meta http-equiv=\"X-UA-Compatible\" content"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": []
+  },
+  "url": "wf-12"
+ },
+ {
+  "id": "elfsight_website_translator",
+  "case": "wf-13",
+  "why": "Elfsight Website Translator, a widget vendor langaccess has no pattern for. Loaded from the Elfsight CDN in the rendered document only.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-13.example/",
+    "matched_bytes": "elfsightcdn.com/app-releases/website-translator",
+    "context": "t(:last-child){border-right:1px solid hsla(0,0%,7%,.1)}</style><script src=\"https://universe-static.elfsightcdn.com/app-releases/website-translator/stable/v1.13.1/0745e6c9e2e3d5eaffca5ea0790130eceb39b4f3/widget/websiteTranslator.js\" async=\"\" chars"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "home",
+    "page": "https://www.wf-13.example/",
+    "matched_bytes": "elfsightcdn.com/app-releases/website-translator",
+    "context": "t(:last-child){border-right:1px solid hsla(0,0%,7%,.1)}</style><script src=\"https://universe-static.elfsightcdn.com/app-releases/website-translator/stable/v1.13.1/0745e6c9e2e3d5eaffca5ea0790130eceb39b4f3/widget/websiteTranslator.js\" async=\"\" chars"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "interior",
+    "page": "https://www.wf-13.example/mission",
+    "matched_bytes": "elfsightcdn.com/app-releases/website-translator",
+    "context": "t(:last-child){border-right:1px solid hsla(0,0%,7%,.1)}</style><script src=\"https://universe-static.elfsightcdn.com/app-releases/website-translator/stable/v1.13.1/0745e6c9e2e3d5eaffca5ea0790130eceb39b4f3/widget/websiteTranslator.js\" async=\"\" chars"
+   }
+  ],
+  "languages": {
+   "rendered:render": [],
+   "server_via_browser:home": []
+  },
+  "url": "wf-13"
+ },
+ {
+  "id": "smartling_false_positive",
+  "case": "wf-14",
+  "why": "The word smartling here is a key inside a data-localized-strings JSON blob a shop platform emits. The bare substring `smartling` in MT_RX and MT_NAME matches it and would name a vendor that is not installed.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-14.example/resources",
+    "matched_bytes": "smartling",
+    "context": "t;isProductListFiltersV2SeparateCategoriesEnabled&quot;:false}}\"\n    data-localized-strings=\"{&quot;smartling&quot;:{&quot;string_format&quot;:&quot;icu&quot;},&quot;account&quot;:&quot;Account&quot;,&quot;add"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": []
+  },
+  "url": "wf-14"
+ },
+ {
+  "id": "crowdin_substring_false_positive",
+  "case": "wf-15",
+  "why": "A candidate pattern `crowdin` matches the English word overcrowding. Kept as a fixture because it is the shape of the mistake: a vendor name that is also a substring of ordinary prose.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://wf-15.example/housing-relocation-program/",
+    "matched_bytes": "overcrowding",
+    "context": "tunately, in the United States, far too many American Indians reside in subpar housing plagued with overcrowding and unsanitary conditions. In 1996, to address this need, a partnership and subsequent legislation "
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": []
+  },
+  "url": "wf-15"
+ },
+ {
+  "id": "smartling_real",
+  "case": "wf-16",
+  "why": "A real Smartling install, recognisable by the smartling-es body class on the Spanish route. The contrast case for the false positive above: the fingerprint has to be the class, not the word.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "altlang",
+    "page": "https://wf-16.example/es/",
+    "matched_bytes": "smartling-es",
+    "context": "fault page page-id-24 wp-custom-logo wp-theme-hellotheme hellotools is_translated lang-es is_safari smartling-es\">\n\n<!-- Google Tag Manager (noscript) -->\n<noscript><iframe src=\"https://www.googletagmanager.com/n"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://wf-16.example/",
+    "matched_bytes": "smartling-es",
+    "context": "emplate-default page page-id-24 wp-custom-logo wp-theme-hellotheme hellotools is_translated lang-es smartling-es modal-open\" style=\"overflow: hidden; padding-right: 0px;\">\n\n<!-- Google Tag Manager (noscript) -->\n"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-16"
+ },
+ {
+  "id": "userway_live_translations",
+  "case": "wf-17",
+  "why": "UserWay is an accessibility widget that also ships a live translation module. Ambiguous: the asset name says translations, the presence of the widget does not say the site is translated.",
+  "matches": [
+   {
+    "document": "server_via_browser",
+    "channel": "home",
+    "page": "https://www.wf-17.example/",
+    "matched_bytes": "userway.org/widgetapp/2026-07-07-10-43-48/translations/live_translations",
+    "context": "origin=\"anonymous\" integrity=\"sha256-xZ90VA+gStIU/3ehR5Jn8ig4Yhoq2XXjJSVvpB4xK1M=\" src=\"https://cdn.userway.org/widgetapp/2026-07-07-10-43-48/translations/live_translations_1783421028734.js\"></script><script crossorigin=\"anonymous\" integrity=\"sha256-hxGFbUB+sK9BxvnBE99P1u"
+   }
+  ],
+  "languages": {
+   "rendered:render": [],
+   "server_via_browser:home": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-17"
+ },
+ {
+  "id": "wix_multilingual_linguist",
+  "case": "wf-18",
+  "why": "Wix Multilingual, whose language selector loads its flags from parastorage under the service name linguist. Rendered document only, since a Wix page is assembled in the browser.",
+  "matches": [
+   {
+    "document": "server_via_browser",
+    "channel": "home",
+    "page": "https://www.wf-18.example/",
+    "matched_bytes": "linguist-flags",
+    "context": "index=\"-1\"><div class=\"gEOfRC\" aria-hidden=\"true\"><img src=\"https://static.parastorage.com/services/linguist-flags/1.1005.0/assets/flags/round/USA.png\" srcset=\"https://static.parastorage.com/services/linguist-flags"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "interior",
+    "page": "https://www.wf-18.example/services",
+    "matched_bytes": "linguist-flags",
+    "context": "index=\"-1\"><div class=\"gEOfRC\" aria-hidden=\"true\"><img src=\"https://static.parastorage.com/services/linguist-flags/1.1005.0/assets/flags/round/USA.png\" srcset=\"https://static.parastorage.com/services/linguist-flags"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://www.wf-18.example/",
+    "matched_bytes": "linguist-flags",
+    "context": "index=\"-1\"><div class=\"gEOfRC\" aria-hidden=\"true\"><img src=\"https://static.parastorage.com/services/linguist-flags/1.1005.0/assets/flags/round/USA.png\" srcset=\"https://static.parastorage.com/services/linguist-flags"
+   }
+  ],
+  "languages": {
+   "rendered:render": [],
+   "server_via_browser:home": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-18"
+ },
+ {
+  "id": "squarespace_google_translate",
+  "case": "wf-19",
+  "why": "A Squarespace site running the Google element through a third-party style helper. The helper is evidence of the widget; the widget itself is what gets named.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-19.example/",
+    "matched_bytes": "google_translate_element",
+    "context": "<script>\n  var GoogleLanguages = 'en,es,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';\n</script>\n<div id=\"google_translate_element\"></div>\n<script src=\"//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\"><"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-19.example/about-us",
+    "matched_bytes": "google_translate_element",
+    "context": "<script>\n  var GoogleLanguages = 'en,es,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';\n</script>\n<div id=\"google_translate_element\"></div>\n<script src=\"//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\"><"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-19.example/",
+    "matched_bytes": "google_translate_element",
+    "context": "<script>\n  var GoogleLanguages = 'en,es,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';\n</script>\n<div id=\"google_translate_element\"></div>\n<script src=\"//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\"><"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://www.wf-19.example/",
+    "matched_bytes": "google_translate_element",
+    "context": "<script>\n  var GoogleLanguages = 'en,es,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';\n</script>\n<div id=\"google_translate_element\"><div class=\"skiptranslate goog-te-gadget\" dir=\"ltr\" style=\"\"><div id=\":0.targetLanguage\" class=\"go"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-19"
+ },
+ {
+  "id": "adabundle_google_translate",
+  "case": "wf-20",
+  "why": "A Squarespace plugin that wraps the Google element and renames its callback to adabundleGoogleTranslateElementInit. MT_NAME catches it only because the callback name still contains googletranslateelementinit.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "http://www.wf-20.example/",
+    "matched_bytes": "adabundle",
+    "context": "ancybox-margin{margin-right:0px;}</style><link rel=\"stylesheet\" type=\"text/css\" href=\"https://embed.adabundle.com/css/widget.css?v=1.6.0\"><script type=\"text/javascript\" src=\"https://embed.adabundle.com/js/dist"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "home",
+    "page": "http://www.wf-20.example/",
+    "matched_bytes": "adabundle",
+    "context": "ancybox-margin{margin-right:0px;}</style><link rel=\"stylesheet\" type=\"text/css\" href=\"https://embed.adabundle.com/css/widget.css?v=1.6.0\"><script type=\"text/javascript\" src=\"https://embed.adabundle.com/js/dist"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "interior",
+    "page": "https://www.wf-20.example/cookie-policy/#cmplz-cookies-overview",
+    "matched_bytes": "adabundle",
+    "context": "ancybox-margin{margin-right:0px;}</style><link rel=\"stylesheet\" type=\"text/css\" href=\"https://embed.adabundle.com/css/widget.css?v=1.6.0\"><script type=\"text/javascript\" src=\"https://embed.adabundle.com/js/dist"
+   }
+  ],
+  "languages": {
+   "rendered:render": [],
+   "server_via_browser:home": []
+  },
+  "url": "wf-20"
+ },
+ {
+  "id": "gtranslate_tdn_proxy",
+  "case": "wf-21",
+  "why": "GTranslate in its translation-delivery-network mode, which serves translated pages from GTranslate servers. Same vendor, different deployment: not a browser rewrite.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://wf-21.example/",
+    "matched_bytes": "GTranslate",
+    "context": "nbsp;&nbsp;&nbsp; <span style=\"color:#ffffff;\"><a href=\"https://wf-21.example\" onclick=\"doGTranslate('en|en');return false;\" class=\"glink nturl notranslate edac-removed-title ahs-underline-fixed ahs-l"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://wf-21.example/",
+    "matched_bytes": "GTranslate",
+    "context": "nbsp;&nbsp;&nbsp; <span style=\"color:#ffffff;\"><a href=\"https://wf-21.example\" onclick=\"doGTranslate('en|en');return false;\" class=\"glink nturl notranslate edac-removed-title ahs-underline-fixed ahs-l"
+   }
+  ],
+  "languages": {
+   "rendered:render": [],
+   "rendered_recapture:render": []
+  },
+  "url": "wf-21"
+ },
+ {
+  "id": "goog_te_marker_is_css",
+  "case": "wf-22",
+  "why": "The only goog-te bytes in the server response are stylesheet rules shipped by the Google Language Translator plugin. A goog-te match in a server document is not evidence that the widget rendered; the loader on the same page is what makes it a widget. This site also carries Spanish in the server response, so the class is decided by rule 3 and rule 16 and not by the widget.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://wf-22.example/",
+    "matched_bytes": ".goog-te-gadget{",
+    "context": "y:inline-block;margin-right:2px;}#google_language_translator{width:auto!important;}div.skiptranslate.goog-te-gadget{display:inline!important;}.goog-tooltip{display: none!important;}.goog-tooltip:hover{display: none!i"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://wf-22.example/",
+    "matched_bytes": ".goog-te-gadget{",
+    "context": "y:inline-block;margin-right:2px;}#google_language_translator{width:auto!important;}div.skiptranslate.goog-te-gadget{display:inline!important;}.goog-tooltip{display: none!important;}.goog-tooltip:hover{display: none!i"
+   },
+   {
+    "document": "rendered_recapture",
+    "channel": "render",
+    "page": "https://wf-22.example/",
+    "matched_bytes": ".goog-te-gadget{",
+    "context": "y:inline-block;margin-right:2px;}#google_language_translator{width:auto!important;}div.skiptranslate.goog-te-gadget{display:inline!important;}.goog-tooltip{display: none!important;}.goog-tooltip:hover{display: none!i"
+   }
+  ],
+  "languages": {
+   "server:home": [
+    "Spanish"
+   ],
+   "rendered:render": [
+    "Spanish"
+   ],
+   "rendered_recapture:render": [
+    "Spanish"
+   ]
+  },
+  "url": "wf-22"
+ },
+ {
+  "id": "localize_real",
+  "case": "wf-23",
+  "why": "A real Localize install, named by the vendor domain and by the localize-powered-by node. The bare token localizejs also matches a theme variable called kopaLocalizeJS elsewhere in the corpus, so the domain is the safer fingerprint.",
+  "matches": [
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://wf-23.example/en-US",
+    "matched_bytes": "localize-powered-by",
+    "context": "kground:rgba(255,255,255,.8)!important;border: 1px solid #a3a3a3;}.localize-dark a, .localize-dark #localize-powered-by { color:#ffffff!important; }.localize-light a, .localize-light #localize-powered-by { color:#000000"
+   },
+   {
+    "document": "server_via_browser",
+    "channel": "home",
+    "page": "https://wf-23.example/en-US",
+    "matched_bytes": "localize-powered-by",
+    "context": "kground:rgba(255,255,255,.8)!important;border: 1px solid #a3a3a3;}.localize-dark a, .localize-dark #localize-powered-by { color:#ffffff!important; }.localize-light a, .localize-light #localize-powered-by { color:#000000"
+   }
+  ],
+  "languages": {
+   "rendered:render": [
+    "Arabic"
+   ],
+   "server_via_browser:home": [
+    "Arabic"
+   ]
+  },
+  "url": "wf-23"
+ },
+ {
+  "id": "widget_menu_read_as_language",
+  "case": "wf-24",
+  "why": "The rendered document of this site makes langaccess report Zulu. The bytes behind that reading are stylesheet text, not writing. A negative case: the instrument must find no language here.",
+  "matches": [
+   {
+    "document": "server",
+    "channel": "home",
+    "page": "https://www.wf-24.example/",
+    "matched_bytes": "weglot",
+    "context": "-show-header-subtitle: false;\n    --show-header-motto: false;\n    --show-footer-title: false;\n    --weglot-display-position: default;\n  }\n</style>\n\n\t\t<script src=\"/assets/in_layout_head2-7df9fd0fe690668e949"
+   },
+   {
+    "document": "server",
+    "channel": "interior",
+    "page": "https://www.wf-24.example/about",
+    "matched_bytes": "weglot",
+    "context": "-show-header-subtitle: false;\n    --show-header-motto: false;\n    --show-footer-title: false;\n    --weglot-display-position: default;\n  }\n</style>\n\n\t\t<script src=\"/assets/in_layout_head2-7df9fd0fe690668e949"
+   },
+   {
+    "document": "rendered",
+    "channel": "render",
+    "page": "https://www.wf-24.example/",
+    "matched_bytes": "weglot",
+    "context": "-show-header-subtitle: false;\n    --show-header-motto: false;\n    --show-footer-title: false;\n    --weglot-display-position: default;\n  }\n</style>\n\n\t\t<script src=\"/assets/in_layout_head2-7df9fd0fe690668e949"
+   }
+  ],
+  "languages": {
+   "server:home": [],
+   "rendered:render": [
+    "Zulu"
+   ]
+  },
+  "url": "wf-24"
+ }
+]
