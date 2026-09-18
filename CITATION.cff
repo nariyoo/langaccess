@@ -8,10 +8,10 @@
 # vocabularies and are edited together. An edit made here and not there reaches a reader of this
 # repository and never reaches the archive.
 #
-# `doi` is absent on purpose. It is known only once a GitHub Release has been archived by Zenodo,
-# and a placeholder would be an invalid value rather than a missing one. Add the VERSION doi, not
-# the concept doi: a verdict is the output of one rule set, so a citation that does not name the
-# version has not said which instrument produced its numbers.
+# `doi` is the VERSION doi and not the concept doi: a verdict is the output of one rule set, so a
+# citation that does not name the version has not said which instrument produced its numbers. It
+# was reserved on the Zenodo deposition for 0.2.0 on 2026-09-18 and resolves once that deposition
+# is published. Reserve the next one the same way and move this field with the version.
 #
 # `date-released` is the date of the CHANGELOG section this version ships under, and it moves when
 # the version does.
@@ -34,6 +34,7 @@ authors:
 version: 0.2.0
 date-released: 2026-09-18
 repository-code: "https://github.com/nariyoo/langaccess"
+doi: "10.5281/zenodo.22837242"
 license:
   - MIT
   - CC-BY-SA-3.0

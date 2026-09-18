@@ -435,8 +435,9 @@ the wheel alone can retrieve them with `pip download --no-binary :all: langacces
 ## 8. Citation
 
 Cite the software. [CITATION.cff](https://github.com/nariyoo/langaccess/blob/main/CITATION.cff) holds the record, and the version belongs in the
-citation, because a classification is the output of one rule set. The accompanying paper this
-document refers to is not published yet.
+citation, because a classification is the output of one rule set. Version 0.2.0 has the DOI
+[10.5281/zenodo.22837242](https://doi.org/10.5281/zenodo.22837242), which resolves once the Zenodo deposition
+is published. The accompanying paper this document refers to is not published yet.
 
 ### Methods wording
 
