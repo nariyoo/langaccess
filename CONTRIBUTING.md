@@ -279,9 +279,9 @@ runs after that commit, because what it exports is the private tree at HEAD.
    the public repository's `git status`. It writes no commit and pushes nothing. Read that status,
    then commit in the public copy as Nari Yoo.
 7. **The push and the upload are the maintainer's own acts**, and the procedure stops in front of
-   them: the push of the branch and the tag, the GitHub release, and `twine upload`. The version
-   DOI Zenodo returns for that release goes into `CITATION.cff` afterwards, in a commit of its own,
-   for the reason written at the top of that file.
+   them: the push of the branch and the tag, the GitHub release, and `twine upload`. The GitHub
+   release and the PyPI distribution are the archive of a version; no DOI is assigned, and
+   `CITATION.cff` carries none, for the reason written at the top of that file.
 
 ## 10. Support
 
