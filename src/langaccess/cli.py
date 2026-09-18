@@ -16,10 +16,10 @@
 
 The human-readable output format below is the same one the original script printed; --json,
 --concurrency, --deep, --no-escalate, --timeout, --from-file, --output, --shared-browser,
---block-private-hosts, --ignore-robots, --store, --explain and --version are additions for
-packaging, not changes to the judgement logic. `diff`, `review`, `ingest`, `report` and
-`depth` are subcommands that read files, reach no site, and judge nothing; `retry` is the one that
-reaches sites, exactly the sites a clean browser could not, through the user's own browser and
+--no-retry-pass, --block-private-hosts, --ignore-robots, --store, --explain and --version are
+additions for packaging, not changes to the judgement logic. `diff`, `review`, `ingest`, `report`
+and `depth` are subcommands that read files, reach no site, and judge nothing; `retry` is the one
+that reaches sites, exactly the sites a clean browser could not, through the user's own browser and
 saying so on every record.
 
     langaccess demo                                          # four invented sites, no browser
@@ -51,6 +51,7 @@ from .core import (audit_async, audit_many_async, BrowserUnavailable, Result, SU
                    _snip,
                    StoreWriteFailed, probe_store,
                    set_page_delay, set_acceptance, IGNORE_ROBOTS_MIN_DELAY,
+                   RETRY_PASS_CONCURRENCY,
                    RULES, read_store, rejudge_store, _stored_record)
 from .diff import diff_runs, diff_text
 from .explain import explain, explain_text
@@ -117,6 +118,13 @@ EXIT_WRITE_BLOCKED = 7
 # the run's own store stopped taking writes (disk full, path revoked): the run stops where it
 # stands, what was appended is safe on disk, and no site after the failure gets a row
 EXIT_STORE_FAILED = 8
+# `--strict` only, and never without it: the run finished and wrote everything it writes, and the
+# reading it produced is one `capture_acceptance` refuses or one in which a browser driver died
+# part way through. Both were already detectable and neither changed the exit code, so a degraded
+# run reached a pipeline as a success: the warning goes to stderr, where a scheduled job's log is
+# read by nobody, and the rows on disk are honest rows that no longer mean what a comparison
+# needs them to mean.
+EXIT_DEGRADED = 9
 
 
 def _rung(n):
@@ -219,12 +227,19 @@ def _progress(done, total, t0):
 
 async def _run(urls, concurrency, as_json, deep=False, timeout=None, output=None,
                shared_browser=False, block_private_hosts=False, ignore_robots=False, store=None,
-               escalate=True, explaining=False, max_pages=None):
-    """Audit the addresses and print each result. Returns (infrastructure failure or None, printed).
+               escalate=True, explaining=False, max_pages=None, retry_pass=True):
+    """Audit the addresses and print each result.
 
-    The second half of that return is what separates the two kinds of ending. A site that could not
+    Returns (infrastructure failure or None, how many were printed, one small record per result).
+
+    The second of those is what separates the two kinds of ending. A site that could not
     be audited is a Result and is printed; a machine that cannot start a browser produces no Result
     at all, stops the run where it stands, and is handed back for `main` to report once and exit on.
+
+    The third is what `--strict` reads when the run is over: `read_quality` and `note`, and not the
+    Result, because a run over ten thousand sites would otherwise hold every evidence list and every
+    page of every reading in memory to answer two questions at the end. `capture_acceptance` already
+    accepts a record of this shape, so nothing is reimplemented to read it.
     """
     sem = asyncio.Semaphore(max(1, concurrency))
     # passed only when it was asked for, so an ordinary run calls audit_async exactly as before
@@ -289,12 +304,16 @@ async def _run(urls, concurrency, as_json, deep=False, timeout=None, output=None
                 else open(output, 'a', encoding='utf-8'))
     done_by_index, nxt = {}, 0
     broken = None                       # the one infrastructure failure that stopped the run
+    seen = []                           # what --strict judges the finished run on
 
     def drain():
         # print the run of results that is complete from the front, and hold the rest
         nonlocal nxt
         while nxt in done_by_index:
-            _emit(done_by_index.pop(nxt), as_json, sink, explaining)
+            r = done_by_index.pop(nxt)
+            _emit(r, as_json, sink, explaining)
+            seen.append({'read_quality': dict(getattr(r, 'read_quality', None) or {}),
+                         'note': getattr(r, 'note', '') or ''})
             nxt += 1
 
     pending = set()
@@ -309,6 +328,11 @@ async def _run(urls, concurrency, as_json, deep=False, timeout=None, output=None
 
             got = None
             try:
+                # `retry_pass` goes in only when it was turned OFF, so an ordinary run calls the
+                # batch exactly as it did before the switch existed and a caller pinned to an
+                # older signature is not broken by a keyword it does not take.
+                if not retry_pass:
+                    extra['retry_pass'] = False
                 got = await audit_many_async(urls, concurrency=concurrency, deep=deep,
                                              timeout=timeout, on_result=landed, **extra)
             except (BrowserUnavailable, StoreWriteFailed) as e:
@@ -321,7 +345,7 @@ async def _run(urls, concurrency, as_json, deep=False, timeout=None, output=None
                 if i >= nxt and i not in done_by_index:
                     done_by_index[i] = r
             drain()
-            return broken, nxt
+            return broken, nxt, seen
         pending = {asyncio.ensure_future(slot(i, u)) for i, u in enumerate(urls)}
         while pending and broken is None:
             finished, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
@@ -338,7 +362,7 @@ async def _run(urls, concurrency, as_json, deep=False, timeout=None, output=None
                 done_by_index[i] = r
                 _tick()
             drain()
-        return broken, nxt
+        return broken, nxt, seen
     finally:
         # Whatever ended the run, nothing is left running behind it and the file holds what was read.
         for f in pending:
@@ -347,6 +371,38 @@ async def _run(urls, concurrency, as_json, deep=False, timeout=None, output=None
             await asyncio.gather(*pending, return_exceptions=True)
         if sink is not None:
             sink.close()
+
+
+def _strict_fault(seen):
+    """Why `--strict` refuses a finished run, or '' when it does not.
+
+    Two faults, both of which the package already detected and neither of which changed the exit
+    code. `capture_acceptance` answers whether the reading is deep enough to compare with another
+    run's, and it already warns; a warning goes to stderr, and a scheduled job's stderr is read by
+    nobody until somebody asks why two runs disagree. `DEAD_DRIVER_NOTE` is written onto a site that
+    answered nothing, too fast, on every driver it was offered, which is what a batch looks like
+    after its browser has gone: the rows are honest rows saying the site was not read, and a run
+    full of them exits 0 and looks like a census of dead websites.
+
+    Both are properties of the RUN and not of any site in it, which is why this reads the whole list
+    and why the default stays 0. A run may legitimately be full of sites that refuse a crawler, and
+    the exit code has never claimed otherwise.
+    """
+    from .core import capture_acceptance, DEAD_DRIVER_NOTE
+    why = []
+    acc = capture_acceptance(seen)
+    if not acc['accepted']:
+        why.append('this run is not deep enough to be compared with another run: %s. %d of %d '
+                   'sites produced a reading, median %g pages, %d of them on a search too thin to '
+                   'support an absence claim'
+                   % (acc['why'], acc['read'], acc['sites'], acc['median_pages'], acc['thin']))
+    dead = sum(1 for x in seen if DEAD_DRIVER_NOTE in (x.get('note') or ''))
+    if dead:
+        why.append('%d of %d sites answered nothing on every browser driver they were offered, '
+                   'which is what a run looks like after its driver died; those rows say the site '
+                   'was not read and they may be saying it about the machine'
+                   % (dead, len(seen)))
+    return '; '.join(why)
 
 
 def _addresses_already_done(path):
@@ -1149,6 +1205,13 @@ def main(argv=None):
                    help='launch one browser for the whole run instead of one per site. Each site '
                         'still gets a browser context of its own, which is what keeps its cookies '
                         'and widget state out of the next one')
+    p.add_argument('--no-retry-pass', dest='retry_pass', action='store_false',
+                   help='with --shared-browser, do not read the batch\'s own infrastructure '
+                        'failures again at the end of it. The pass reads once more, on a browser '
+                        'launched for them alone and at concurrency %d, every row whose failure '
+                        'was a closed connection, a protocol error or a timeout, and keeps the '
+                        'second reading only where it read a page. It is on by default; this '
+                        'measures what it recovers' % RETRY_PASS_CONCURRENCY)
     p.add_argument('--block-private-hosts', dest='block_private_hosts', action='store_true',
                    help='refuse every request whose host resolves off the public internet. Costs a '
                         'DNS lookup per host; for a list of addresses somebody else supplied')
@@ -1186,6 +1249,11 @@ def main(argv=None):
                         'with its address and quoted words, the two axes per language, and what '
                         'the search was worth. Combines with --rejudge to explain a stored capture, '
                         'and with --json for the same arrangement as one JSON object per site')
+    p.add_argument('--strict', action='store_true',
+                   help='exit 9 when the finished run is one capture_acceptance refuses, or when a '
+                        'browser driver died part way through it. The run itself is unchanged and '
+                        'every row it writes is still written; only the exit code moves, so a '
+                        'scheduled job stops instead of recording a degraded reading as a success')
     p.add_argument('--version', action='store_true', help='print the version and exit')
     args = p.parse_args(argv)
 
@@ -1218,6 +1286,7 @@ def main(argv=None):
         _ignored = [(name, flag) for name, flag in (
             ('--store', args.store), ('--resume', args.resume), ('--deep', args.deep),
             ('--shared-browser', args.shared_browser),
+            ('--no-retry-pass', not args.retry_pass),
             ('--block-private-hosts', args.block_private_hosts),
             ('--no-escalate', not args.escalate), ('--delay', args.delay),
             ('--min-median-pages', args.min_median_pages is not None),
@@ -1331,11 +1400,14 @@ def main(argv=None):
               'thresholds it was judged against' % (was, args.min_median_pages, args.max_thin_share),
               file=sys.stderr)
 
-    broken, printed = asyncio.run(
+    broken, printed, seen = asyncio.run(
         _run(urls, args.concurrency, args.json, args.deep, args.timeout, args.output,
              args.shared_browser, args.block_private_hosts, args.ignore_robots,
-             args.store, args.escalate, args.explain, args.max_pages))
+             args.store, args.escalate, args.explain, args.max_pages, args.retry_pass))
     if broken is None:
+        # Asked for and never applied otherwise. The run is already over and everything it writes
+        # is written; what moves is the code this process leaves behind.
+        fault = _strict_fault(seen) if args.strict else ''
         if rejected:
             # The summary a person reads after a long run, carrying the denominator: a
             # run over 1,000 lines that audited 996 sites has to say so where the count can be seen,
@@ -1343,7 +1415,17 @@ def main(argv=None):
             print('\nlangaccess audited %d of the %d strings given; %d were not addresses, are named '
                   'above, and are in no output.'
                   % (len(urls), len(urls) + len(rejected), len(rejected)), file=sys.stderr)
+            if fault:
+                print('--strict: %s' % fault, file=sys.stderr)
+                return EXIT_DEGRADED
             return EXIT_INPUT_REJECTED
+        if fault:
+            # 9 outranks 6 where both apply, and the line about the rejected strings is printed
+            # either way. Code 6 says the output does not cover the list it was given; code 9 says
+            # the rows that ARE in the output cannot be compared with another run's, which is the
+            # stronger statement about what a caller has in hand.
+            print('--strict: %s' % fault, file=sys.stderr)
+            return EXIT_DEGRADED
         return EXIT_OK
     # Once, to stderr, so that it stays readable beside a thousand JSON lines on stdout and does not
     # land in the file `--output` is writing. What a reader has to know is not only that the browser
@@ -1354,6 +1436,8 @@ def main(argv=None):
     print('%d of %d addresses were read; the remaining %d were not opened and no result was written '
           'for them. Nothing here says anything about those sites.' % (printed, len(urls), left),
           file=sys.stderr)
+    # 3 and 8 outrank 9. A run that stopped where it stood is not a degraded reading of a whole
+    # list, it is a fraction of a list, and the more specific code says so.
     return EXIT_STORE_FAILED if isinstance(broken, StoreWriteFailed) else EXIT_NO_BROWSER
 
 

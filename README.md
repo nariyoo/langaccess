@@ -15,11 +15,12 @@ text that support it, so that any result can be verified without repeating the c
 describes and classifies what a site provides; it does not score how well a site serves any
 population.
 
-![How a result is produced. A website address, with robots.txt respected, is read two ways: rendered in a headless Chromium, and fetched again as the plain server document. The difference between the two separates widget text from the site's own writing, the codebook rules judge each language on authorship and extent, and three things come out: a classification, an evidence record with the URL and quoted text, and a read-quality record.](https://raw.githubusercontent.com/nariyoo/langaccess/main/figures/system.png)
+![How a result is produced. A website address, with robots.txt respected, is read two ways: rendered in a headless Chromium, and fetched again as the plain server document. The difference between the two separates widget text from the site's own writing, the codebook rules judge each language on authorship and sufficiency, and three things come out: a classification, an evidence record with the URL and quoted text, and a read-quality record.](https://raw.githubusercontent.com/nariyoo/langaccess/main/figures/system.png)
 
 langaccess is a wrapper around two libraries.
-[Playwright](https://github.com/microsoft/playwright-python) runs a Chromium that renders each
-page and hands back its text, and [fastText](https://github.com/facebookresearch/fastText)'s
+[Playwright](https://github.com/microsoft/playwright-python) runs the headless browser that
+renders each page and hands back the document, real Chrome where that channel is installed and the
+Chromium it manages otherwise, and [fastText](https://github.com/facebookresearch/fastText)'s
 [`lid.176`](https://fasttext.cc/docs/en/language-identification.html) names the language of a passage
 the package's own rules do not cover. There is no third-party HTML parser in the reading path: the
 text comes from the rendered DOM rather than from source markup, since a translation widget rewrites
@@ -317,8 +318,10 @@ widget produced it. The text may be the site's own or a server-side translation 
 `authorship` field on each piece of evidence records which was observed.
 
 `unreachable` is a read outcome; it does not describe a form of access. The site was not read at
-all, because of a bot wall, a timeout, a parked domain, or an empty response, so nothing is
-established about its languages in either direction.
+all, because of a domain that no longer resolves, a bot wall, a timeout, a parked domain, or an
+empty response, so nothing is established about its languages in either direction. `failure_kind`
+names which of sixteen reasons it was, and one of the sixteen, a domain that does not resolve, is
+a fact about the organization rather than about the crawl.
 
 The five names are nominal. They are printed in a fixed order so that tables from different runs
 line up, and that order is not a ranking: no class is better than another, none is a step toward
@@ -406,6 +409,14 @@ The figure covers three classes, `english_only`, `machine_translate` and `true_m
 the 1,861 is smaller than the 2,000 sites drawn. [LIMITATIONS.md](https://github.com/nariyoo/langaccess/blob/main/LIMITATIONS.md) carries that
 ladder, the per-class recall and precision, and the build the table belongs to.
 
+0.2.0 was measured on a live re-read of the same frame in September 2026, its 1,992 addresses
+captured once and judged twice from the same stored pages: 91.2% agreement under the build that took
+the capture and 91.5% under 0.2.0 (three classes, n = 1,807), with 19 sites changing class between
+the two judgements, 12 toward the settled class, 6 away from it and 1 between two classes neither of
+which is the settled one. Section 1.1 of LIMITATIONS.md carries the table and what the comparison
+can and cannot say; the 93.2% above stays the figure of record for 0.1.0, measured on the pages the
+coders read, and 0.2.0 has no figure of record until it is re-judged over that same capture.
+
 ## 6. Limitations
 
 [LIMITATIONS.md](https://github.com/nariyoo/langaccess/blob/main/LIMITATIONS.md) states what a reader must know to interpret a result, including
@@ -431,13 +442,14 @@ document refers to is not published yet.
 
 A verdict in a table is the output of a rule set, a crawl budget and a date, and a reader who has
 only the tool's name cannot tell which of those produced the number. Adapt this, filling in the
-four values from your own run:
+five values from your own run:
 
-> Website language access was classified with langaccess 0.1.0 (Yoo, 2026), which renders each site
-> in a headless browser, reads up to N pages per site, and assigns one of five classes from the
-> text it finds and the translation machinery it detects. Sites were audited between DATE and DATE.
-> Of the N sites, N could not be read and are reported as `unreachable` and not as English-only.
-> The package reports 93.2% agreement with a gold dataset coded by language models on 1,861 sites.
+> Website language access was classified with langaccess 0.2.0, build BUILD (Yoo, 2026), which
+> renders each site in a headless browser, reads up to N pages per site, and assigns one of five
+> classes from the text it finds and the translation machinery it detects. Sites were audited
+> between DATE and DATE. Of the N sites, N could not be read and are reported as `unreachable` and
+> not as English-only. The package reports 93.2% agreement with a gold dataset coded by language
+> models on 1,861 sites.
 
 Four clauses get left out most often, and each changes what the numbers mean.
 
@@ -456,9 +468,17 @@ lapses. A verdict is a statement about a site on a day.
 
 **Name the build that produced the classes.** Two builds can classify one stored capture
 differently, in either direction, so two tables produced from the same addresses by different builds
-are not comparable. A released version names one rule set, and 0.1.0 is the version every figure in
-`LIMITATIONS.md` was measured on. A working copy taken from the repository between releases names
-none, so a study running from source records the revision it ran.
+are not comparable. A released version names one rule set, and 0.2.0 is the released version this
+document describes; section 8 of `LIMITATIONS.md` says which build each figure in that document was
+measured on. A working copy taken from the repository between releases names none, so a study
+running from source records the revision it ran.
+
+Every result also names the build itself, and the two fields are what a methods section quotes
+beside the version: `tool_build` for the bytes that read the site and `judged_build` for the bytes
+that applied the rules, each the first twelve hex digits of the sha256 of `core.py` as installed,
+with `build_id()` returning the value for a document. The label alone is not enough to identify an
+instrument. A working copy and a release can both report 0.1.0 while holding different rules, and
+one organization census holds 334 records whose reading came from a build the label did not name.
 
 If a reviewer asks which rules produced a class, every result carries them: `Result.rules` is the
 list of numbered codebook rules that fired, and each piece of evidence carries the URL and the

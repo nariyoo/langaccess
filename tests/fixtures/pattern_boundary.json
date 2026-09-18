@@ -164,7 +164,7 @@
   },
   {
    "text": "Before you launch, work through our security checklist and confirm every volunteer account has been reviewed.",
-   "why": "What this gate does NOT cover, stated so that nobody reads it as covering more. A left word boundary says nothing about the right-hand side, and `security check` matches inside `security checklist` under both forms. Whether the wall vocabulary needs a right boundary as well is a separate question and a measurement, not a transcription."
+   "why": "The case the right-hand boundary was added for. A LEFT boundary says nothing about the character behind a match, so `security check` matched inside `security checklist` under both forms and this file recorded that as what the gate did not cover. In 0.2.0 the alternative carries a right boundary and this sentence is read as what it is, a page telling volunteers to work through a list before launch."
   },
   {
    "text": "The centre offers weekend English classes, a legal clinic on Tuesdays, and a food pantry that any resident of the county may use without an appointment.",
@@ -173,6 +173,50 @@
   {
    "text": "Nuestro centro ofrece clases de inglés, asesoría legal y una despensa de alimentos abierta a cualquier residente del condado.",
    "why": "The same negative control in Spanish. Every gate in this family was written in English, and the pages it must not reach are not all in English."
+  },
+  {
+   "text": "The move caused just a momentary gap in the pantry schedule, and Tuesday hours resumed the same week.",
+   "why": "`just a moment` is the Cloudflare interstitial and it matched inside `momentary`, which is an ordinary word in a sentence about a service that paused for a week. WALL_UNGATED_RX decides on its own at any page length, so this page was reported as a site nobody read."
+  },
+  {
+   "text": "The staff export lists two dormant logins under not authorized_users, and the office reviews that column every quarter.",
+   "why": "`not authorized` matched inside `not authorized_users`, a column name a person can reasonably write on a page about record keeping. An underscore is a word character, so the right boundary is what refuses it."
+  },
+  {
+   "text": "Immigration law is a domain not founded on guesswork, and our attorneys sit the training every year.",
+   "why": "`domain not found` matched inside `domain not founded`. `founded`, `founder` and `foundation` are three of the commonest words on a nonprofit page, and this alternative is ungated, so the reach costs a live organization its whole reading."
+  },
+  {
+   "text": "A site not founded by the people who use it is a site nobody visits twice, which is why we ran four listening sessions first.",
+   "why": "`site not found` inside `site not founded`. The same word and the same ungated pattern as the entry above, on the alternative that carries the shortest wording of the three."
+  },
+  {
+   "text": "A website not founded on what families actually asked for gets rebuilt within the year.",
+   "why": "`website not found` inside `website not founded`. The third of the three `found` wordings in WALL_UNGATED_RX, held here so a change to one of them cannot quietly leave the others behind."
+  },
+  {
+   "text": "We are doing some workshops on tenant rights this autumn and the first three are already full.",
+   "why": "`we are doing some work` matched inside `we are doing some workshops`, which is a sentence a community organization writes about its programme. The wording is a maintenance interstitial and this page is the opposite of one."
+  },
+  {
+   "text": "This site is currently privately funded by two family foundations and carries no advertising.",
+   "why": "`this site is currently private` matched inside `currently privately`. The wording is meant to catch a login wall, and `privately funded` is a statement about money."
+  },
+  {
+   "text": "The requested page about our founder explains how the centre was not founded by a church but by six families.",
+   "why": "`requested (?:url|resource|page) .{0,60}not found` matched inside `not founded`, reached across the wildcard the alternative carries. A page describing its own history is the page this pattern must never reach."
+  },
+  {
+   "text": "We fixed the 404 errors two volunteers reported on the events calendar last week.",
+   "why": "`404 ... error` matched inside `404 errors`, which is what a site writes when it has REPAIRED something rather than when it is broken."
+  },
+  {
+   "text": "Every page not founded on a real question from a family gets cut in the next redesign.",
+   "why": "`page (?:not found|cannot be found)` matched inside `page not founded`. The last of the `found` wordings, in the pattern gated to 300 characters, where a short page of plain prose is exactly what the gate lets through."
+  },
+  {
+   "text": "<body class=\"page template-default smartling-esp-hero lang-en\">",
+   "why": "The one right boundary that predates 0.2.0, on `smartling-[a-z]{2}` in MT_RX and ROUTE_WIDGET. core.py records that a Smartling install signs itself with a `smartling-<lang>` body class, so the two letters are a language code and have to be the whole of the token; without the boundary any longer class name beginning `smartling-` and two letters is read as an installed translation vendor, which decides a verdict. No claim is made here about how often a class of this shape occurs; the string is what says what the boundary refuses."
   }
  ]
 }

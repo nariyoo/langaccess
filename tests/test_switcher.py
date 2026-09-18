@@ -253,7 +253,10 @@ def test_the_vocabulary_only_names_languages_the_package_already_knows():
     known = LA.COVERED | set(LA.AUX_NAMES) | {LA.SWITCHER_ENGLISH}
     assert set(LA.LANG_CODE.values()) - known == set(LA.SWITCHER_ONLY)
     assert set(LA.LANG_TOKEN.values()) - known == set(LA.SWITCHER_ONLY)
-    assert LA.SWITCHER_ONLY == {'Nepali'}
+    # Empty since the Devanagari resolution, and Nepali was the last member. The set stays because
+    # what it pins is the declaration: a name the vocabulary can report and the reader cannot reach
+    # fails the two assertions above until somebody writes it in here with a reason.
+    assert LA.SWITCHER_ONLY == frozenset()
     # every alias points at a name the package can either read or has declared it cannot
     assert set(LA.SWITCHER_ALIAS.values()) <= known | set(LA.SWITCHER_ONLY)
     # and the four that DID get detectors are not quietly sitting in the declared set
@@ -726,13 +729,20 @@ def test_a_vendor_menu_does_not_spend_the_control_budget():
     publishes in. The page is counted before anything is worked, and a page over MENU_SIZE gets
     SELECT_OPTION_CANDIDATES controls rather than `limit` of them.
 
+    Which two those are is MENU_PREFERENCE and no longer the widget's alphabet. The cap alone left
+    the budget on the first two names the vendor happened to list, which is how seventeen recovered
+    sites came to report Amharic seven times.
+
     Driven against a stub rather than through `_audit_async`, because the first version of this
     test went through the map browser and passed with MENU_SIZE set to 9999.
     """
     assert len(NAMES) > LA.MENU_SIZE, 'the fixture is not a menu under this threshold'
     worked, _out, _dead = _work([_StubEl(None, 'a', n) for n in NAMES], limit=8)
     assert len(worked) == LA.SELECT_OPTION_CANDIDATES, worked
-    assert worked == NAMES[:LA.SELECT_OPTION_CANDIDATES], worked
+    # This menu carries no Spanish, so the two highest entries of the preference present in it are
+    # Chinese and Korean. What page order would have spent the same budget on is on the next line.
+    assert worked == ['Chinese', 'Korean'], worked
+    assert NAMES[:LA.SELECT_OPTION_CANDIDATES] == ['Afrikaans', 'Albanian']
 
 
 def test_an_authored_switcher_still_gets_the_whole_budget():

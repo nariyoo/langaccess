@@ -17,6 +17,7 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -287,7 +288,184 @@ def test_the_rule_registry_names_nothing_the_gate_leaves_out():
 # THREE PROPOSALS WERE MEASURED AND REFUSED, recorded so they are not made again: an English guard
 # on counted_evidence moves real language lists, rule 11's gate-ran reporting is the semantics rule
 # 13 already has, and a recorded sufficiency of zero cannot be told from the dataclass default.
-FREEZE = '8c385efdf73136b14d659dfd581d058f01b86d754c2984ccb13954cc9cfcb51f'
+# 2026-09-17, the parked-domain family. Three constants moved and one was added, all by addition
+# and none by a change to an existing value: FAILURE_KINDS gains `parked_domain` after
+# `directory_profile`, _FAILURE_PATTERNS gains the pattern that reads the note rule 2 has always
+# written, RULES names PARKED_HOST and _parked_host under rule 2, and PARKED_HOST is the new frozen
+# set of registrar sale and parking hosts. No reading of any fixture moved.
+# 2026-09-17, the right-hand word boundary. Four constants moved and nothing was added or
+# removed: WALL_UNGATED_RX on six alternatives, WALL_GATED_RX on two, WALL_NOTFOUND_RX on three,
+# and WALL_RX, which is built from the first two. The ward gate over the synthetic corpus did not
+# move and no fixture reading moved.
+# 2026-09-17, the merge of the engineering and recall branches. The listing is the union of the
+# two: every line of each branch's listing is in it and it holds no line from neither, checked
+# by diffing the three dumps; the seven constants the engineering branch changed (FAILURE_KINDS,
+# RULES, WALL_GATED_RX, WALL_NOTFOUND_RX, WALL_RX, WALL_UNGATED_RX, _FAILURE_PATTERNS) carry
+# that branch's values.
+# 2026-09-17, Ethiopic. Five constants arrive (ETHIOPIC, ETH_FUNC, ETH_RX, _ETH_ALL, _ETH_LANGS)
+# and five move. COVERED and SCRIPT_LANGUAGES gain Tigrinya; SCRIPT_FUNC['Amharic'] becomes the
+# union of ETH_FUNC instead of a hand-written Amharic list, which adds the Tigrinya particles and
+# removes none of the fourteen it held; SCRIPT_FUNC_RX follows it; and LANGNAME, LANGLABEL and
+# LANG_TOKEN follow COVERED plus the autonym ትግርኛ and the code `ti`, which are a reporting
+# widening and move no class. No agreement figure is computed over a corpus that contains Tigrinya,
+# so none of the figures in LIMITATIONS §1 changes; what changes is the inventory count in §6.
+#
+# 2026-09-17, Devanagari. Six constants arrive (DEV_EDGE, DEV_FUNC, DEV_RX, _DEV_ALL, _DEV_LANGS and
+# SCRIPT_FUNC_EDGE) and five move. COVERED and SCRIPT_LANGUAGES gain Nepali and Marathi;
+# SWITCHER_ONLY becomes empty, because Nepali was its last member and the reader can now name it;
+# SCRIPT_FUNC['Hindi'] becomes the union of DEV_FUNC plus the connectives the three languages share,
+# keeping all twenty words it held; and SCRIPT_FUNC_RX['Hindi'] changes SHAPE, from a \b boundary to
+# the Devanagari range, which is the one entry here that changes what a page reads rather than what
+# it can be called. It moves in both directions: twelve of the twenty words could not match standing
+# alone and now can, and a fragment of one inside a longer word could match and now cannot. No
+# agreement figure is computed over a corpus that separates the Devanagari languages, so nothing in
+# LIMITATIONS section 1 moves; section 6's inventory does.
+#
+# 2026-09-17, the Bengali script. Six constants arrive (BENGALI, BEN_EDGE, BEN_FUNC, BEN_RX,
+# _BEN_ALL, _BEN_LANGS) and nine move, and the nine are the same shapes the two commits before this
+# one moved: COVERED and SCRIPT_LANGUAGES gain Assamese, SCRIPT_FUNC['Bengali'] becomes the union of
+# BEN_FUNC and keeps all fifteen words it held, SCRIPT_FUNC_EDGE gains the Bengali range and
+# SCRIPT_FUNC_RX['Bengali'] changes shape with it, and SWITCHER_AUTONYM, LANGNAME, LANGLABEL and
+# LANG_TOKEN follow the autonym. Nine of the fifteen Bengali words could not match standing alone
+# under the old boundary and now can.
+#
+# 2026-09-17, four Brahmic ranges. No constant arrives and ten move. SCRIPTS gains Gurmukhi,
+# Gujarati, Tamil and Telugu, and COVERED and SCRIPT_LANGUAGES follow it; SCRIPT_FUNC gains a
+# particle list for each, SCRIPT_FUNC_EDGE the four ranges and SCRIPT_FUNC_RX the four patterns;
+# and SWITCHER_AUTONYM, LANGNAME, LANGLABEL and LANG_TOKEN gain the four autonyms. The four
+# languages were reported before, through the identifier, so what moves is the evidence a reading
+# rests on and not the vocabulary: a run of the script and a particle beside it, in place of two
+# sentences of 140 characters and a model's answer.
+#
+# 2026-09-17, Armenian and Georgian. No constant arrives and ten move, the same ten the Brahmic
+# commit moved with SCRIPT_FUNC_SPACED in place of SCRIPT_FUNC_EDGE: these two scripts write no
+# combining vowel signs, so their lists take the ordinary word boundary.
+#
+# 2026-09-17, Oromo. No constant arrives and ten move: FUNC gains a twenty-first non-English list
+# with FUNC_RX and FUNC_ONLY_RX behind it, COVERED follows, and SWITCHER_ISO and SWITCHER_AUTONYM
+# gain the code and the two spellings of the autonym with LANGNAME, LANGLABEL, LANG_CODE and
+# LANG_TOKEN behind them. `_SHARED` is NOT in the diff and that is the property the addition rests
+# on: the Oromo words are shared with none of the other twenty lists, so no other language's
+# unique-word licence thins and no other language reads differently.
+#
+# 2026-09-17, Lithuanian. Three constants move and no constant arrives: FUNC gains fourteen words
+# in one entry, with FUNC_RX and FUNC_ONLY_RX behind it. `_SHARED` is not in the diff, so no other
+# language's licence thins; the one candidate that would have thinned one was dropped instead.
+# 2026-09-17, the merge of the language branch onto the engineering and recall merge. No constant
+# was changed by both sides (checked by diffing the branch dumps against the recall branch's), so
+# the listing is the union: the seven the engineering branch changed, the sixteen the language
+# branch changed and the seventeen it added, each carrying its own branch's value.
+#
+# 2026-09-17, codebook rule 9 inside a script. Two constants arrive, SCRIPT_CONNECTIVE and
+# SCRIPT_CONNECTIVE_SET, and NOTHING existing moves: the listing diff is those two lines. The
+# particle lists are untouched, because the change is not which words count but whether a
+# coordinating conjunction may be the only one that does. `_script_prose` now requires one
+# qualifying particle that is not a coordinator, which is rule 9's own distinction restated for a
+# script, where the particle stands in for the verb. No published figure moves: the change refuses
+# one shape of reading on one site of the 300-site prefix it was found on, and that site's settled
+# class is the one it now returns.
+#
+# 2026-09-18, the note for a control scan the clock cut short. One constant arrives,
+# CONTROL_SCAN_CUT_NOTE, and NOTHING existing moves: the listing diff is that one line, and the
+# count goes from 307 covered to 308. No verdict can move on it. The sentence goes on the note
+# beside CONTROL_DEAD_NOTE, `control_dead` is a substring test for CONTROL_DEAD_NOTE at its three
+# call sites, and no pattern in `_FAILURE_PATTERNS` matches the new sentence, which is asserted
+# rather than assumed. READINGS did not move: the reading corpus runs without a deadline, so the
+# clock guard the sentence reports cannot fire in it.
+#
+# What the sentence is for, and what it deliberately is not. All 33 machine_translate_error rows
+# of the 2,000-site gold frame were re-operated one site at a time on a 300-second clock on
+# 2026-09-18, against 240 seconds at concurrency 8 in the capture. 27 came back
+# machine_translate_error again and 26 of those 27 finished with clock_exhausted false, so the
+# class is not being written for a starved clock; the control step runs on the home page before
+# the interior crawl spends the page budget, which is why it cannot easily be. The remaining
+# shape, a scan the clock stops with a control still unworked, has never been counted because
+# nothing recorded it. This records it. Suppressing rule 16 on it would move an unknown number of
+# sites and waits on that count.
+# 2026-09-18, the crawler's reach. Six constants arrive, two go, and two move. UA_BASE and
+# UA_CONTACT are gone and UA holds what UA_BASE held: the contact comment the crawler appended to
+# its user agent was measured against the 144 addresses the gold-frame run recorded unreachable,
+# each probed once under each string, and it cost 13 of them, 7 refusing with
+# net::ERR_HTTP2_PROTOCOL_ERROR, 4 with HTTP 403 and 2 with a destroyed execution context, against
+# none that answered the token and not the plain string. FAILURE_KINDS gains `protocol_error` and
+# `connection_closed` and _FAILURE_PATTERNS gains their two patterns, which are the two transport
+# failures the note could not say until it began carrying the exception's message; the `timeout`
+# pattern moves by one character class, `timed[ _]out`, so that Chromium's own
+# net::ERR_CONNECTION_TIMED_OUT is a timeout and not an unspecified error. ERROR_NOTE_CHARS,
+# _PW_CALL_RX and _NET_ERR_RX are the note's own bound and trimming, and RETRY_PASS_KINDS,
+# RETRY_PASS_CONCURRENCY and RETRY_PASS_NOTE are the end-of-batch second reading.
+#
+# WHICH FIGURE THIS INVALIDATES. The user agent decides which sites answer at all, so this is a
+# change to crawler reach and every figure measured under the old string describes a crawler that
+# no longer exists. The agreement figures in LIMITATIONS 1 are measured on sites that were READ,
+# and a site the old string could not read contributed to neither; what moves is the denominator of
+# reach, which LIMITATIONS 4 now states for this build with the re-read it was measured on. No
+# rule changed, no threshold changed and `READINGS` did not move: judged from the same pages, this
+# build returns the same class, the same languages and the same quotes as the one before it.
+# 2026-09-18, the merge of work packages H and F onto main. Re-recorded on the merged tree: the
+# listing diff against main after H is exactly F's nine lines (six constants added, UA and the two
+# failure tables changed, UA_BASE and UA_CONTACT gone) and H's CONTROL_SCAN_CUT_NOTE is kept, which
+# was checked by diffing the four listings (base, H tip, F tip, merged) as sets, not read off.
+
+# 2026-09-18, the merge of work package G onto main after H and F. Re-recorded on the merged tree:
+# against main after F the listing changes exactly G's nine lines (AUX_ISO, AUX_NAMES, FUNC, FUNC_RX,
+# FUNC_ONLY_RX, LANGLABEL, LANGNAME, LANG_CODE, LANG_TOKEN), checked by diffing the four listings as
+# sets (base, main after F, G tip, merged); nothing of H or F moved. READINGS is G's value and the
+# reading freeze passed on the merged tree without re-recording.
+#
+# 2026-09-18, one reader for the live audit and the re-judge. Four constants arrive and NOTHING
+# existing moves: WIDGET_ID, WIDGET_CLASS and WIDGET_SUBSTRING are the three tuples WIDGET_SEL is
+# now built from, and _WIDGET_HINT is the cheap refusal the byte reader takes over a document
+# before it scans it. WIDGET_SEL itself is byte for byte the string it was, which is the line to
+# check in the listing diff, because the selector the browser is handed decides what a live strip
+# removes and nothing about this release changes that. The count goes from 308 covered to 312.
+# The three tuples exist because `_page_text` now removes the widget's own furniture from the
+# BYTES as well, which is what `_strip_widget` has always removed from the DOM: the store keeps
+# `page.content()` taken before the strip, so a Google Translate menu of autonyms is in the stored
+# document, and a re-judge read it as the site's own content while the live audit did not.
+# READINGS moved, for the reading change this commit is about; the note above it names the
+# fixtures.
+#
+# 2026-09-18, the reason code for a reading that is now reproduced. Two constants leave and one
+# moves: REJUDGE_BROWSER_TEXT is deleted and REJUDGE_LIMITS loses its entry, which is the whole
+# listing diff. 312 covered to 310. The code declared that a stored capture cannot carry the
+# browser's own rendered text, and that stopped being a limit when the live audit stopped taking
+# that text: both sides read `_page_text` of one document now, so the statement would be false on
+# every re-judged row that carried it. A row written by an earlier release still holds the string
+# in its own `unreproducible` list, which is the truth about that row and is why nothing rewrites
+# stored rows. No reading moves on it: the code is reported and nothing reads it.
+# 2026-09-18, the merge of the reader-parity branch onto the main that carries F, G and the
+# placeholder branch. Checked against the dumps of both sides: no constant was changed by both;
+# the listing is main's plus the reader branch's four widget constants and its REJUDGE_LIMITS,
+# and lacks REJUDGE_BROWSER_TEXT (retired by the reader branch) and UA_BASE/UA_CONTACT (retired
+# by F).
+# 2026-09-18, a quoted testimonial is recorded and not counted. Eight constants arrive
+# (MECH_TESTIMONIAL, TESTIMONIAL_WORDS, TESTIMONIAL_RX, QUOTED_TAGS, QUOTED_FIGURE_CHILD,
+# QUOTED_NEVER, _QUOTED_HINT, _QUOTED_JS) and ONE moves: MECH_SUFFICIENCY gains
+# `testimonial: 1`, which is the rung SUFF_TOKEN already named and which `sufficiency_of`
+# returned for an unknown mechanism anyway, so the entry is a statement of what was already true
+# rather than a change to it. The listing diff is those nine lines and nothing else, checked by
+# dumping both revisions.
+#
+# No verdict can move on the constants. What moves a reading is the removal of a quoted
+# container's text from the counted stream, which is measured in the commit message and in
+# LIMITATIONS 7.2: 3 of 72 sites of the 2026-09-17 capture, one gaining an uncounted row, one
+# leaving true_multilingual on a Spanish client testimonial, and one dropping a rung on a
+# bilingual mission statement in a `<blockquote>`. READINGS moved by two added fixtures and no
+# existing fixture.
+# 2026-09-18, the merge of the testimonial branch onto the reader-parity merge. Checked against
+# both dumps: the eight quoted-container constants join, MECH_SUFFICIENCY takes the branch's value
+# (it alone changed it), and nothing else moved.
+#
+# 2026-09-18, the clock the end-of-batch pass gives a timed-out row. Three constants arrive,
+# RETRY_PASS_SLOW_KINDS, RETRY_PASS_CLOCK_FACTOR and RETRY_PASS_CLOCK_CAP, and NOTHING existing
+# moves: the listing diff is those three lines, and RETRY_PASS_KINDS, RETRY_PASS_CONCURRENCY and
+# RETRY_PASS_NOTE are not in it. The pass had been giving a timed-out row the clock that had just
+# run out on it, and recovered none of the 12 such rows the 144-address re-read offered it. Those
+# 12, read again the same day with everything else held identical and the bound at 480 seconds
+# instead of 240, answered on 11 of the 12 at a median of 15 pages. No published figure moves: no
+# rule reads a clock, and a row this recovers is judged by the same rules as every other row.
+FREEZE = '77aca509b07a940a9276c89d3413b22cd5d60f8cea5cfc98aa40a34bf1e4c7f9'
 
 
 def test_the_frozen_constants_have_not_moved():
@@ -915,8 +1093,22 @@ def test_a_noise_code_can_never_name_a_language(monkeypatch):
     # the name out after the lookup. It cannot produce a reading, exactly as `ga` cannot, and it was
     # named in two comments as the language the auxiliary reader exists for. Pinned by the same rule
     # and for the same reason: waking it up should be a decision somebody makes.
+    # `mr` joined it with the Devanagari resolution. Marathi used to arrive only through the
+    # identifier, gated on the Devanagari range; DEV_FUNC now names it from its own grammatical
+    # words, so it is in COVERED and the code is shadowed the way `lt` is. That is the trade the
+    # change makes and it is worth stating: what Marathi loses is a route that needed two blocks of
+    # 140 characters each, and what it gains is one that reads a single help notice.
+    # `as` joined them with the Bengali-script resolution, on the same trade: Assamese used to
+    # arrive only through the identifier, gated on the Bengali range, and BENGALI now names it from
+    # the letter ৰ, which is in almost every Assamese sentence.
+    # `gu`, `pa`, `ta` and `te` joined them when the four Brahmic ranges entered SCRIPTS. Each of
+    # those languages writes a script nothing else in these inventories claims, so the range is the
+    # evidence and the identifier is no longer the route; what they lose is a gate that wanted two
+    # sentences of 140 characters each, and what they gain is a reading of one help notice.
+    # `hy` and `ka` joined with the Armenian and Georgian ranges, on the same trade again.
     dead = sorted(c for c, name in LA.AUX_ISO.items() if name in LA.COVERED)
-    assert dead == ['lt'], f'the AUX_ISO codes shadowed by a word list changed: {dead}'
+    assert dead == ['as', 'gu', 'hy', 'ka', 'lt', 'mr', 'pa', 'ta', 'te'], (
+        f'the AUX_ISO codes shadowed by a word list or a script changed: {dead}')
 
     fake = types.ModuleType('langid')
     fake.classify = lambda text: ('ga', 1.0)
@@ -1412,9 +1604,15 @@ class _ChromePage(_MapPage):
     """A page that can answer the chrome-removal script, which needs a DOM the fake has not got.
 
     `mains` maps an address to the text the browser would report with the navigation, header and
-    footer hidden. The real removal is JavaScript and is exercised in tests/test_live.py; what is
-    pinned here is the WIRING, that the chrome-free text and not the whole body is what the language
-    reading is taken on.
+    footer hidden. The real removal is JavaScript and is exercised in tests/test_live.py.
+
+    WHAT IT PINS NOW. Until 0.2.0 this was the wiring of the page reading, and the two tests below
+    held that the chrome-free text and not the whole body was what `languages_in` was given. The
+    reading comes off the document through `_page_text` from 0.2.0 on, because that is the function
+    `rejudge` reads a stored page with, and neither it nor any byte reader can hide a block a
+    browser laid out. So what these fixtures pin is the opposite: a browser reporting an empty
+    chrome-free text no longer silences a page, and the cost of that is recorded rather than
+    papered over.
     """
 
     async def evaluate(self, script, arg=None):
@@ -1447,28 +1645,70 @@ _FR_CHROME = ('Passer au contenu principal ACCUEIL NOS SERVICES POUR LES FAMILLE
               'DE NOUS ÉVÉNEMENTS RELIER PRENDRE CONTACT New Page New Page New Page')
 
 
-def test_a_page_whose_only_second_language_is_its_menu_is_not_a_page_in_that_language():
-    """One site reads a language off a single locale page whose whole text is menu chrome: a skip
-    link, a translated navigation bar and a footer, interleaved with untranslated placeholders. One
-    page, so the cross-page repeat test has nothing to compare; one locale mirror, so the
-    three-front-doors rule cannot fire either. The markup says which parts are navigation."""
+def test_a_page_whose_only_second_language_is_its_menu_reads_as_that_language():
+    """The price of one reader, on the shape that price is paid on.
+
+    A locale page whose whole text is a skip link, a translated navigation bar and three
+    untranslated placeholders. One page, so the cross-page repeat test has nothing to compare; one
+    locale mirror, so the three-front-doors rule cannot fire either. The browser here reports the
+    chrome-free text as the empty string and the audit reads French anyway, which is what says the
+    chrome hiding no longer decides a page reading.
+
+    THE FIGURE ALREADY READ IT THIS WAY. `rejudge` hides no navigation and never has, and every
+    agreement figure this project publishes is computed by re-judging stored captures, so a reader
+    that answered `english_only` here was a reader no published figure described. REJUDGE_LIMITS
+    counted this shape when the two readers were separate: of seven stored captures whose locale
+    page the byte reader found a language on, two are this page, where the hidden-chrome answer was
+    the right one. Two sites of seven is what one reader costs, against the 24 sites of 1,992 that
+    two readers cost.
+    """
     site = {'https://x.org/fr': _page(_FR_CHROME)}
     assert LA.languages_in(_FR_CHROME) == ['French'], 'the fixture has to be readable as French'
     b = _ChromeBrowser(site, mains={'https://x.org/fr': ''})
     r = asyncio.run(LA._audit_async('https://x.org/fr', browser=b))
-    assert r.languages == []
-    assert r.verdict == 'english_only'
+    assert r.languages == ['French']
+    assert r.verdict == 'true_multilingual'
 
 
 def test_the_body_underneath_the_chrome_is_still_read():
-    """Removing the furniture must not remove the page: the same nav with a paragraph under it is a
-    page in the language, and it is the paragraph that says so."""
+    """The same nav with a paragraph under it is a page in the paragraph's language, which is the
+    half of the old chrome rule that survives the change: the menu no longer suppresses anything
+    and it no longer has to, because the paragraph is read either way. What moved is that the
+    navigation's own language is now named beside it, and a run counting `true_multilingual` should
+    read `evidence` rather than the class alone on a site with a translated menu."""
     prose = ('Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y recursos '
              'para las familias que necesitan ayuda con este proceso, y todos pueden hacer una cita.')
     site = {'https://x.org/': _page(_FR_CHROME + '\n' + prose)}
     b = _ChromeBrowser(site, mains={'https://x.org/': prose})
     r = asyncio.run(LA._audit_async('https://x.org', browser=b))
-    assert r.languages == ['Spanish']
+    assert r.languages == ['French', 'Spanish']
+    assert any(e.language == 'Spanish' for e in r.evidence), 'the paragraph is still the reading'
+
+
+def test_a_template_the_page_does_not_lay_out_does_not_make_a_live_site_parked():
+    """The reading is the served document from 0.2.0 and the three unreadability tests are not.
+
+    A theme ships the placeholder it was installed with, and the commonest form of it is a "coming
+    soon" or "domain for sale" block the live page never renders. `is_parked`, `is_wall` and the
+    empty-body test are taken on the browser's own text for that reason, so a template nobody sees
+    cannot write off a site that is serving content. Both directions are held, because asserting
+    only the first would pass on a build where the parked test had stopped working altogether.
+    """
+    parked = ('This domain is for sale. Buy this domain now from our registrar and start your '
+              'new website today.')
+    prose = ('Our community center helps families with legal questions, housing and school '
+             'enrollment every day of the week, and the first appointment is free.')
+    live = {'https://x.org/': ('<html><body><p>' + prose + '</p>'
+                               '<div class="coming-soon" style="display:none"><p>' + parked
+                               + '</p></div></body></html>', prose, 200)}
+    r = asyncio.run(LA._audit_async('https://x.org', browser=_MapBrowser(live)))
+    assert r.verdict != 'unreachable', 'a hidden placeholder wrote off a site that serves content'
+    assert LA.is_parked(parked), 'the placeholder in this fixture is not one the test recognises'
+
+    # and the direction that has to keep working: the same text as the page a visitor sees
+    shown = {'https://x.org/': ('<html><body><p>' + parked + '</p></body></html>', parked, 200)}
+    r2 = asyncio.run(LA._audit_async('https://x.org', browser=_MapBrowser(shown)))
+    assert r2.verdict == 'unreachable' and LA.failure_kind(r2) == 'parked_domain'
 
 
 def test_the_whole_body_is_still_what_the_wall_and_the_widget_tests_read():
@@ -1485,9 +1725,12 @@ def test_the_whole_body_is_still_what_the_wall_and_the_widget_tests_read():
 _SPANISH_HOME = ('Nuestros servicios para la comunidad son gratuitos. Ofrecemos informacion y '
                  'recursos para las familias que necesitan ayuda con este proceso, y todos '
                  'pueden hacer una cita con un abogado.')
+# The markup carries the paragraph the browser reports, because from 0.2.0 the reading is taken off
+# the document: a fixture whose markup held only its links described a page no server sends and
+# tested the clock against a home page with nothing on it to read.
 _MANY_PAGES = dict(
     {'https://x.org/': (
-        '<html><head><title>Centro</title></head><body>'
+        '<html><head><title>Centro</title></head><body><p>' + _SPANISH_HOME + '</p>'
         + ''.join('<a href="/services/%d">Servicios %d</a>' % (i, i) for i in range(12))
         + '</body></html>', _SPANISH_HOME, 200)},
     **{'https://x.org/services/%d' % i: _page('Page %d about our work in the county.' % i)
@@ -1554,8 +1797,9 @@ def test_a_disallowed_interior_page_is_skipped_and_the_audit_goes_on():
     """robots.txt is a statement about addresses, not about the site, so one disallowed address is
     one page not read and not a site written off."""
     site = {'https://x.org/': (
-        '<html><head><title>Centro</title></head><body><a href="/private">Private</a>'
-        '<a href="/servicios">Servicios</a></body></html>',
+        '<html><head><title>Centro</title></head><body>'
+        '<p>Welcome to our center, with legal help and classes for families.</p>'
+        '<a href="/private">Private</a><a href="/servicios">Servicios</a></body></html>',
         'Welcome to our center, with legal help and classes for families.', 200),
         'https://x.org/private': _page('Staff only.'),
         'https://x.org/servicios': _page(_SPANISH_HOME)}
@@ -1574,7 +1818,9 @@ def test_robots_is_read_by_default_and_switching_it_off_is_an_override():
         assert p['respect_robots'].default is True
         assert p['respect_robots'].kind is inspect.Parameter.KEYWORD_ONLY
     site = {'https://x.org/': (
-        '<html><head><title>Centro</title></head><body><a href="/private">Private</a></body></html>',
+        '<html><head><title>Centro</title></head><body>'
+        '<p>Welcome to our center, with legal help and classes for families.</p>'
+        '<a href="/private">Private</a></body></html>',
         'Welcome to our center, with legal help and classes for families.', 200),
         'https://x.org/private': _page(_SPANISH_HOME)}
     b = _MapBrowser(site, plain=_RobotsClient('User-agent: *\nDisallow: /private\n'))
@@ -2190,6 +2436,80 @@ def test_the_guard_on_a_control_that_changed_nothing_still_fires():
         'the guard did not fire: the page was read and navigated away from anyway'
 
 
+# ---- which option of a full vendor menu is driven
+#
+# A vendor menu is alphabetical and the budget for worked controls is SELECT_OPTION_CANDIDATES, so
+# the control that settled what the menu does was whichever language the widget listed first. Seven
+# of seventeen sites a development round recovered through a menu reported Amharic, which is the
+# first name in this package's vocabulary that a Google Translate menu reaches, and nothing about
+# those sites is Amharic. A curated switcher keeps page order, because its order is a decision an
+# organization made.
+
+# Alphabetical, as a vendor writes it, and longer than MENU_SIZE so that the menu branch is the one
+# under test. Nothing is invented here but the list: these are language names.
+_VENDOR_MENU = ['Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Azerbaijani', 'Basque',
+                'Belarusian', 'Bengali', 'Bulgarian', 'Burmese', 'Catalan', 'Chinese', 'Czech',
+                'Danish', 'Dutch', 'Estonian', 'Finnish', 'French', 'Galician', 'Georgian',
+                'German', 'Greek', 'Gujarati', 'Haitian Creole', 'Hausa', 'Hebrew', 'Hindi',
+                'Hungarian', 'Icelandic', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Latvian',
+                'Lithuanian', 'Macedonian', 'Malay', 'Nepali', 'Polish', 'Portuguese', 'Romanian',
+                'Russian', 'Slovak', 'Somali', 'Spanish', 'Swahili', 'Swedish', 'Tagalog', 'Tamil',
+                'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Vietnamese']
+
+
+class _MenuControl(_LangControl):
+    """A control that records WHICH label was clicked, which is the whole question here."""
+
+    async def click(self, timeout=None):
+        self._page.clicked.append(self._label)
+        self._page.calls.append('click')
+
+
+class _MenuPage(_ClickDomPage):
+    """A page presenting a whole list of language-labelled controls, in the order given."""
+
+    def __init__(self, labels, before, after):
+        super().__init__(before, after)
+        self.labels, self.clicked = labels, []
+
+    async def query_selector_all(self, sel):
+        return [_MenuControl(self, lab) for lab in self.labels]
+
+
+def test_a_full_vendor_menu_is_driven_to_spanish_first():
+    """Not to Afrikaans, and not to Amharic. The menu is alphabetical and the budget for worked
+    controls is two, so page order spent both on languages nobody on the list had asked for."""
+    assert len({lab.lower() for lab in _VENDOR_MENU}) > LA.MENU_SIZE, 'this is not a menu'
+    page = _MenuPage(_VENDOR_MENU, 'Select Language ' + _MENU_ES, _MENU_ES)
+    asyncio.run(LA._click_language_controls(page, _HOME_EN, 'https://x.org/'))
+    assert page.clicked[:1] == ['Spanish']
+
+
+def test_a_curated_switcher_keeps_the_order_the_organization_wrote():
+    """Four options is a list of the languages an organization serves, and which one it put first is
+    a decision somebody made. Nothing about the preference applies below MENU_SIZE."""
+    page = _MenuPage(['Hmong', 'Somali', 'Spanish', 'Arabic'],
+                     'Select Language ' + _MENU_ES, _MENU_ES)
+    asyncio.run(LA._click_language_controls(page, _HOME_EN, 'https://x.org/'))
+    assert page.clicked[:1] == ['Hmong']
+
+
+def test_the_preference_reads_the_switcher_vocabulary_and_not_the_english_name():
+    """A menu rendered in its own languages writes Spanish as `Español`. The preference
+    resolves a label the way every other part of this file resolves one."""
+    menu = ['Afrikaans' if lab == 'Spanish' else lab for lab in _VENDOR_MENU] + ['Español']
+    page = _MenuPage(menu, 'Select Language ' + _MENU_ES, _MENU_ES)
+    asyncio.run(LA._click_language_controls(page, _HOME_EN, 'https://x.org/'))
+    assert page.clicked[:1] == ['Español']
+
+
+def test_every_language_in_the_preference_is_one_the_vocabulary_names():
+    """A name in this list the switcher vocabulary cannot resolve would rank nothing and would look
+    like a preference that is being applied."""
+    unknown = [n for n in LA.MENU_PREFERENCE if LA._lookup_language(LA.LANG_TOKEN, n) != n]
+    assert unknown == []
+
+
 # ---- a control that opens a new tab, and one that starts a download (F5)
 #
 # A window.open switcher puts its result in a NEW tab and a document link starts a download; both
@@ -2633,12 +2953,134 @@ def test_a_dead_control_is_recorded_rather_than_dropped():
     assert LA.verdict_for(ev, 'Google Translate', control_dead=True) == LA.MT_ERROR
     assert 16 in LA.verdict_rules(ev, 'Google Translate', control_dead=True)
 
+class _TwoControlPage:
+    """`_ClickDomPage` with two dead controls, so a scan can be stopped between them.
+
+    Both controls change nothing, which is what makes each of them rule 16's observation, and the
+    page records every click so a stubbed clock can be driven off what has already happened rather
+    than off how many times the function happens to read it.
+    """
+
+    def __init__(self, home, labels=('Chinese', 'Spanish')):
+        self.calls = []
+        self.url = 'https://x.org/'
+        self._home, self._labels = home, labels
+
+    async def query_selector_all(self, sel):
+        return [_LangControl(self, lab) for lab in self._labels]
+
+    async def wait_for_timeout(self, ms):
+        return None
+
+    async def inner_text(self, sel):
+        return self._home          # unchanged, whatever the control did
+
+    async def evaluate(self, *a, **k):
+        return None
+
+    async def goto(self, url, wait_until=None, timeout=None):
+        self.url = url
+        return _FakeResp(200)
+
+
+def test_a_control_scan_the_clock_cut_short_says_so(monkeypatch):
+    """Rule 16 rests on a control that was worked and answered nothing, and until this was written
+    the record could not say whether the scan that produced that observation had finished. A site
+    whose second control would have produced the language, never reached because the clock ran out,
+    left a note identical to one whose every control was worked and was dead.
+
+    The clock is stubbed on what the page has already been asked to do rather than on wall time, so
+    the test states the shape it is about: once one control has been worked, the clock is inside the
+    reserve, and the scan stops with a candidate still in hand."""
+    page = _TwoControlPage(_HOME_EN)
+    monkeypatch.setattr(LA, '_left', lambda d: 5.0 if 'click' in page.calls else 5000.0)
+    seen = {}
+    worked, dead, _stuck = asyncio.run(LA._click_language_controls(
+        page, _HOME_EN, 'https://x.org/', deadline=1.0, outcome=seen))
+    assert worked == []
+    assert dead == [('Chinese', 'https://x.org/')], 'the second control was worked after all'
+    assert seen.get('cut_short') is True, 'the clock ended the scan and nothing recorded it'
+
+
+def test_a_control_scan_that_finished_is_not_recorded_as_cut_short(monkeypatch):
+    """The other direction, which is the one that decides whether the note means anything: a scan
+    with time to spare works every candidate and says nothing about the clock."""
+    page = _TwoControlPage(_HOME_EN)
+    monkeypatch.setattr(LA, '_left', lambda d: 5000.0)
+    seen = {}
+    worked, dead, _stuck = asyncio.run(LA._click_language_controls(
+        page, _HOME_EN, 'https://x.org/', deadline=1.0, outcome=seen))
+    assert worked == []
+    assert dead == [('Chinese', 'https://x.org/'), ('Spanish', 'https://x.org/')]
+    assert 'cut_short' not in seen
+
+
+def test_the_cut_short_sentence_is_a_record_and_moves_no_class():
+    """The fragment goes on the note BESIDE rule 16's own sentence, and `control_dead` is a
+    substring test for that sentence at three call sites, so adding a second sentence cannot move a
+    verdict. Stated as an assertion because the alternative, suppressing rule 16 on a scan that did
+    not finish, would move an unknown number of sites and the shape has never been counted: over
+    the 2,000-site gold frame the 33 rows in this class were re-operated one at a time on a
+    300-second clock and 26 of the 27 that reproduced finished with the clock unexhausted."""
+    note = LA.CONTROL_DEAD_NOTE + '; ' + LA.CONTROL_SCAN_CUT_NOTE
+    assert LA.CONTROL_SCAN_CUT_NOTE not in LA.CONTROL_DEAD_NOTE
+    assert LA.CONTROL_DEAD_NOTE not in LA.CONTROL_SCAN_CUT_NOTE
+    assert LA.CONTROL_DEAD_NOTE in note, 'rule 16 stopped firing on its own observation'
+    assert LA.ROUTE_ENGLISH_NOTE not in note
+    assert not [k for k, p in LA._FAILURE_PATTERNS if p.search(note)], \
+        'the fragment reads as a failure kind, which would name a reason no read established'
+    ev = [LA.Evidence('translation_plugin', 'https://x.org/', 'gtranslate', '')]
+    assert LA.verdict_for(ev, 'Google Translate',
+                          control_dead=LA.CONTROL_DEAD_NOTE in note) == LA.MT_ERROR
+
+
+def _widget_browser():
+    """A one-page site with a Google Translate widget, for the control-step guard tests."""
+    return _MapBrowser({'https://x.org/': _page(
+        _HOME_EN + ' <div id="google_translate_element"></div>'
+        '<script src="//translate.google.com/translate_a/element.js"></script>')})
+
+
+def test_a_defect_in_the_control_step_is_not_swallowed_with_the_browser_errors(monkeypatch):
+    """The control step runs inside a guard wide enough to hide a defect completely, and it hid
+    one. A test double written against the previous signature raised TypeError on 2026-09-18, the
+    whole step was skipped, the note was never written, and the audit answered machine_translate on
+    a fixture whose answer is machine_translate_error: a verdict moved by a bug, with nothing
+    failing and nothing printed. A browser cannot raise TypeError and neither can a network, so the
+    two classes that are always a defect in this file are re-raised and the rest are still
+    absorbed."""
+    async def wrong_signature(page, home_text, base, limit=8, exclude=(), deadline=None):
+        return [], [('Chinese', 'https://x.org/')], []
+
+    monkeypatch.setattr(LA, '_click_language_controls', wrong_signature)
+    with pytest.raises(TypeError):
+        asyncio.run(LA._audit_async('https://x.org/', browser=_widget_browser()))
+
+
+def test_a_browser_error_in_the_control_step_is_still_absorbed(monkeypatch):
+    """The other direction, which is what keeps the narrowing honest. A page that goes away
+    mid-step is the ordinary reason this guard exists: the reading goes on without the control
+    step rather than losing the site. AttributeError stays absorbed too, because this file
+    duck-types the page it is handed and a driver missing a method is a degradation and not a
+    defect."""
+    for boom in (RuntimeError('Target page, context or browser has been closed'),
+                 AttributeError("'NoneType' object has no attribute 'query_selector_all'")):
+        async def fails(page, home_text, base, limit=8, exclude=(), deadline=None, outcome=None,
+                        _e=boom):
+            raise _e
+
+        monkeypatch.setattr(LA, '_click_language_controls', fails)
+        r = asyncio.run(LA._audit_async('https://x.org/', browser=_widget_browser()))
+        assert r.verdict == 'machine_translate', type(boom).__name__
+        assert LA.CONTROL_DEAD_NOTE not in r.note
+
+
 def test_a_dead_control_reaches_machine_translate_error_without_a_real_browser(monkeypatch):
     """The whole wire of the fifth class, in the default suite for the first time: the dead list
     becomes evidence, the evidence sets the note, the note sets the flag, and the flag is the
     class. Until this test, deleting the three lines that append the note broke only a live-marked
     test that CI never runs."""
-    async def fake_click(page, home_text, base, limit=8, exclude=(), deadline=None):
+    async def fake_click(page, home_text, base, limit=8, exclude=(), deadline=None, outcome=None):
         return [], [('Chinese', 'https://x.org/')], []
 
     monkeypatch.setattr(LA, '_click_language_controls', fake_click)
@@ -2656,7 +3098,7 @@ def test_a_stuck_control_is_evidence_and_moves_nothing_without_a_real_browser(mo
     """The stuck list's caller contract, in the default suite: an entry becomes evidence saying the
     control could not be operated, with no language and no rule number, and the class stands on
     what else was found."""
-    async def fake_click(page, home_text, base, limit=8, exclude=(), deadline=None):
+    async def fake_click(page, home_text, base, limit=8, exclude=(), deadline=None, outcome=None):
         return [], [], [('Arabic', 'https://x.org/')]
 
     monkeypatch.setattr(LA, '_click_language_controls', fake_click)
@@ -2685,3 +3127,545 @@ def test_every_name_in_all_resolves():
     import langaccess
     missing = [n for n in langaccess.__all__ if not hasattr(langaccess, n)]
     assert not missing, missing
+
+
+# ---------------------------------------------------------------- a landed registrar sale page
+#
+# The three parking patterns read the TEXT of a page. A domain that has gone to a registrar's
+# marketplace forwards to that marketplace's host, and what arrives is the marketplace's own page in
+# whatever wording that company is using this month. Over the census render store's 1,162 recorded
+# landings, `hugedomains` accounts for 11, `expiredwixdomain` for 6 and `expireddomains` for 2, and
+# the text test reaches them only where the page happens to carry a sentence one of the patterns
+# knows. Where it landed is the fact that does not depend on the wording.
+_SALE_PAGE = ('This name is available. Make an offer through our secure checkout and take '
+              'ownership within one business day, with financing available on request.')
+
+
+@pytest.mark.parametrize('landing', [
+    'https://hugedomains.com/domain_profile.cfm?d=example&e=org',
+    'https://www.sedo.com/search/details/?domain=example.org',
+    'https://dan.com/buy-domain/example.org',
+    'https://bodis.com/',
+    'https://www.parkingcrew.net/',
+])
+def test_a_home_read_that_lands_on_a_sale_host_is_rule_2(landing):
+    """Rule 2 and `unreachable`, whatever the page says. The fixture's wording deliberately matches
+    none of PARKED_RX, PARKED_EXPIRED_RX or PARKED_SOON_RX, so the only thing that can decide it is
+    where the address went."""
+    assert not LA.is_parked(_SALE_PAGE), 'the fixture has to defeat the text test'
+    b = _MapBrowser({'http://lapsed.example/': ('<html><body>' + _SALE_PAGE + '</body></html>',
+                                                _SALE_PAGE, 200, landing)})
+    r = asyncio.run(LA._audit_async('http://lapsed.example/', browser=b))
+    assert r.verdict == 'unreachable'
+    assert r.rules == [2]
+    assert r.note == "a parked or expired domain, not the organization's own website"
+    assert LA.failure_kind(r) == 'parked_domain', 'and it stops landing in `other`'
+
+
+def test_the_www_form_of_a_sale_host_is_the_same_host():
+    b = _MapBrowser({'http://lapsed.example/': ('<html><body>' + _SALE_PAGE + '</body></html>',
+                                                _SALE_PAGE, 200, 'https://www.hugedomains.com/')})
+    r = asyncio.run(LA._audit_async('http://lapsed.example/', browser=b))
+    assert r.rules == [2] and r.verdict == 'unreachable'
+
+
+def test_a_site_builder_host_is_not_a_parking_host():
+    """The list is registrar sale and parking hosts and nothing else. A builder is an address real
+    organizations run their websites on, and one in this set would call a live organization
+    unreachable. Rule 1 already says a builder address is included."""
+    for host in ('sites.google.com', 'wixsite.com', 'squarespace.com', 'godaddy.com',
+                 'weebly.com', 'wordpress.com'):
+        assert host not in LA.PARKED_HOST
+        assert not LA._parked_host('https://%s/some-organization/' % host)
+
+
+_BUILDER_HOME = ('Our center offers after-school tutoring, a food pantry and help with housing '
+                 'applications. Families are welcome to drop in during opening hours.')
+
+
+def test_a_real_site_on_a_builder_host_is_still_read():
+    b = _MapBrowser({'https://sites.google.com/view/an-organization/': _page(_BUILDER_HOME)})
+    r = asyncio.run(LA._audit_async('https://sites.google.com/view/an-organization/', browser=b))
+    assert r.verdict != 'unreachable' and r.rules != [2]
+
+
+def test_the_host_test_is_the_bare_host_and_not_a_suffix():
+    """An exact set, so that what it catches can be read off the list. A host that merely ENDS with
+    one of the names is a different host and is not in it."""
+    assert LA._parked_host('https://hugedomains.com:443/x')
+    assert LA._parked_host('http://HugeDomains.com/')
+    assert not LA._parked_host('https://nothugedomains.com/')
+    assert not LA._parked_host('https://sale.hugedomains.com/')
+    assert not LA._parked_host('not a url at all')
+
+
+def test_the_parked_note_was_already_written_and_had_nowhere_to_go():
+    """The text test has written this note since the release and `failure_kind` filed it under
+    `other`, so the family a study most wants to set aside was the one it could not name."""
+    note = "a parked or expired domain, not the organization's own website"
+    assert LA.failure_kind(note) == 'parked_domain'
+    assert 'parked_domain' in LA.FAILURE_KINDS
+    assert LA.FAILURE_KINDS.index('parked_domain') == LA.FAILURE_KINDS.index('directory_profile') + 1
+
+
+# ---------------------------------------------------------------- the challenge that cleared
+#
+# `_read` polls `inner_text('body')` four times, four seconds apart, while a Cloudflare interstitial
+# clears itself. Two things went wrong with that in a borrowed browser, which is a person's own
+# Chrome attached over CDP by the retry, and both were measured in the government session: of five
+# walled sites that had refused a 420-second wait, four came back with a page.
+#
+# A challenge that clears NAVIGATES the page, and a navigation destroys the execution context the
+# poll is holding, so `inner_text` raises `Execution context was destroyed, most likely because of a
+# navigation` and the read fails on the good news. And a page in a tab the person is not looking at
+# is throttled by their browser, so a challenge that has to run JavaScript may never finish at all.
+
+
+class _ChallengePage:
+    """A page whose body reads as a wall until the challenge clears, one poll at a time.
+
+    `raise_on` is the poll number, counted from 1, at which `inner_text` raises the destroyed-context
+    error instead of answering; `after` is the text the page holds once it has cleared.
+    """
+
+    def __init__(self, wall, after, raise_on=None, error=None):
+        self._wall, self._after = wall, after
+        self._raise_on, self._error = raise_on, error
+        self.mouse = _FakeMouse()
+        self.url = ''
+        self.polls = 0
+        self.waits = []
+        self.fronted = 0
+        self.cleared = False
+
+    async def goto(self, url, wait_until=None, timeout=None):
+        self.url = url
+        return _FakeResp(200)
+
+    async def bring_to_front(self):
+        self.fronted += 1
+
+    async def wait_for_timeout(self, ms):
+        self.waits.append(ms)
+
+    async def evaluate(self, *a, **k):
+        return None
+
+    async def content(self):
+        return '<html><body>' + (self._after if self.cleared else self._wall) + '</body></html>'
+
+    async def inner_text(self, sel):
+        self.polls += 1
+        if self._raise_on is not None and self.polls == self._raise_on:
+            # the navigation happened between the last poll and this one
+            self.cleared = True
+            raise RuntimeError(self._error)
+        return self._after if self.cleared else self._wall
+
+
+_CHALLENGE_WALL = 'Just a moment... Checking your browser before accessing the site.'
+_CHALLENGE_PAGE = ('Our office helps families with housing applications and runs a food pantry on '
+                   'Saturdays. Everyone is welcome and no appointment is needed.')
+
+
+def test_a_challenge_that_navigates_mid_poll_is_read_and_not_failed():
+    """The defect. The poll asks the page for its text, the challenge clears by navigating, and the
+    call raises out of the read, so a site that had just become readable was recorded as one that
+    could not be read."""
+    page = _ChallengePage(
+        _CHALLENGE_WALL, _CHALLENGE_PAGE, raise_on=2,
+        error='Execution context was destroyed, most likely because of a navigation.')
+    st, html, text, raw, main = asyncio.run(LA._read(page, 'https://x.example/'))
+    assert st == 200
+    assert text == _CHALLENGE_PAGE, 'the page behind the challenge is what the read returns'
+    assert not LA.is_wall(text)
+    assert page.waits, 'the poll waits one interval before asking again'
+
+
+def test_only_the_destroyed_context_is_caught():
+    """Every other error out of `inner_text` is the page, and swallowing it would turn a read that
+    did not happen into a reading of an empty string."""
+    page = _ChallengePage(_CHALLENGE_WALL, _CHALLENGE_PAGE, raise_on=1,
+                          error='Target closed')
+    with pytest.raises(RuntimeError) as e:
+        asyncio.run(LA._read(page, 'https://x.example/'))
+    assert 'Target closed' in str(e.value)
+
+
+def test_a_borrowed_browser_brings_the_page_to_the_front_and_an_ordinary_one_does_not():
+    """A background tab of a person's own browser is throttled by that browser, so a challenge that
+    runs in JavaScript may not finish while the tab is not the one being looked at. An instrument's
+    own headless browser has no foreground and nothing to bring anything to."""
+    borrowed = _ChallengePage(_CHALLENGE_PAGE, _CHALLENGE_PAGE)
+    asyncio.run(LA._read(borrowed, 'https://x.example/', borrowed=True))
+    assert borrowed.fronted == 1
+
+    plain = _ChallengePage(_CHALLENGE_PAGE, _CHALLENGE_PAGE)
+    asyncio.run(LA._read(plain, 'https://x.example/'))
+    assert plain.fronted == 0
+
+
+def test_a_page_that_refuses_to_come_to_the_front_is_still_read():
+    """Bringing a page forward is a thing a browser may refuse, and no read is worth losing to it."""
+    class _Refuses(_ChallengePage):
+        async def bring_to_front(self):
+            raise RuntimeError('Protocol error (Page.bringToFront): Not attached to an active page')
+
+    page = _Refuses(_CHALLENGE_PAGE, _CHALLENGE_PAGE)
+    st, html, text, raw, main = asyncio.run(LA._read(page, 'https://x.example/', borrowed=True))
+    assert st == 200 and text == _CHALLENGE_PAGE
+
+
+def test_the_borrowed_flag_reaches_read_from_the_audit():
+    """`_read` is called from three places inside `_audit_async` and the flag has to reach all of
+    them, or the site whose home page is walled is read in the foreground and its interior pages are
+    not."""
+    import inspect
+
+    src = inspect.getsource(LA._audit_async)
+    calls = [line for line in src.splitlines() if '_read(' in line and 'await' in line]
+    assert len(calls) == 3, 'the call sites moved: %s' % calls
+    assert src.count('borrowed=borrowed_browser') == 3, (
+        'a call to _read inside the audit does not carry the borrowed flag')
+
+
+# ------------------------------------------------------- the language inventory, 2026-09-18
+#
+# LIMITATIONS section 6 opens on four counts and a total, and says of itself that the counts are
+# computed from the tables in `langaccess.core` rather than kept by hand. They were computed once,
+# on 2026-09-17, and then typed into a paragraph, which is the arrangement that had let the
+# previous set drift: the recount that produced these numbers found the document claiming 83 where
+# the same decomposition over the same code gave 84.
+#
+# The decomposition is the section's own, and the order is what makes it a decomposition rather
+# than four overlapping lists. A language belongs to the first part it qualifies for: a
+# function-word list of its own; failing that, a writing system this package reads directly;
+# failing that, a resolution inside a script whose entry is filed under another name, which is
+# where the Cyrillic, Ethiopic, Devanagari, Bengali and Arabic tables put theirs; failing that, a
+# label the bundled identifier supplies and nothing here shadows. Persian, Urdu, Kurdish and
+# Pashto are the names the order decides: each is resolved inside the Arabic script AND has a code
+# in the identifier's table, so each is counted in the third part and not the fourth.
+
+
+def _inventory_parts():
+    """The four parts of LIMITATIONS 6, computed from core, disjoint and in the section's order."""
+    func = {k for k in LA.FUNC if k != LA.ENGLISH}
+    systems = set(LA.SCRIPT_FUNC)
+    in_script = ({k for k in LA.COVERED if k != LA.ENGLISH} - func - systems
+                 | {name for name, _letters in LA.ARABIC_SCRIPT})
+    identifier = {name for _code, name in LA.AUX_ISO.items()
+                  if name not in LA.COVERED} - in_script
+    return func, systems, in_script, identifier
+
+
+def test_the_language_inventory_decomposes_the_way_limitations_6_says_it_does():
+    """The arithmetic, whatever the numbers are. Four parts, pairwise disjoint, summing to the
+    number of distinct languages the inventories name besides English. This holds under any
+    addition to any of the tables, so it is the half of the claim that never needs re-reading."""
+    func, systems, in_script, identifier = _inventory_parts()
+    parts = (func, systems, in_script, identifier)
+    for i, a in enumerate(parts):
+        for b in parts[i + 1:]:
+            assert not (a & b), 'the parts overlap, so they cannot sum to the total: %s' % (a & b)
+    named = ({k for k in LA.COVERED if k != LA.ENGLISH}
+             | {name for _c, name in LA.AUX_ISO.items()}
+             | {name for name, _l in LA.ARABIC_SCRIPT}) - {LA.ENGLISH}
+    assert sum(len(p) for p in parts) == len(named)
+
+
+def test_limitations_6_states_the_counts_this_code_gives():
+    """And the numbers themselves, against the document. A table that grows moves four figures in
+    one paragraph, and the paragraph is what a reader of the paper checks the coverage claim
+    against; this is what makes the section's "computed from the tables" true on every run rather
+    than on the day somebody computed them."""
+    doc = Path(__file__).resolve().parent.parent / 'LIMITATIONS.md'
+    if not doc.exists():
+        pytest.skip('no LIMITATIONS.md beside these tests: %s' % doc)
+    text = io.open(str(doc), encoding='utf-8').read()
+    m = re.search(r'The inventories name (\d+) languages besides English: (\d+) non-English '
+                  r'function-word lists, (\d+) writing\s+systems, (\d+) further languages', text)
+    assert m, 'the opening sentence of LIMITATIONS 6 has been rewritten; re-read it and this test'
+    total, func_n, systems_n, in_script_n = (int(g) for g in m.groups())
+    m2 = re.search(r'and (\d+) more names the bundled lid\.176', text)
+    assert m2, 'the identifier count has left the sentence'
+    identifier_n = int(m2.group(1))
+    func, systems, in_script, identifier = _inventory_parts()
+    assert (func_n, systems_n, in_script_n, identifier_n) == \
+        (len(func), len(systems), len(in_script), len(identifier))
+    assert total == func_n + systems_n + in_script_n + identifier_n
+# ============================================================ the crawler's reach, 2026-09-18
+#
+# Three changes, measured together on the 144 addresses the gold-frame run of 2026-09-08 recorded
+# unreachable: the user agent stopped carrying a contact comment, the note on a failed read started
+# carrying the exception's message instead of its class, and a batch started reading its own
+# transport failures once more at the end of itself.
+
+
+def test_the_user_agent_carries_nothing_but_a_browser():
+    """The contact comment cost 13 of the 144 unreachable addresses of the gold frame, 7 refusing
+    under it with net::ERR_HTTP2_PROTOCOL_ERROR and 4 with HTTP 403, against none that answered the
+    comment and not the plain string. What is left has to be a browser string and nothing else: a
+    mailbox, a product name or a URL in here is the same identification under another spelling."""
+    assert LA.UA.startswith('Mozilla/5.0 ') and LA.UA.endswith('Safari/537.36')
+    for marker in ('mailto', '@', 'langaccess', 'crawler', 'bot', 'http://', 'https://', '(+'):
+        assert marker not in LA.UA.lower(), 'the user agent names %r' % marker
+    assert not hasattr(LA, 'UA_CONTACT'), 'the contact string is gone, not merely unused'
+
+
+def test_the_context_and_the_plain_fetch_send_the_same_string():
+    """One string for both routes is what makes the plain fetch a second attempt at the same site
+    rather than a second site: one host refuses Chromium with a 32-character 403 and answers a
+    plain client with 20 KB, and that comparison only means anything under one user agent."""
+    class _Recording(_MapBrowser):
+        def __init__(self, pages):
+            _MapBrowser.__init__(self, pages)
+            self.kw = []
+
+        async def new_context(self, **k):
+            self.kw.append(dict(k))
+            return await _MapBrowser.new_context(self, **k)
+
+    b = _Recording({'https://x.org/': _page('A community centre in this town. We run classes.')})
+    asyncio.run(LA._audit_async('https://x.org/', browser=b))
+    assert b.kw and all(k.get('user_agent') == LA.UA for k in b.kw)
+    src = inspect.getsource(LA)
+    assert src.count("'User-Agent': UA") == 3, (
+        'the plain fetch, the robots fetch and the confirming fetch each send it')
+
+
+def test_a_borrowed_browser_is_still_left_its_own_string():
+    """The whole point of borrowing a person's browser is its own fingerprint, and writing this
+    package's string over it puts a second, invented browser on a real profile."""
+    src = inspect.getsource(LA._audit_async)
+    assert 'if not borrowed_browser:' in src and "_ctx_kw['user_agent'] = UA" in src
+
+
+# ---------------------------------------------------------------- what a failed read is called
+
+@pytest.mark.parametrize('exc,want', [
+    (RuntimeError('Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://x.example/'),
+     'RuntimeError: net::ERR_HTTP2_PROTOCOL_ERROR'),
+    (RuntimeError('Page.goto: net::ERR_EMPTY_RESPONSE at https://x.example/'),
+     'RuntimeError: net::ERR_EMPTY_RESPONSE'),
+    (RuntimeError('Browser.new_context: Connection closed while reading from the driver'),
+     'RuntimeError: Connection closed while reading from the driver'),
+    (RuntimeError('Page.goto: Timeout 30000ms exceeded.'),
+     'RuntimeError: Timeout 30000ms exceeded.'),
+    (RuntimeError(''), 'RuntimeError'),
+    (ValueError('Invalid IPv6 URL'), 'ValueError: Invalid IPv6 URL'),
+])
+def test_the_note_carries_the_cause_and_not_the_class(exc, want):
+    """Until 2026-09-18 the note was the class alone, so every Playwright error arrived as the one
+    word `Error` and 24 of the 144 unreachable addresses of the gold frame said nothing about why.
+    The API call in front of the message is dropped, because `Page.goto` is the same for every
+    cause, and so is the ` at <address>` a network code is reported with, which the Result already
+    carries in `url`."""
+    assert LA._error_note(exc) == want
+
+
+def test_the_note_is_bounded_and_takes_the_first_line_only():
+    """A note is read in a terminal and in a table cell, and a page's own JavaScript has arrived in
+    an exception message before now."""
+    long = LA._error_note(RuntimeError('x' * 400))
+    assert len(long) <= len('RuntimeError: ') + LA.ERROR_NOTE_CHARS
+    assert LA._error_note(RuntimeError('first line\nstack\nmore')) == 'RuntimeError: first line'
+
+
+def test_a_home_read_that_raises_says_what_raised(monkeypatch):
+    """Through the crawl, where the defect was: `Error (home read retried once)` on 24 rows."""
+    async def no_sleep(_s):
+        return None
+
+    class _RefusingPage(_FakePage):
+        async def goto(self, url, wait_until=None, timeout=None):
+            raise RuntimeError('Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at %s' % url)
+
+    class _RefusingCtx(_FakeCtx2):
+        async def new_page(self):
+            return _RefusingPage(self, 200, '')
+
+    class _Exploding(_FakeBrowser2):
+        async def new_context(self, **k):
+            c = _RefusingCtx(self.reads, self._status, self._body)
+            self.contexts.append(c)
+            return c
+
+    monkeypatch.setattr(LA.asyncio, 'sleep', no_sleep)
+    r = asyncio.run(LA._audit_async('https://x.org', browser=_Exploding(200, '')))
+    assert r.verdict == 'unreachable'
+    assert r.note == 'RuntimeError: net::ERR_HTTP2_PROTOCOL_ERROR (home read retried once)'
+    assert LA.failure_kind(r) == 'protocol_error'
+
+
+# ------------------------------------------------------- reading the batch's own failures again
+
+
+def _batch_that_dies_then_answers(monkeypatch, note, pages=6):
+    """A run whose first browser answers every site with `note` and whose second reads it.
+
+    The browser object is the seam. `_launch` hands out a new one per `_playwright()`, the batch
+    opens one and the end-of-batch pass opens another, so answering on the identity of the browser
+    it was given is what a driver that dies under a run looks like from inside this function.
+    """
+    opened, launched = _counting_browser(monkeypatch)
+
+    async def stub(url, max_pages=6, deep=False, keep_pages=False, block_private_hosts=False,
+                   browser=None):
+        if browser is launched[0]:
+            return LA._failed(url, note)
+        return LA.Result(url=url, requested_url=url, verdict='english_only', pages_read=pages,
+                         read_quality={'pages_read': pages, 'sufficient': True})
+
+    monkeypatch.setattr(LA, '_audit_async', stub)
+    return opened, launched
+
+
+_CLOSED = 'RuntimeError: Connection closed while reading from the driver'
+
+
+def test_the_batch_reads_its_own_transport_failures_again(monkeypatch):
+    """10 of the 144 unreachable addresses of the gold frame carried `Browser.new_context:
+    Connection closed`, which is the shared browser dying under a site that was then written down
+    as unreadable, and 9 of the 10 answered a probe the same day. A driver of the pass's own is
+    what the batch boundary already does for the next batch, one batch sooner and for these rows."""
+    urls = ['a.org', 'b.org', 'c.org']
+    opened, launched = _batch_that_dies_then_answers(monkeypatch, _CLOSED)
+    got = asyncio.run(LA.audit_many_async(urls, concurrency=2))
+    assert [r.url for r in got] == urls
+    assert len(opened) == 2 and len(launched) == 2, 'one driver for the batch, one for the pass'
+    assert all(r.verdict == 'english_only' and r.pages_read == 6 for r in got)
+    assert all(LA.RETRY_PASS_NOTE in r.note for r in got)
+
+
+def test_the_first_reading_stands_where_the_second_read_nothing(monkeypatch):
+    """The pass may only ADD a reading. A second failure is not evidence of anything the first
+    failure was not, and replacing the note with the second attempt's words would lose what the
+    batch saw."""
+    urls = ['a.org', 'b.org']
+    _batch_that_dies_then_answers(monkeypatch, _CLOSED, pages=0)
+    got = asyncio.run(LA.audit_many_async(urls, concurrency=2))
+    assert all(r.verdict == 'unreachable' and r.pages_read == 0 for r in got)
+    assert all(r.note.startswith(_CLOSED) for r in got), "the batch's own note is kept"
+    assert all(LA.RETRY_PASS_NOTE in r.note for r in got), 'and the row says it was offered a pass'
+    assert all(LA.failure_kind(r) == 'connection_closed' for r in got), (
+        'the note the pass appends may not move the row into another family')
+
+
+@pytest.mark.parametrize('note,kind', [
+    ('HTTP 403 on the home page, 49-character body', 'http_403'),
+    ('robots.txt disallowed the home page, so the site was not read', 'robots_disallow'),
+    ("a parked or expired domain, not the organization's own website", 'parked_domain'),
+    ('bot wall', 'bot_wall'),
+    ('the domain does not resolve', 'no_dns'),
+])
+def test_a_site_that_answered_is_not_read_again(monkeypatch, note, kind):
+    """The pass is for failures that say nothing about the site. A host that refused, a host that
+    asked this crawler to stay away, a domain that is not there and an address that was never the
+    organization's website have all answered, and reading them again is this package fetching
+    sites that already said no."""
+    opened, launched = _batch_that_dies_then_answers(monkeypatch, note)
+    got = asyncio.run(LA.audit_many_async(['a.org'], concurrency=1))
+    assert LA.failure_kind(got[0]) == kind and kind not in LA.RETRY_PASS_KINDS
+    assert len(opened) == 1, 'no second driver was opened'
+    assert LA.RETRY_PASS_NOTE not in (got[0].note or '')
+
+
+def test_the_pass_can_be_turned_off(monkeypatch):
+    """How a study measures what the pass recovers: the same list, twice, one flag apart."""
+    urls = ['a.org', 'b.org']
+    opened, launched = _batch_that_dies_then_answers(monkeypatch, _CLOSED)
+    got = asyncio.run(LA.audit_many_async(urls, concurrency=2, retry_pass=False))
+    assert all(r.verdict == 'unreachable' for r in got)
+    assert all(LA.RETRY_PASS_NOTE not in (r.note or '') for r in got)
+    assert len(opened) == 1
+
+
+def test_the_pass_writes_one_row_per_site_and_writes_it_once(monkeypatch, tmp_path):
+    """A row held back for the pass has not been settled, so `store` and `on_result` see the
+    reading that was kept and see it once. A caller counting rows may not be given two for a site
+    because the run read it twice."""
+    urls = ['a.org', 'b.org', 'c.org']
+    _batch_that_dies_then_answers(monkeypatch, _CLOSED)
+    store = tmp_path / 'store.jsonl'
+    handed = []
+    asyncio.run(LA.audit_many_async(urls, concurrency=2, store=str(store),
+                                    on_result=lambda i, r: handed.append((i, r.url))))
+    lines = [json.loads(x) for x in store.read_text(encoding='utf-8').splitlines() if x.strip()]
+    assert len(lines) == len(urls) and {d['url'] for d in lines} == set(urls)
+    assert all(LA.RETRY_PASS_NOTE in d['note'] for d in lines)
+    assert sorted(handed) == sorted(enumerate(urls))
+
+
+def test_the_pass_runs_once_and_not_until_the_site_answers(monkeypatch):
+    """One pass. A row that failed the same way on two browsers is a row about the site, and a
+    pass that read its own failures again would be a loop with a frame of dead addresses in it."""
+    opened, launched = _batch_that_dies_then_answers(monkeypatch, _CLOSED, pages=0)
+    asyncio.run(LA.audit_many_async(['a.org'], concurrency=1))
+    assert len(opened) == 2, 'the batch and one pass, and no third driver'
+
+
+def test_the_pass_is_skipped_where_the_machine_cannot_open_a_browser(monkeypatch):
+    """The batch has already read everything it is going to read. A machine that cannot start the
+    pass's browser has nothing to say about these sites, so the rows stand as the batch left them
+    and the run ends as a run rather than as an infrastructure failure."""
+    opened, launched = _batch_that_dies_then_answers(monkeypatch, _CLOSED)
+    real = LA._launch
+
+    async def once_then_no_browser(pw):
+        if launched:
+            raise LA.BrowserUnavailable('no browser')
+        return await real(pw)
+
+    monkeypatch.setattr(LA, '_launch', once_then_no_browser)
+    got = asyncio.run(LA.audit_many_async(['a.org'], concurrency=1))
+    assert got[0].verdict == 'unreachable' and got[0].note == _CLOSED
+
+
+def test_a_timed_out_row_is_read_back_on_a_doubled_clock(monkeypatch):
+    """The pass gave every row the clock the run had given it, which for a timed-out row is the
+    clock that had just run out, and it recovered none of the 12 timed-out addresses it was offered
+    on the 144-address re-read. Those 12, read the same day at 480 seconds instead of 240 with
+    everything else identical, answered on 11 of the 12 at a median of 15 pages."""
+    seen = []
+
+    async def stub(url, max_pages=6, deep=False, keep_pages=False, block_private_hosts=False,
+                   browser=None, deadline=None, **kw):
+        if browser is launched[0]:
+            return LA._failed(url, 'Error: net::ERR_CONNECTION_TIMED_OUT')
+        seen.append((url, deadline))
+        return LA.Result(url=url, requested_url=url, verdict='english_only', pages_read=9,
+                         read_quality={'pages_read': 9, 'sufficient': True})
+
+    opened, launched = _counting_browser(monkeypatch)
+    monkeypatch.setattr(LA, '_audit_async', stub)
+    # A clock that does not move, so the deadline the pass computed is the clock it gave, exactly.
+    monkeypatch.setattr(LA, '_clock', lambda: 0.0)
+    got = asyncio.run(LA.audit_many_async(['slow.org'], concurrency=1, timeout=240))
+
+    assert got[0].verdict == 'english_only' and got[0].pages_read == 9
+    assert len(seen) == 1, 'the pass read it exactly once'
+    # `_audit_extras` sets the deadline back from the cancel by AUDIT_GRACE, so what the pass gave
+    # is the deadline plus that grace rather than a bare number.
+    doubled = 240 * LA.RETRY_PASS_CLOCK_FACTOR
+    gave = seen[0][1] + min(LA.AUDIT_GRACE, doubled / 4.0)
+    assert gave == doubled, 'the pass gave %gs where the doubled clock is %ds' % (gave, doubled)
+
+
+def test_only_a_timed_out_row_gets_the_longer_clock(monkeypatch):
+    """A connection that did not hold fails in seconds and spent none of the clock, so giving those
+    rows longer buys nothing and spends a batch's tail on a site whose failure was instant."""
+    assert LA._retry_pass_clock('Error: net::ERR_CONNECTION_TIMED_OUT', 240) == 480
+    assert LA._retry_pass_clock('Exception: Connection closed while reading', 240) == 240
+    assert LA._retry_pass_clock('Error: net::ERR_HTTP2_PROTOCOL_ERROR', 240) == 240
+    for kind in LA.RETRY_PASS_SLOW_KINDS:
+        assert kind in LA.RETRY_PASS_KINDS, 'a slow kind the pass does not read is unreachable code'
+
+
+def test_the_doubled_clock_is_capped(monkeypatch):
+    """`timeout` is a per-site clock, and a run set to 480 would otherwise put sixteen minutes into
+    one address at the tail of every batch."""
+    assert LA._retry_pass_clock('Error: net::ERR_CONNECTION_TIMED_OUT', 480) == LA.RETRY_PASS_CLOCK_CAP
+    assert LA._retry_pass_clock('Error: net::ERR_CONNECTION_TIMED_OUT', 900) == LA.RETRY_PASS_CLOCK_CAP
+    assert LA._retry_pass_clock('Error: net::ERR_CONNECTION_TIMED_OUT', None) is None, (
+        'a run with no per-site bound has nothing to double'
+    )

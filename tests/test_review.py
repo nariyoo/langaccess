@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """The queue of readings a person has to settle, and the three ways a queue lies.
 
-A CEILING SHIPPED AS A VERDICT IS A CEILING NOBODY ACTS ON. `unreachable`, a thin `english_only` and
-a translation control this package cannot name are all readings it cannot settle, and all three go
-out today as numbers in a table beside readings it can. The tests here hold the predicate to the
-record: it reads `verdict`, `read_quality` and `authorship` and nothing else, it flags the four
-states the package itself calls unsettled, and it leaves alone the verdicts that rest on something
-FOUND, whose thin search is not a doubt about what was found.
+A CEILING SHIPPED AS A VERDICT IS A CEILING NOBODY ACTS ON. `unreachable`, a thin `english_only`, a
+translation control this package cannot name and one it clicked to no effect are all readings it
+cannot settle, and every one of them goes out today as a number in a table beside readings it can.
+The tests here hold the predicate to the record: it reads `verdict`, `read_quality`, `authorship`,
+`declared_off_site`, the note and `machine_translation` and nothing else, it flags the seven states
+the package itself calls unsettled, and it leaves alone the verdicts that rest on something FOUND,
+whose thin search is not a doubt about what was found.
 
 AN EMPTY STAGE REPORTED AS A FINISHED ONE. Six distinct instances of it in this project, and a work
 queue is the shape that invites the seventh: "no site needs a person" and "the predicate never
@@ -27,7 +28,8 @@ from langaccess import (needs_human, unsettled_kind, unsettled_reason, review_qu
                         review_text, write_review, read_review, ingest_review, ingest_text,
                         hand_coding, SheetRejected, HAND_CODING, REVIEW_COLUMNS)
 from langaccess import cli as CLI
-from langaccess.review import (DEAD_CONTROL, KIND_ORDER, KIND_TITLE, NO_CLASS, OFF_SITE_DECLARATION,
+from langaccess.review import (DEAD_CONTROL, DEAD_CONTROL_NO_VENDOR, KIND_ORDER, KIND_TITLE,
+                               NO_CLASS, OFF_SITE_DECLARATION,
                                THIN_ABSENCE, UNNAMED_CONTROL, UNREAD)
 
 
@@ -41,7 +43,7 @@ def _quality(pages=9, sufficient=True, **kw):
 
 def _rec(url, verdict='true_multilingual', languages=('English', 'Spanish'), **kw):
     rec = {'url': url, 'verdict': verdict, 'languages': list(languages), 'evidence': [],
-           'audited_at': '2026-08-01T09:00:00Z', 'tool_version': '0.1.0', 'note': '',
+           'audited_at': '2026-08-01T09:00:00Z', 'tool_version': '0.2.0', 'note': '',
            'machine_translation': '', 'pages_read': 9, 'switcher_languages': [],
            'switcher_unresolved': 0, 'read_quality': _quality()}
     rec.update(kw)
@@ -165,6 +167,88 @@ def test_an_unnameable_control_beside_a_language_the_site_wrote_is_not_queued():
     r = _rec('https://both.org/', 'true_multilingual', ('English', 'Spanish'),
              authorship=LA.AUTHOR_AUTHORED)
     assert not needs_human(r)
+
+
+def test_a_dead_control_with_no_vendor_named_is_queued_and_moves_no_verdict():
+    """The gap this kind closes. Rule 16 reads `a control of a NAMED WIDGET that was operated and
+    changed nothing`, so on a site where no vendor pattern matched the class cannot be
+    machine_translate_error and the reading falls to english_only, which is the one class that
+    asserts an absence. The observation was on the record twice over, as evidence with rule 16 on
+    it and as the note sentence, and it decided nothing and queued nothing, so the absence claim
+    was standing over the clearest reason to doubt it. Counted over the 2,000-site gold frame on
+    2026-09-18: 14 readings, 10 of them queued by nothing before this."""
+    r = _rec('https://deadcontrol.org/', 'english_only', ('English',),
+             note=LA.CONTROL_DEAD_NOTE, machine_translation='')
+    assert needs_human(r)
+    assert unsettled_kind(r) == DEAD_CONTROL_NO_VENDOR
+    reason = unsettled_reason(r)
+    assert 'did not change' in reason and 'no vendor' in reason
+    # the verdict on the sheet is the one the reading reached, unchanged
+    assert review_row(r)['verdict'] == 'english_only'
+
+
+def test_the_two_dead_control_kinds_are_told_apart_by_the_vendor():
+    """`dead_control` says a widget was NAMED and its control did nothing; this one says nothing
+    named a widget at all. Widening the first to cover the second would have put its sentence, `a
+    translation widget is on this site`, on rows where no widget was found."""
+    named = _rec('https://named.org/', 'machine_translate_error', ('English',),
+                 note=LA.CONTROL_DEAD_NOTE, machine_translation='Google Translate')
+    assert unsettled_kind(named) == DEAD_CONTROL
+    assert 'a translation widget is on this site' in unsettled_reason(named)
+    unnamed = _rec('https://unnamed.org/', 'english_only', ('English',),
+                   note=LA.CONTROL_DEAD_NOTE, machine_translation='')
+    assert unsettled_kind(unnamed) == DEAD_CONTROL_NO_VENDOR
+    assert 'a translation widget is on this site' not in unsettled_reason(unnamed)
+
+
+def test_a_dead_control_beside_a_verdict_that_rests_on_something_found_is_not_queued():
+    """The boundary that decides the size of this kind, and the same one `needs_human` already
+    applies to a thin search. `true_multilingual` and `machine_translate` rest on something FOUND,
+    so a control that did nothing settles nothing about them: the site publishes its own second
+    language, or the widget produced one somewhere else and the `produced` guard kept rule 16
+    quiet. Over the gold frame that is 40 true_multilingual readings and 1 machine_translate one
+    left alone, against 14 taken in."""
+    for verdict in ('true_multilingual', 'machine_translate'):
+        r = _rec('https://found.org/', verdict, ('English', 'Spanish'),
+                 note=LA.CONTROL_DEAD_NOTE, machine_translation='')
+        assert not needs_human(r), verdict
+
+
+def test_a_dead_control_where_a_vendor_was_named_and_the_route_answered_english_is_settled():
+    """The other exclusion, and it is rule 15's. An `english_only` with a vendor named and a dead
+    control is a site whose advertised locale route came back English, which is the server's own
+    answer and the stronger of the two observations. That reading is settled, so the vendor test in
+    this kind is not decoration."""
+    r = _rec('https://route.org/', 'english_only', ('English',),
+             note=LA.ROUTE_ENGLISH_NOTE + '; ' + LA.CONTROL_DEAD_NOTE,
+             machine_translation='Google Translate')
+    assert unsettled_kind(r) != DEAD_CONTROL_NO_VENDOR
+    assert not needs_human(r)
+
+
+def test_a_dead_control_with_no_vendor_on_a_thin_search_says_both_things():
+    """Four of the fourteen gold-frame sites were already queued for a thin search, so this kind
+    takes rows away from `thin_absence` as well as adding new ones, and a coder who is told only
+    one of the two facts has been told the wrong half."""
+    r = _rec('https://both.org/', 'english_only', ('English',), pages_read=2,
+             note=LA.CONTROL_DEAD_NOTE, machine_translation='',
+             read_quality=_quality(2, False, shallow=True, unread=11))
+    assert unsettled_kind(r) == DEAD_CONTROL_NO_VENDOR
+    reason = unsettled_reason(r)
+    assert 'did not change' in reason and '2 pages read' in reason and 'too thin' in reason
+
+
+def test_the_queue_reads_the_same_note_sentence_the_class_reads():
+    """One channel, so the queue and the verdict derivation cannot disagree about whether a control
+    was worked. `control_dead` in `class_for` is a substring test for this constant at three call
+    sites, and this predicate tests the same constant against the same field."""
+    r = _rec('https://drift.org/', 'english_only', ('English',),
+             note='something else entirely', machine_translation='')
+    assert unsettled_kind(r) != DEAD_CONTROL_NO_VENDOR
+    r['note'] = 'a link redirected off the site; ' + LA.CONTROL_DEAD_NOTE + '; ' + \
+                LA.CONTROL_SCAN_CUT_NOTE
+    assert unsettled_kind(r) == DEAD_CONTROL_NO_VENDOR, \
+        'the kind stopped firing when the note carried more than one sentence'
 
 
 def _off(url='https://lapsed.org/', alternates=1, off=('Turkish',), languages=('English',)):
@@ -830,6 +914,43 @@ def test_retry_refuses_the_addresses_a_run_file_could_aim_at_your_own_network():
     assert report['retried'] == 0 and len(report['refused']) == 1
     assert records[0] == run[0], 'a refused record is left exactly as it was'
 
+
+_CASES = (('mailto', 'mailto:person@example.org'),
+          ('tel', 'tel:+15555550100'),
+          ('sms', 'sms:+15555550100'),
+          ('javascript', 'javascript:alert(1)'),
+          ('data', 'data:text/html,<h1>x</h1>'),
+          ('file', 'file:///etc/passwd'),
+          ('ftp', 'ftp://example.org/'),
+          ('about', 'about:blank'))
+
+
+def test_the_retry_refuses_every_non_web_scheme_and_not_six_of_the_seven():
+    """USAGE 18 says the retry admits http and https and no other scheme, and `refused` did not
+    implement that sentence. It put `https://` in front of any string with no `://` in it and read
+    the result with `urlsplit`, which is the defect 0.2.0 repaired in `auditable_url` and left
+    standing in this second front door: `mailto:person@example.org` parses to a URL whose userinfo
+    is `mailto:person` and whose host is `example.org`, so this function answered it with the empty
+    string and an email address in a column of websites was an address the retry would open in
+    somebody's own browser.
+
+    Every scheme `langaccess.address` names is covered, which is eight: the seven tried by hand
+    against 0.1.0 and `sms:`, which was not in that trial. Four of them were refused by the port
+    test rather than by anything about schemes, which is why the reason is asserted here and not
+    only the refusal: a message about a port that cannot be read sends a person looking for a typo
+    in an address that is not a website at all."""
+    from langaccess.address import _NON_WEB_SCHEME
+    from langaccess.retry import refused
+    assert len(_NON_WEB_SCHEME) == 8, 'the scheme list moved; this test names what it covers'
+    assert {s for s, _u in _CASES} == set(_NON_WEB_SCHEME), 'a scheme in the list is untested'
+    for scheme, url in _CASES:
+        why = refused(url)
+        assert why, '%s came through the retry front door' % url
+        assert repr(scheme) in why, 'the reason for %r does not name the scheme: %r' % (url, why)
+    for ok in ('https://example.org/', 'http://example.org/', 'https://example.org:443/x',
+               'example.org', 'https://sub.example.org/a?b=1#c'):
+        assert refused(ok) == '', ok
+
 def test_a_widget_that_was_worked_and_did_nothing_goes_to_a_person():
     """`machine_translate_error` says what THIS client could obtain, and only a person opening the
     address can turn that into a finding about the site. It is reported ahead of `unnamed_control`
@@ -878,6 +999,8 @@ def test_the_summary_prints_every_kind_the_queue_defines():
         LA.Result(url='https://b.org/', verdict=LA.MT_ERROR,
                   machine_translation='Google Translate', note=LA.CONTROL_DEAD_NOTE,
                   rules=[12, 14, 16], read_quality={'sufficient': True, 'pages_read': 15}),
+        LA.Result(url='https://b2.org/', verdict='english_only', note=LA.CONTROL_DEAD_NOTE,
+                  read_quality={'sufficient': True, 'pages_read': 15}),
         LA.Result(url='https://c.org/', verdict='english_only',
                   read_quality={'sufficient': False, 'pages_read': 2}),
         LA.Result(url='https://d.org/', verdict='no_such_class'),

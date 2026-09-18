@@ -11,13 +11,13 @@ python -m pip install -e ".[test]"
 pytest -q
 ```
 
-In continuous integration that command reports **1443 passed, 5 skipped, 15
+That command reports **1727 passed, 5 skipped, 15
 deselected**. No browser is installed and none is needed, because the fifteen deselected tests are
 the only ones that open one. They are marked `live` and `pyproject.toml` deselects them by default
-with `addopts = -m "not live"`. Of the five skips, three are in the boundary gate and are the
-alternatives a word boundary is not about, and two are vendor patterns that begin on a
-non-word character. A count in this file that no longer matches is a bug in this file; run the
-suite and correct it.
+with `addopts = -m "not live"`. All five skips are in the boundary gate, one for each alternative
+that begins on a character no word boundary is about, and the gate names the alternative in the skip
+reason. A count in this file that no longer matches is a bug in this file; run the suite and correct
+it.
 
 To run the fifteen that do open a browser and reach the network:
 
@@ -248,10 +248,48 @@ The house style is plain prose in comments, with the reason a thing is the way i
 the measurement that settled it. Most of the constants in this package were set by a named case, and
 the comment naming that case stops the next person from undoing it.
 
-## 9. Support
+## 9. Release procedure
+
+The order matters in two places. The version is set in every file before the CHANGELOG section is
+dated and committed, because the tag is what the distribution is built from, and the public export
+runs after that commit, because what it exports is the private tree at HEAD.
+
+1. **The suite green.** `pytest -q` from the repository root, and the counts in section 1 corrected
+   from that run if they moved.
+2. **`python tools/set_version.py <version>`.** With no argument it reports what each file says.
+   With a version it rewrites `__version__` in `src/langaccess/__init__.py`, which is the one place
+   `pyproject.toml` reads the version from, and the three files that quote it in a form a pattern
+   can find without ambiguity: `CITATION.cff`, the version `tests/test_cli.py` asserts the command
+   line prints, and a fixture's `tool_version` in `tests/test_review.py`. Nothing is written unless
+   every file is found and every occurrence is unambiguous, so the state where the package says one
+   version and the citation says another cannot arise. It then names the four files where the
+   version is prose and is edited by hand, `README.md`, `LIMITATIONS.md`, `docs/USAGE.md` and
+   `pyproject.toml`, and prints the test count this file claims, to be re-read from the run in step
+   1.
+3. **The CHANGELOG section.** `[Unreleased]` becomes `[<version>] - <date>`, dated the day of the
+   release, and what is under it is what ships.
+4. **One commit**, and the tag `v<version>` on it.
+5. **The distribution, built from the tag.** `git archive v<version>` extracted into an empty
+   directory, `python -m build` there, then `twine check --strict dist/*`. An untracked file in a
+   working tree is a file that ships by accident, and building from the archive is what prevents it.
+6. **The public export.** `python tools/export_public.py --public <path>` reports what would
+   change and writes nothing; `--apply` copies every file git tracks in the private tree at HEAD,
+   less the logo-candidate build scripts and proof sheets its `EXCLUDE` list names, into the public
+   working copy, removes from that copy any tracked file the export does not include, and prints
+   the public repository's `git status`. It writes no commit and pushes nothing. Read that status,
+   then commit in the public copy as Nari Yoo.
+7. **The push and the upload are the maintainer's own acts**, and the procedure stops in front of
+   them: the push of the branch and the tag, the GitHub release, and `twine upload`. The version
+   DOI Zenodo returns for that release goes into `CITATION.cff` afterwards, in a commit of its own,
+   for the reason written at the top of that file.
+
+## 10. Support
 
 For a question about a result, use the issue form above. For anything else, open an issue on
 `https://github.com/nariyoo/langaccess`, or write to Nari Yoo at `nariyoo@umich.edu`.
 
 If you are a site owner and you want this crawler to stay off your site, robots.txt is read and
-obeyed by default, and an email to the address above is enough.
+obeyed by default, and an email to the address above is enough. The user agent does not name this
+project. A contact comment was in it until 0.2.0 and cost 13 of 144 addresses their reading,
+measured in section 16 of `docs/USAGE.md`, so what identifies the traffic now is its conduct:
+robots.txt obeyed, one page at a time within a site, and a handful of pages per address.

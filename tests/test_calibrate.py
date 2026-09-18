@@ -14,6 +14,7 @@ import pytest
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, 'src'))
 
+from conftest import cli_argv, cli_env                                   # noqa: E402
 from langaccess import core                                              # noqa: E402
 from langaccess.cli import calibrate_plan, calibrate_reading             # noqa: E402
 
@@ -102,9 +103,9 @@ def test_calibrate_is_a_subcommand():
 def test_calibrate_refuses_an_empty_list_rather_than_opening_a_browser():
     """With no addresses there is nothing to measure, and a browser launched to read nothing would
     report a machine that cannot clear the floor."""
-    p = subprocess.run([sys.executable, '-m', 'langaccess.cli', 'calibrate'],
+    p = subprocess.run(cli_argv() + ['calibrate'],
                        capture_output=True, text=True, encoding='utf-8', errors='replace',
-                       cwd=os.path.join(_ROOT, 'src'))
+                       env=cli_env())
     assert p.returncode == 2, p.stdout[-400:]
     assert 'needs addresses' in p.stderr
 
@@ -121,10 +122,10 @@ def test_the_only_address_the_package_fetches_unasked_belongs_to_the_author():
 def test_demo_never_replaces_a_list_that_was_given():
     """--demo beside real addresses has to lose. A flag that silently swapped a thousand-address
     calibration for one site would report a setting measured on nothing."""
-    p = subprocess.run([sys.executable, '-m', 'langaccess.cli', 'calibrate', '--demo',
-                        'https://example.org', '--attempts', '0', '--json'],
+    p = subprocess.run(cli_argv() + ['calibrate', '--demo',
+                                     'https://example.org', '--attempts', '0', '--json'],
                        capture_output=True, text=True, encoding='utf-8', errors='replace',
-                       cwd=os.path.join(_ROOT, 'src'), timeout=600)
+                       env=cli_env(), timeout=600)
     assert '--demo ignored' in p.stderr, p.stderr[-400:]
     from langaccess.cli import DEMO_URL
     assert DEMO_URL not in p.stdout
@@ -133,8 +134,8 @@ def test_demo_never_replaces_a_list_that_was_given():
 @pytest.mark.parametrize('flag', ['--from-file', '--sample', '--for', '--attempts', '--quick',
                                   '--delay', '--ignore-robots', '--json', '--demo'])
 def test_the_command_offers_its_settings(flag):
-    p = subprocess.run([sys.executable, '-m', 'langaccess.cli', 'calibrate', '--help'],
+    p = subprocess.run(cli_argv() + ['calibrate', '--help'],
                        capture_output=True, text=True, encoding='utf-8', errors='replace',
-                       cwd=os.path.join(_ROOT, 'src'))
+                       env=cli_env())
     assert p.returncode == 0, p.stderr[-400:]
     assert flag in p.stdout

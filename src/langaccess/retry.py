@@ -45,6 +45,7 @@ import gzip
 import os
 from urllib.parse import urlsplit
 
+from .address import AddressRejected, auditable_url
 from .core import _audit_async, read_store
 from .files import replace_atomically
 from .review import unsettled_kind, UNREAD
@@ -53,6 +54,10 @@ DEFAULT_CDP = 'http://localhost:9222'
 DEFAULT_TIMEOUT = 120
 ALLOWED_SCHEMES = ('http', 'https')
 ALLOWED_PORTS = (None, 80, 443)
+# The same ports in the form `auditable_url` takes. That function tests `port is not None` itself,
+# so the None that stands for "no port in the address" is not passed to it and would otherwise be
+# printed back at a person as a port they could have typed.
+_AUDITABLE_PORTS = tuple(p for p in ALLOWED_PORTS if p is not None)
 
 START_CHROME = (
     'Start a separate Chrome profile with debugging on and leave it open:\n'
@@ -77,20 +82,27 @@ def refused(url):
     Read before anything is opened. Loopback and private addresses are refused by literal too, so
     a run file naming `http://127.0.0.1:9222/json/new` is stopped here and not only by the host
     guard inside the audit.
+
+    The scheme, the port and the shape of the string are `auditable_url`'s question, and it is
+    asked here rather than answered again, so that the two front doors cannot disagree about what
+    an address is. They did disagree until this was written. This function put `https://` in front
+    of any string with no `://` in it and read the result with `urlsplit`, which is the defect
+    0.2.0 repaired in `auditable_url` and left standing here: `mailto:person@example.org` parsed to
+    a URL whose userinfo is `mailto:person` and whose host is `example.org`, so `refused` answered
+    it with the empty string and an email address in a column of websites was an address this
+    retry would open in somebody's own browser. Of the seven non-web schemes tried by hand against
+    0.1.0, that was the one that came through; `tel:`, `javascript:`, `data:` and `about:` were
+    stopped, but by the port test, which reported that the address does not hold a readable port
+    rather than that it is not a website.
     """
     if not url:
         return 'no address on the record'
-    p = urlsplit(url if '://' in url else 'https://' + url)
-    if p.scheme not in ALLOWED_SCHEMES:
-        return 'scheme %r is not http or https' % p.scheme
     try:
-        if p.port not in ALLOWED_PORTS:
-            return 'port %s is not 80 or 443' % p.port
-    except ValueError:
-        return 'the address does not carry a readable port'
+        url = auditable_url(url, ports=_AUDITABLE_PORTS)
+    except AddressRejected as e:
+        return e.reason
+    p = urlsplit(url)
     host = (p.hostname or '').strip('[]')
-    if not host:
-        return 'the address names no host'
     try:
         ip = ipaddress.ip_address(host)
     except ValueError:
@@ -166,7 +178,7 @@ async def retry_unreachable_async(run, cdp=DEFAULT_CDP, browser=None, timeout=DE
             try:
                 r = await asyncio.wait_for(
                     _audit_async(url, browser=browser, keep_pages=keep_pages,
-                                 block_private_hosts=True), timeout)
+                                 block_private_hosts=True, borrowed_browser=True), timeout)
             except asyncio.TimeoutError:
                 report['timed_out'] += 1
                 report['retried'] += 1

@@ -10,6 +10,7 @@ import json
 import pytest
 
 from langaccess import cli as CLI
+from langaccess import core as LA
 from langaccess.core import BrowserUnavailable, Result
 
 
@@ -280,12 +281,245 @@ def test_the_module_form_reaches_the_same_entry_point():
     import subprocess
     import sys
 
-    out = subprocess.run([sys.executable, '-m', 'langaccess', '--version'],
-                         capture_output=True, text=True)
+    from conftest import cli_argv, cli_env
+
+    env = cli_env()
+    out = subprocess.run(cli_argv() + ['--version'],
+                         capture_output=True, text=True, env=env)
     assert out.returncode == 0, out.stderr
     direct = subprocess.run([sys.executable, '-c',
                              'import sys; from langaccess.cli import main;'
                              " sys.argv=['langaccess','--version'];"
-                             ' sys.exit(main())'], capture_output=True, text=True)
+                             ' sys.exit(main())'], capture_output=True, text=True, env=env)
     assert out.stdout == direct.stdout
-    assert '0.1.0' in out.stdout
+    assert '0.2.0' in out.stdout
+
+
+# ------------------------------------------------------------ --strict, the degraded run
+#
+# A dead driver part way through a batch writes honest rows saying the sites were not read, and the
+# process exits 0. `capture_acceptance` already answers whether a finished run is deep enough to be
+# compared with another and already warns when it is not, and a warning on stderr is what a
+# scheduled job's log buries. `--strict` is the exit code for both, asked for explicitly, with the
+# run itself unchanged: everything it writes is still written and only the code moves.
+
+
+def _reading_stub(quality, note=''):
+    """An audit_async that answers every address with one read_quality and one note."""
+    async def fake(u, deep=False, timeout=None):
+        return Result(url=u, requested_url=u, verdict='english_only', note=note,
+                      pages_read=int(quality.get('pages_read') or 0),
+                      read_quality=dict(quality))
+    return fake
+
+
+_DEEP = {'pages_read': 6, 'sufficient': True}
+_THIN = {'pages_read': 1, 'sufficient': False}
+
+
+def test_a_run_deep_enough_to_compare_exits_zero_under_strict(monkeypatch, capsys):
+    """The flag is not a way of failing every run. A run `capture_acceptance` accepts exits 0 with
+    the flag and without it."""
+    monkeypatch.setattr(CLI, 'audit_async', _reading_stub(_DEEP))
+    urls = ['s%d.org' % i for i in range(5)]
+    assert CLI.main(['--json', '--strict'] + urls) == CLI.EXIT_OK
+    capsys.readouterr()
+    assert CLI.main(['--json'] + urls) == CLI.EXIT_OK
+
+
+def test_a_run_capture_acceptance_refuses_exits_nine_only_when_strict_was_asked_for(
+        monkeypatch, capsys):
+    """The defect. The same five sites, read one page each on a search too thin to support an
+    absence claim, exit 0 by default, which is what put a degraded reading into a pipeline as a
+    success."""
+    monkeypatch.setattr(CLI, 'audit_async', _reading_stub(_THIN))
+    urls = ['s%d.org' % i for i in range(5)]
+    assert CLI.main(['--json'] + urls) == CLI.EXIT_OK, 'the default may not move'
+    capsys.readouterr()
+    assert CLI.main(['--json', '--strict'] + urls) == CLI.EXIT_DEGRADED
+    err = capsys.readouterr().err
+    assert '--strict' in err and 'compared with another run' in err
+
+
+def test_a_driver_that_died_part_way_through_exits_nine_under_strict(monkeypatch, capsys):
+    """The second fault, and the one the exit code was asked for. The rows say the sites answered
+    nothing on every driver they were offered, which is what the batch looks like after its browser
+    has gone, and a run of them is a census of dead websites that is really a dead machine."""
+    from langaccess.core import DEAD_DRIVER_NOTE
+    note = 'no page, and back in under 2s, on 3 %s: a site that answers nothing and a dead driver '
+    monkeypatch.setattr(CLI, 'audit_async',
+                        _reading_stub(_DEEP, note=(note % DEAD_DRIVER_NOTE) + 'look the same'))
+    urls = ['s%d.org' % i for i in range(5)]
+    assert CLI.main(['--json'] + urls) == CLI.EXIT_OK
+    capsys.readouterr()
+    assert CLI.main(['--json', '--strict'] + urls) == CLI.EXIT_DEGRADED
+    err = capsys.readouterr().err
+    assert 'every browser driver' in err and '5 of 5' in err
+
+
+def test_strict_changes_the_exit_code_and_nothing_else(monkeypatch, capsys, tmp_path):
+    """The run completes and writes exactly what it writes now. The same thin run with and without
+    the flag produces byte-identical output files and the same lines on stdout."""
+    monkeypatch.setattr(CLI, 'audit_async', _reading_stub(_THIN))
+    urls = ['s%d.org' % i for i in range(5)]
+    plain, strict = tmp_path / 'plain.jsonl', tmp_path / 'strict.jsonl'
+    assert CLI.main(['--json', '--output', str(plain)] + urls) == CLI.EXIT_OK
+    out_plain = capsys.readouterr().out
+    assert CLI.main(['--json', '--strict', '--output', str(strict)] + urls) == CLI.EXIT_DEGRADED
+    out_strict = capsys.readouterr().out
+
+    def _rows(path):
+        return [{k: v for k, v in json.loads(l).items()
+                 if k not in ('audited_at', 'judged_at')}
+                for l in path.read_text(encoding='utf-8').splitlines() if l.strip()]
+
+    assert len(_rows(plain)) == 5 and _rows(plain) == _rows(strict)
+    assert out_plain.count('\n') == out_strict.count('\n')
+
+
+def test_a_missing_browser_outranks_strict(monkeypatch, capsys):
+    """Code 3 stays code 3. A run that stopped where it stood is not a degraded reading of a whole
+    list, it is a fraction of a list, and the more specific code says so."""
+    monkeypatch.setattr(CLI, 'audit_async', _no_browser())
+    assert CLI.main(['--json', '--strict', 'a.org', 'b.org']) == CLI.EXIT_NO_BROWSER
+
+
+def test_strict_outranks_a_rejected_input(monkeypatch, capsys):
+    """Both are true and one code has to be returned. Code 6 says the output does not cover the
+    list it was given; code 9 says the rows that are in the output cannot be compared with another
+    run's, which is the stronger statement about what the caller has in hand. The line naming the
+    rejected strings is printed either way."""
+    monkeypatch.setattr(CLI, 'audit_async', _reading_stub(_THIN))
+    assert CLI.main(['--json', '--strict', 'good.org', 'hello world']) == CLI.EXIT_DEGRADED
+    err = capsys.readouterr().err
+    assert 'were not addresses' in err and '--strict' in err
+
+
+def test_the_exit_codes_are_distinct():
+    """Nine names one condition and nothing else does."""
+    codes = [CLI.EXIT_OK, CLI.EXIT_USAGE, CLI.EXIT_NO_BROWSER, CLI.EXIT_NOTHING,
+             CLI.EXIT_SHEET_REJECTED, CLI.EXIT_INPUT_REJECTED, CLI.EXIT_WRITE_BLOCKED,
+             CLI.EXIT_STORE_FAILED, CLI.EXIT_DEGRADED]
+    assert len(set(codes)) == len(codes)
+    assert CLI.EXIT_DEGRADED == 9
+
+
+# --------------------------------------------------- the end-of-batch pass, through the command line
+#
+# A shared-browser run reads its own transport failures once more at the end of each batch, on a
+# browser launched for them alone. What the command line has to show is that the run still prints one
+# line per address, in the order the addresses were given, carrying the reading that was kept; that
+# `--no-retry-pass` turns the pass off; and that `--strict` judges the run as it finished rather than
+# as the batch first left it.
+
+
+class _DeadDriver:
+    """A browser that is alive as far as the batch can tell. What it is standing in for is the pipe
+    to the Playwright driver, which dies without saying so."""
+
+    def __init__(self):
+        self.closed = False
+
+    def is_connected(self):
+        return not self.closed
+
+    async def close(self):
+        self.closed = True
+
+
+class _FakePW:
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc):
+        return False
+
+
+_CLOSED_NOTE = 'RuntimeError: Connection closed while reading from the driver'
+
+
+def _driver_dies_then_answers(monkeypatch):
+    """The first browser of the run answers every site with a closed connection; the second reads.
+
+    The browser object is the seam, as it is in the batch's own tests: `_launch` hands out a new one
+    per driver, the batch opens one and the end-of-batch pass opens another, and the audit answers on
+    which of the two it was given. This is the shape 10 of the 144 unreachable addresses of the
+    gold-frame run carried, `Browser.new_context: Connection closed`, of which 9 answered a probe.
+    """
+    launched = []
+
+    async def fake_launch(pw):
+        b = _DeadDriver()
+        launched.append(b)
+        return b
+
+    async def stub(url, max_pages=6, deep=False, keep_pages=False, block_private_hosts=False,
+                   browser=None):
+        if browser is launched[0]:
+            return LA._failed(url, _CLOSED_NOTE)
+        return Result(url=url, requested_url=url, verdict='english_only', pages_read=6,
+                      read_quality={'pages_read': 6, 'sufficient': True})
+
+    monkeypatch.setattr(LA, '_playwright', lambda: _FakePW())
+    monkeypatch.setattr(LA, '_launch', fake_launch)
+    monkeypatch.setattr(LA, '_audit_async', stub)
+    return launched
+
+
+def test_the_retry_pass_reaches_the_run_and_prints_one_line_per_address(monkeypatch, capsys):
+    launched = _driver_dies_then_answers(monkeypatch)
+    urls = ['a.org', 'b.org', 'c.org']
+    assert CLI.main(['--json', '--shared-browser', '--concurrency', '2'] + urls) == CLI.EXIT_OK
+    rows = [json.loads(l) for l in capsys.readouterr().out.splitlines() if l.strip()]
+    assert [r['requested_url'] for r in rows] == urls, 'one row per address, in the order given'
+    assert all(r['verdict'] == 'english_only' for r in rows)
+    assert all(LA.RETRY_PASS_NOTE in r['note'] for r in rows)
+    assert len(launched) == 2, 'the batch had one browser and the pass had one of its own'
+
+
+def test_no_retry_pass_leaves_the_batch_s_own_answer(monkeypatch, capsys):
+    """The flag is how a study measures what the pass recovers: the same list, one flag apart."""
+    launched = _driver_dies_then_answers(monkeypatch)
+    urls = ['a.org', 'b.org', 'c.org']
+    assert CLI.main(['--json', '--shared-browser', '--no-retry-pass'] + urls) == CLI.EXIT_OK
+    rows = [json.loads(l) for l in capsys.readouterr().out.splitlines() if l.strip()]
+    assert [r['requested_url'] for r in rows] == urls
+    assert all(r['verdict'] == 'unreachable' for r in rows)
+    assert all(LA.RETRY_PASS_NOTE not in r['note'] for r in rows)
+    assert len(launched) == 1, 'no second browser was opened'
+
+
+def test_the_output_file_holds_the_reading_that_was_kept(monkeypatch, capsys, tmp_path):
+    """A row held back for the pass reaches `--output` once, carrying the reading that was kept.
+    Two rows for one address would be a run that read more addresses than it was given."""
+    _driver_dies_then_answers(monkeypatch)
+    out = tmp_path / 'run.jsonl'
+    assert CLI.main(['--json', '--shared-browser', '--output', str(out),
+                     'a.org', 'b.org']) == CLI.EXIT_OK
+    capsys.readouterr()
+    rows = [json.loads(l) for l in out.read_text(encoding='utf-8').splitlines() if l.strip()]
+    assert [r['requested_url'] for r in rows] == ['a.org', 'b.org']
+    assert all(r['pages_read'] == 6 for r in rows)
+
+
+def test_strict_judges_the_run_as_the_pass_left_it(monkeypatch, capsys):
+    """`--strict` refuses a run whose reading cannot be compared with another run's. The same three
+    addresses are a refused run when the pass is off and an accepted one when it is on, which is
+    what it means for the exit code to see the final state and not the batch's first answer."""
+    _driver_dies_then_answers(monkeypatch)
+    urls = ['a.org', 'b.org', 'c.org']
+    assert CLI.main(['--json', '--shared-browser', '--strict', '--no-retry-pass']
+                    + urls) == CLI.EXIT_DEGRADED
+    assert '--strict' in capsys.readouterr().err
+    _driver_dies_then_answers(monkeypatch)
+    assert CLI.main(['--json', '--shared-browser', '--strict'] + urls) == CLI.EXIT_OK
+
+
+def test_no_retry_pass_is_refused_with_rejudge(monkeypatch, tmp_path, capsys):
+    """A re-judge opens no browser, so a crawl setting on it is a misunderstanding to answer rather
+    than ignore. Eleven flags were once dropped here in silence."""
+    run = tmp_path / 'run.jsonl'
+    run.write_text('{"url": "https://x.org/", "verdict": "english_only"}\n', encoding='utf-8')
+    with pytest.raises(SystemExit):
+        CLI.main(['--json', '--rejudge', str(run), '--no-retry-pass'])
+    assert '--no-retry-pass' in capsys.readouterr().err

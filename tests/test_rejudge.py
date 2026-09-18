@@ -12,7 +12,9 @@ the SAME detection and judgement the live audit applies, because a second copy o
 second answer.
 """
 import asyncio
+import hashlib
 import json
+import re
 
 import pytest
 
@@ -71,15 +73,24 @@ def test_a_stored_capture_is_judged_to_the_same_answer_as_the_live_run(tmp_path)
 def test_a_re_judge_says_what_it_could_not_reproduce(tmp_path):
     """The fields that cannot match are named rather than silently answered differently. A live
     audit reproduces everything by definition, so the list is empty there and is the first thing a
-    reader of a re-judged row has to see."""
+    reader of a re-judged row has to see.
+
+    Five reasons and not six. `browser_rendered_text` left the list in 0.2.0, when the live audit
+    stopped reading the browser's own text and started reading the stored document through
+    `_page_text`: the reading is reproduced exactly now, and a reason code claiming otherwise would
+    be a false statement on every re-judged row. What a capture still cannot carry is a fetch, a
+    click, a probe, where a page came from and a pass that was never made.
+    """
     path = tmp_path / 'run.jsonl'
     live = _audit_and_store(_SITE, path)
     again = LA.rejudge(str(path), 'https://x.org/')
 
     assert live.unreproducible == []
-    assert set(again.unreproducible) == {LA.REJUDGE_BROWSER_TEXT, LA.REJUDGE_SERVER_CONFIRMATION,
+    assert set(again.unreproducible) == {LA.REJUDGE_SERVER_CONFIRMATION,
                                          LA.REJUDGE_CLICKED_CONTROLS, LA.REJUDGE_ROUTE_PROBE,
                                          LA.REJUDGE_PAGE_ORIGIN, LA.REJUDGE_ESCALATION}
+    assert not hasattr(LA, 'REJUDGE_BROWSER_TEXT'), (
+        'the code is retired, and a constant nothing emits is a limit a reader would still look up')
     for code in again.unreproducible:
         assert code in LA.REJUDGE_LIMITS
         assert len(LA.REJUDGE_LIMITS[code]) > 80, f'{code} needs a reason a person can act on'
@@ -251,7 +262,7 @@ def test_the_cli_re_judges_a_store_file_without_a_browser(tmp_path, capsys):
     assert len(rows) == 1
     assert rows[0]['verdict'] == 'true_multilingual'
     assert rows[0]['languages'] == ['English', 'Spanish']
-    assert LA.REJUDGE_BROWSER_TEXT in rows[0]['unreproducible']
+    assert LA.REJUDGE_SERVER_CONFIRMATION in rows[0]['unreproducible']
     assert rows[0]['rules']
 
     # and the human output names the rules and the limits
@@ -420,6 +431,64 @@ def test_a_capture_with_no_pages_still_names_the_build_that_judged_it(monkeypatc
     assert r.unreproducible == [LA.REJUDGE_NO_PAGES]
     assert r.tool_version == '0.0.1-capture' and r.judged_version == '9.9.9-rejudge'
     assert r.judged_at
+
+
+def test_a_live_audit_names_the_bytes_that_took_the_reading(tmp_path):
+    """The field that answers problem 2. A version label named two `core.py` files over one census
+    and the rows could not tell them apart; the build is the file's own sha256, so the row can."""
+    path = tmp_path / 'run.jsonl'
+    live = _audit_and_store(_SITE, path)
+    assert re.fullmatch(r'[0-9a-f]{12}', live.tool_build), live.tool_build
+    assert live.tool_build == live.judged_build == LA.build_id(), (
+        'a live audit captures and judges in one act, so the two builds agree there')
+    # and the value is the file's own hash, not something derived from the version literal
+    with open(LA.__file__, 'rb') as fh:
+        assert live.tool_build == hashlib.sha256(fh.read()).hexdigest()[:12]
+
+
+def test_the_build_is_computed_once(monkeypatch):
+    """Lazily and once: the file is read on the first call and the answer is cached on the
+    function, which is also why it is not a module constant and does not move the constant
+    freeze."""
+    assert LA.build_id() == LA.build_id()
+    monkeypatch.setattr(LA, 'open', _refuses_to_open, raising=False)
+    assert re.fullmatch(r'[0-9a-f]{12}', LA.build_id()), 'the cached answer survives'
+
+
+def _refuses_to_open(*a, **k):
+    raise AssertionError('build_id read the file a second time')
+
+
+def test_a_re_judged_result_names_the_capturing_build_and_the_judging_build(tmp_path, monkeypatch):
+    """The builds behave as the versions do, and they are the pair that still answers on a working
+    tree, where two re-judges months apart carry one version label and different code."""
+    path = tmp_path / 'run.jsonl'
+    monkeypatch.setattr(LA, 'build_id', lambda: 'aaaaaaaaaaaa')
+    live = _audit_and_store(_SITE, path)
+    assert live.tool_build == live.judged_build == 'aaaaaaaaaaaa'
+
+    monkeypatch.setattr(LA, 'build_id', lambda: 'bbbbbbbbbbbb')
+    again = LA.rejudge(str(path), 'https://x.org/')
+    assert again.tool_build == 'aaaaaaaaaaaa', 'the capture keeps the build that fetched the bytes'
+    assert again.judged_build == 'bbbbbbbbbbbb', 'and the judging build is the one running now'
+    assert (again.tool_build == again.judged_build) is False
+    # through the record a store writes, which is the join every figure is computed over
+    assert LA.rejudge(again.to_dict(with_pages=True)).tool_build == 'aaaaaaaaaaaa'
+
+
+def test_the_stored_record_carries_both_builds_and_an_old_record_carries_neither(monkeypatch):
+    """The round trip, and what a store written before this field existed says. `''` is an honest
+    answer and is the one a 0.1.0 capture gives, so a row with an empty `tool_build` beside a
+    filled `judged_build` is exactly that: old bytes judged by these."""
+    path_rec = {'url': 'https://x.org/', 'verdict': 'unreachable', 'pages': {},
+                'tool_version': '0.1.0', 'audited_at': '2020-01-01T00:00:00Z'}
+    monkeypatch.setattr(LA, 'build_id', lambda: 'cccccccccccc')
+    r = LA.rejudge(path_rec)
+    assert r.tool_build == '' and r.judged_build == 'cccccccccccc'
+
+    d = r.to_dict()
+    assert d['tool_build'] == '' and d['judged_build'] == 'cccccccccccc'
+    assert LA.rejudge(dict(d, pages={})).tool_build == ''
 
 
 def test_a_re_judge_under_a_different_build_is_recorded_and_never_refused(tmp_path, monkeypatch):

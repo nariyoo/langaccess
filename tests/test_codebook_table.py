@@ -17,7 +17,13 @@ import pytest
 
 from langaccess.core import RULES
 
+# The README of the repository these tests came from. Run from a copy of `tests/` beside an
+# installed wheel, which is how the suite is run against what a user gets, there is no README to
+# read and these tests skip with the path they wanted rather than failing as though the package
+# were broken.
 README = Path(__file__).resolve().parent.parent / 'README.md'
+if not README.exists():
+    pytest.skip('no README.md beside these tests: %s' % README, allow_module_level=True)
 BEGIN = '<!-- codebook: generated from RULES, do not edit by hand -->'
 END = '<!-- end codebook -->'
 

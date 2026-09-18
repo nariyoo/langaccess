@@ -409,8 +409,12 @@ def test_adding_english_left_every_other_languages_licence_where_it_was():
     states the rule instead of a snapshot of it: whatever the twenty lists hold, the subtraction
     set is what they share with EACH OTHER and English is not a party to it.
     """
+    # Twenty-one since Oromo was added 2026-09-17. The number is not what this test holds; the
+    # RULE is, which is that `_SHARED` is computed over the non-English lists and English is not a
+    # party to it. The count is asserted so that a list arriving without anybody noticing fails
+    # here, which is how Oromo's arrival was checked against every other language's licence.
     twenty = {k: v for k, v in LA.FUNC.items() if k != 'English'}
-    assert len(twenty) == 20
+    assert len(twenty) == 21
     counted = collections.Counter(w for v in twenty.values()
                                   for w in set(LA._fold(v).split()))
     assert LA._SHARED == {w for w, c in counted.items() if c > 1}
@@ -1826,6 +1830,322 @@ def test_the_hmong_words_fire_on_no_other_language():
         assert 'Hmong' not in LA.languages_in(other, aux=False), other[:40]
 
 
+OROMO_PROSE = ('Dhaabbanni keenya torbee hunda maatii godaansaaf gorsa seeraa kaffaltii malee kenna. '
+               'Gorsi kun bilisa yoo taʼe illee nuti haala godaansa keessan hin gaafannu, akkasumas '
+               'waajjirri keenya guyyaa shan banaa dha.')
+OROMO_NOTICE = ('Beeksisa: yoo gargaarsa barbaaddan, waaree dura bilbilaa. Abukaatoo waliin '
+                'dubbachuuf hanga sa\'aatii kudha lamaatti eegaa, gorsi kun kaffaltii hin qabu.')
+
+
+def test_oromo_is_read_off_its_function_words():
+    """Latin script shared with every other language on the list and no identifier route either:
+    lid.176 answers Finnish at 0.24 and 0.16 on the coverage paragraphs, under FT_MIN_CONF, so the
+    words are the only way to this language."""
+    assert LA.languages_in(OROMO_PROSE, aux=False) == ['Oromo']
+    assert LA.languages_in(OROMO_NOTICE, aux=False) == ['Oromo']
+
+
+def test_the_oromo_words_fire_on_no_other_language():
+    """The check that matters for a new Latin-script list, because a false reading moves a site to
+    true_multilingual. Held against the languages Oromo could be confused with by script, including
+    the two that share a single word with it, `yoo` in Yoruba and `kun` in Uzbek: one word cannot
+    reach the four distinct words a paragraph needs."""
+    for other in (HMONG_PROSE,
+                  'Ilé ìṣọ̀kan wa ń fúnni ní ìmọ̀ràn nípa òfin lọ́fẹ̀ẹ́ lórí àwọn ọ̀rọ̀ ìṣíkiri, '
+                  'a sì ń kọ́ àwọn àgbàlagbà ní èdè Gẹ̀ẹ́sì ní alẹ́ ẹ̀ẹ̀mẹta ní ọ̀sẹ̀.',
+                  'Markazimiz har hafta muhojir oilalarga bepul huquqiy maslahat beradi va biz '
+                  'sizning immigratsiya holatingiz haqida soramaymiz.',
+                  'Xarunta bulshada waxay talo sharci bilaash ah siisaa qoysaska socdaalka, '
+                  'toddobaadkiina saddex habeen fasallo Ingiriisi ah ayaa la qabtaa.',
+                  'Kituo chetu kinatoa ushauri wa kisheria bila malipo kwa familia za wahamiaji '
+                  'kila wiki, na hatuulizi kuhusu hali yako ya uhamiaji.',
+                  'Our organization helps immigrant families with legal questions every week of '
+                  'the year, and all of our services are free to anyone who needs them.'):
+        assert 'Oromo' not in LA.languages_in(other, aux=False), other[:40]
+
+
+def test_a_lithuanian_help_notice_is_a_paragraph():
+    """A help notice is the passage that most directly IS the provision this instrument measures,
+    and it is the shape a thin word list loses. This notice carried two words of the list against a
+    bar of four and read as nothing; the Bosnian entry was widened in August for the same shape.
+
+    The neighbour is the thing to watch here, because Latvian and Lithuanian share vocabulary the
+    way Spanish and Portuguese do. `jums` is ordinary Latvian, it is not in the Latvian list so it
+    thins nothing, and what it does is give a Latvian page ONE Lithuanian word, which is three short
+    of a reading.
+    """
+    notice = ('Pranešimas: jei jums reikia pagalbos lietuvių kalba, ateikite į registratūrą nuo '
+              'pirmadienio iki penktadienio. Konsultacija nemokama ir mes neklausiame apie jūsų '
+              'statusą. Norėdami pasikalbėti su advokatu, skambinkite iki vidudienio.')
+    assert LA.languages_in(notice, aux=False) == ['Lithuanian']
+    latvian = ('Paziņojums: ja jums vajadzīga palīdzība latviešu valodā, nāciet uz reģistratūru no '
+               'pirmdienas līdz piektdienai. Konsultācija ir bezmaksas, un mēs neprasām par jūsu '
+               'uzturēšanās statusu.')
+    assert LA.languages_in(latvian, aux=False) == ['Latvian']
+    # `kada` was the fifteenth candidate and is out, because the other list writes it too
+    assert 'kada' not in LA._fold(LA.FUNC['Lithuanian']).split()
+    assert 'kada' in LA._fold(LA.FUNC['Bosnian/Croatian/Serbian']).split()
+
+
+# The two shapes the Spanish list was widened for on 2026-09-18, invented. Neither carries four
+# words of the 48-word list the widening replaced, and both carry ten or eleven of the 122-word one.
+SPANISH_EVENT = ('Aviso: ahora atendemos a quien llegó hace poco al condado, y siempre hay alguien '
+                 'en la recepción. Aunque el trámite demora, cualquier familia consigue cita '
+                 'después de las doce y nadie tiene que pagar.')
+SPANISH_NOTICE = ('Ahora mismo hay alguien en la recepción que habla español. Si usted llegó hace '
+                  'poco, cualquier consulta es sin costo, aunque siempre conviene pedir cita '
+                  'después de las once.')
+
+
+def test_a_spanish_paragraph_is_read_off_the_widened_list():
+    """Spanish is the language this instrument meets most often and its list was the thinnest thing
+    in front of it: 48 words, where a page of ordinary Spanish prose about an event or an opening
+    hour can carry two or three of them and stop one short of FUNC_DISTINCT_MIN. Both passages here
+    carry two words of the old list and ten or eleven of this one."""
+    assert LA.languages_in(SPANISH_EVENT, aux=False) == ['Spanish']
+    assert LA.languages_in(SPANISH_NOTICE, aux=False) == ['Spanish']
+
+
+def test_the_widened_spanish_list_does_not_reach_its_latin_neighbours():
+    """The check that matters for this pair, because Spanish and Portuguese share most of their
+    everyday function vocabulary and a Spanish-only word inside Portuguese prose is a licence. The
+    Portuguese passage carries three Spanish words and no Spanish licence, and each neighbour is
+    still read as itself."""
+    portuguese = ('Aviso: agora atendemos quem chegou há pouco ao condado, e há sempre alguém na '
+                  'recepção. Embora o processo demore, qualquer família consegue marcação depois '
+                  'do meio-dia. Todas as famílias podem pedir uma intérprete para as consultas, e '
+                  'nós não perguntamos nada sobre a sua situação.')
+    italian = ('Avviso: ora seguiamo chi è arrivato da poco nella contea, e c\'è sempre qualcuno '
+               'alla reception. Anche se la pratica richiede tempo, qualsiasi famiglia ottiene un '
+               'appuntamento dopo mezzogiorno. Tutte le famiglie possono chiedere un interprete e '
+               'non chiediamo nulla sulla vostra situazione.')
+    french = ('Avis: nous accueillons maintenant les personnes arrivées récemment dans le comté, '
+              'et il y a toujours quelqu\'un à l\'accueil. Bien que la démarche prenne du temps, '
+              'chaque famille obtient un rendez-vous après midi.')
+    catalan = ('Avís: ara atenem qui ha arribat fa poc al comtat, i sempre hi ha algú a la '
+               'recepció. Encara que el tràmit trigui, qualsevol família aconsegueix cita després '
+               'del migdia.')
+    assert LA.languages_in(portuguese, aux=False) == ['Portuguese']
+    assert LA.languages_in(italian, aux=False) == ['Italian']
+    assert LA.languages_in(french, aux=False) == ['French']
+    assert 'Spanish' not in LA.languages_in(catalan, aux=False)
+
+
+def test_an_english_page_of_spanish_names_is_not_spanish():
+    """Rule 8 says a name is not content, and the widening's largest refusal is here: `los` and
+    `las` are the definite plural articles and they match inside two of the commonest place names
+    in the United States. They are not in the list, and this row is what would have carried them."""
+    row = ('Our offices in Los Angeles and Las Cruces run the Mujeres Unidas and Casa de la '
+           'Familia programs, and the Los Amigos food pantry opens on Saturday mornings at the '
+           'community center.')
+    assert LA.languages_in(row, aux=False) == []
+    for w in ('los', 'las'):
+        assert w not in LA._fold(LA.FUNC['Spanish']).split()
+
+
+def test_the_words_the_spanish_screen_refused_are_not_in_the_list():
+    """Each of these is an ordinary Spanish word and each is refused for a reason the corpus can
+    name, so the ledger is a test rather than a paragraph nobody reads. Portuguese writes `podemos`
+    and the two enclitic pronouns; Catalan writes `aquella`, `algun`, `alguna`, `seran` and `eres`;
+    Dutch, German and Haitian Creole write `gratis`; `sin`, `hay` and `son` are English words."""
+    spanish = set(LA._fold(LA.FUNC['Spanish']).split())
+    for w in ('podemos', 'los', 'las', 'aquella', 'algun', 'alguna', 'seran', 'eres',
+              'gratis', 'sin', 'hay', 'son', 'ese', 'esa', 'durante', 'mediante', 'todavia',
+              'gratuito', 'oficina', 'recursos', 'familias', 'aqui', 'mas', 'solo', 'sido', 'ser'):
+        assert w not in spanish, w
+    # and the bar the Hmong entry set, which this widening did not lower
+    assert all(len(w) >= 3 for w in spanish)
+
+
+def test_the_spanish_widening_thins_no_other_languages_licence():
+    """The same property the Oromo test states, asked of a list that grew rather than appeared. No
+    word added on 2026-09-18 is in another language's list, so `_SHARED` is the set it was and no
+    other language reads differently because Spanish got wider. The words Spanish already shared
+    stay shared, which is what keeps `dos` doing the job the note above the list describes."""
+    spanish = set(LA._fold(LA.FUNC['Spanish']).split())
+    added = spanish - {
+        'ademas', 'ayuda', 'cada', 'como', 'comunidad', 'cuando', 'del', 'desde', 'donde', 'dos',
+        'entre', 'esta', 'estan', 'estas', 'este', 'estos', 'hacer', 'hasta', 'informacion', 'muy',
+        'nosotros', 'nuestra', 'nuestras', 'nuestro', 'nuestros', 'otra', 'otro', 'para', 'pero',
+        'por', 'porque', 'puede', 'pueden', 'que', 'servicios', 'sobre', 'sus', 'tambien', 'tiene',
+        'tienen', 'toda', 'todas', 'todo', 'todos', 'una', 'unas', 'unos', 'usted'}
+    assert len(added) == 74
+    others = set()
+    for name, words in LA.FUNC.items():
+        if name not in ('Spanish', 'English'):
+            others |= set(LA._fold(words).split())
+    assert added & others == set(), sorted(added & others)
+    assert added & LA._SHARED == set()
+    # `dos` is the word that must stay shared, because it is what stops a Portuguese reading of
+    # Spanish prose; see the note on the Spanish entry and ORTHO_ONLY
+    assert 'dos' in LA._SHARED
+
+
+def test_ilocano_and_cebuano_are_named_and_still_carry_tagalog():
+    """What these two codes fix is a WRONG name and not a missing one. The identifier answers `ilo`
+    and `ceb` correctly and the answer was discarded for want of an entry, so both languages came
+    back reported as Tagalog, which is the only Philippine name the reader had. The second half is
+    the honest one: the Tagalog stays, because the word list is what puts it there and no entry in
+    that table can take it off, so a Cebuano page reports two names of which one is right."""
+    assert LA.AUX_ISO['ilo'] == 'Ilocano' and LA.AUX_ISO['ceb'] == 'Cebuano'
+    assert 'Ilocano' not in LA.COVERED and 'Cebuano' not in LA.COVERED
+    # the three share their grammatical vocabulary, which is why the wrong name is there at all
+    shared = set(LA._fold(LA.FUNC['Tagalog']).split())
+    assert {'ang', 'mga'} <= shared
+    # a Latin-script auxiliary language never qualifies on one block, so a help notice is unmoved
+    assert LA.AUX_MIN_BLOCKS == 2
+    assert LA.AUX_SCRIPT.get('Cebuano') is None and LA.AUX_SCRIPT.get('Ilocano') is None
+    assert LA._aux_solo('Cebuano', 'a' * (LA.AUX_SOLO_RUN + 40)) is False
+
+
+def test_the_turkish_list_carries_the_dotless_i():
+    """Four entries of this list were written with a dotted i where Turkish writes the dotless one,
+    so they could never match a page that spells the language properly. U+0131 is the third letter
+    in these lists that NFKD leaves alone, after the Vietnamese `đ` and the Polish `ł`."""
+    turkish = set(LA._fold(LA.FUNC['Turkish']).split())
+    for dotted, dotless in (('arasinda', 'arasında'), ('ayrica', 'ayrıca'),
+                            ('onlarin', 'onların'), ('yardim', 'yardım')):
+        assert dotted in turkish and dotless in turkish, (dotted, dotless)
+        assert LA._fold(dotless) == dotless
+    notice = ('Duyuru: Türkçe yardıma ihtiyacınız varsa pazartesiden cumaya kadar resepsiyona '
+              'gelin. Danışma ücretsizdir, ayrıca göçmenlik durumunuzu sormuyoruz ve bir avukatla '
+              'birlikte görüşmek için şimdi telefon edin.')
+    assert 'Turkish' in LA.languages_in(notice, aux=False)
+
+
+def test_daca_is_not_a_romanian_word_on_this_frame():
+    """The most useful refusal in the file. `dacă` is the Romanian word for `if` and it passes the
+    frequency screen at 2,664; over the stored capture it matches on 19 pages and every one of them
+    is the acronym DACA. On a frame of immigrant-serving organizations that string is everywhere,
+    and a frequency list of Romanian prose cannot know it."""
+    row = ('What is DACA? Deferred Action for Childhood Arrivals is a policy that lets people who '
+           'came here as children apply. We also handle DACA Renewal and Green Card Renewal.')
+    assert LA.languages_in(row, aux=False) == ['English']
+    assert 'daca' not in LA._fold(LA.FUNC['Romanian']).split()
+
+
+def test_both_spellings_of_a_german_umlaut_are_carried():
+    """Neither spelling covers the other. `fuer` is what a page writes when it cannot set the
+    diacritic and `fur` is what the fold produces from `für`, so a list holding one of them misses
+    every page that writes the other. The second half is `die` and `der`, which are ordinary English
+    words and an English surname particle: they are in the list and they cannot carry a reading,
+    because four distinct words inside one window is the bar."""
+    german = set(LA._fold(LA.FUNC['German']).split())
+    for pair in (('fur', 'fuer'), ('uber', 'ueber'), ('konnen', 'koennen')):
+        assert set(pair) <= german, pair
+    assert LA._fold('für') == 'fur' and LA._fold('können') == 'konnen'
+    english = ('The Fischer Foundation and the der Waal family fund our work, and nobody has to '
+               'die waiting for an appointment at the office on Main Street.')
+    assert LA.languages_in(english, aux=False) == ['English']
+
+
+def test_an_italian_help_notice_is_a_paragraph():
+    """Sixty-nine demonstratives, quantifiers and adverbs moved this notice from two distinct words
+    to two. What a real Italian notice is built from is the second person and the articulated
+    preposition, and `avete` and `servizio` are what take it over the bar. The commonest of those
+    prepositions are refused by the screen, which is why `alla` is not here and `agli` is."""
+    notice = ('Avviso: se avete bisogno di aiuto in italiano, rivolgetevi alla reception dal lunedì '
+              'al venerdì. Il servizio è gratuito e non chiediamo la vostra situazione migratoria.')
+    assert 'Italian' in LA.languages_in(notice, aux=False)
+    italian = set(LA._fold(LA.FUNC['Italian']).split())
+    assert 'avete' in italian and 'servizio' in italian
+    # refused by the screen against Spanish, and refused twice over by being in the German list
+    assert 'alla' not in italian and 'alle' not in italian
+    assert 'alle' in LA._fold(LA.FUNC['German']).split()
+
+
+def test_a_polish_help_notice_is_a_paragraph():
+    """The one widening of this pass that moves the coverage table: this notice carried three words
+    of the 37-word list against a bar of four and read as nothing. `ł` is the second letter in these
+    lists that NFKD leaves alone, after the Vietnamese `đ`, so `był` folds to `był` and an entry
+    written `byl` would match nothing."""
+    notice = ('Uwaga: jeśli potrzebujesz pomocy po polsku, przyjdź do biura w godzinach pracy. '
+              'Porada jest bezpłatna i nigdy nie pytamy o status pobytu. Możesz też zadzwonić '
+              'wcześniej, jeżeli chcesz umówić tłumacza.')
+    assert 'Polish' in LA.languages_in(notice, aux=False)
+    assert LA._fold('był') == 'był' and 'był' in LA._fold(LA.FUNC['Polish']).split()
+    assert 'byl' not in LA._fold(LA.FUNC['Polish']).split()
+
+
+def test_a_vietnamese_help_notice_is_a_paragraph():
+    """Vietnamese gives a short list because its grammatical vocabulary is short and most of it is
+    two letters. The second assertion is the thing to know before editing that entry: `đ` is U+0111,
+    NFKD leaves it alone, so `được` folds to `đuoc` and an entry written `duoc` would never match a
+    page that spells the word properly."""
+    notice = ('Thông báo: nếu quý vị cần được giúp đỡ bằng tiếng Việt, xin đến văn phòng của chúng '
+              'tôi trong giờ làm việc. Dịch vụ thông dịch miễn phí và quý vị không phải trả tiền.')
+    assert 'Vietnamese' in LA.languages_in(notice, aux=False)
+    assert LA._fold('được') == 'đuoc' and LA._fold('đến') == 'đen'
+    assert 'đuoc' in LA._fold(LA.FUNC['Vietnamese']).split()
+    # the two the screen refuses to another list here, and the English word
+    for w in ('nao', 'lai', 'them'):
+        assert w not in LA._fold(LA.FUNC['Vietnamese']).split(), w
+    assert 'nao' in LA._fold(LA.FUNC['Portuguese']).split()
+    assert 'lai' in LA._fold(LA.FUNC['Latvian']).split()
+
+
+def test_a_french_help_notice_is_a_paragraph():
+    """French was already read from a long paragraph and this is about the notice, which is the
+    shape a thin list loses. The second half is the removal. `les`, `par` and the English word
+    `services` were French-only inside these inventories, because the Spanish list writes `los`,
+    `por` and `servicios`, so each of them licensed a French reading by itself and a Spanish page
+    could read French off three Spanish words and one English one. They are gone, and the Spanish
+    passage here is what they fired on. `nos` stays and is the mechanism in one line: the Portuguese
+    list writes it too, so `_SHARED` takes its licence away and it counts toward the four without
+    ever licensing anything."""
+    notice = ('Avis: nous accueillons maintenant toute personne arrivée récemment, et il y a '
+              'toujours quelqu\'un à l\'accueil. Chacun peut demander un interprète, et aucune '
+              'démarche n\'est payante.')
+    assert LA.languages_in(notice, aux=False) == ['French']
+    french = set(LA._fold(LA.FUNC['French']).split())
+    for w in ('les', 'par', 'services'):
+        assert w not in french, w
+    assert 'nos' in french and 'nos' not in (french - LA._SHARED)
+    assert 'nos' in LA._fold(LA.FUNC['Portuguese']).split()
+    # the shape those three fired on: ordinary Spanish, with the English word `services` beside it
+    spanish_page = ('Se les haga justicia a los que no pueden hablar por sí mismos. Nuestros '
+                    'servicios y nuestro equipo están aquí para todos. Our services are free.')
+    assert 'French' not in LA.languages_in(spanish_page, aux=False)
+    # and the two the Vietnamese list refuses outright
+    assert 'moi' not in french and 'toi' not in french
+    assert {'moi', 'toi'} <= set(LA._fold(LA.FUNC['Vietnamese']).split())
+
+
+def test_a_portuguese_enrolment_notice_is_a_paragraph():
+    """The other half of the pair the ORTHO_ONLY note is about. Portuguese lost most of its everyday
+    function words to `_SHARED` for the same reason Spanish did, so a short notice carried three of
+    the 46-word list against a bar of four. The neighbour is what to watch: the Spanish passage here
+    carries Portuguese words it shares and no Portuguese licence, and still reads Spanish alone."""
+    notice = ('Aviso: agora atendemos quem chegou há pouco ao condado, e há sempre alguém na '
+              'recepção. Qualquer família pode pedir uma intérprete, e ainda temos vagas nas aulas '
+              'de inglês.')
+    assert LA.languages_in(notice, aux=False) == ['Portuguese']
+    assert LA.languages_in(SPANISH_EVENT, aux=False) == ['Spanish']
+    # refused on its output rather than on the screen: see the note on the entry
+    assert 'foram' not in LA._fold(LA.FUNC['Portuguese']).split()
+    # and refused by the screen, because another list here already writes it
+    assert 'vai' not in LA._fold(LA.FUNC['Portuguese']).split()
+    assert 'vai' in LA._fold(LA.FUNC['Latvian']).split()
+
+
+def test_the_oromo_list_thins_no_other_languages_licence():
+    """`_SHARED` is counted over the non-English lists, so a word entering it takes that word out of
+    some language's unique-word licence. Oromo shares nothing with any of the twenty, which is what
+    lets it be added without any other language reading differently, and it is a property of the
+    list rather than of the code."""
+    om = set(LA._fold(LA.FUNC['Oromo']).split())
+    others = set()
+    for name, words in LA.FUNC.items():
+        if name not in ('Oromo', 'English'):
+            others |= set(LA._fold(words).split())
+    assert om & others == set(), sorted(om & others)
+    assert om & LA._SHARED == set()
+    # so its whole list is its licence and the unique-word test can never be what refuses it
+    assert set(LA._fold(LA.FUNC['Oromo']).split()) - LA._SHARED == om
+    # two letters cannot separate a language from an abbreviation, so the commonest word is out
+    assert 'fi' not in om and all(len(w) >= 3 for w in om)
+
+
 def test_a_hmong_language_label_row_is_not_hmong():
     """`Kev Pab Rau Fab Kev Cai Lij Choj` is how one site writes `legal help` in a row of eight
     languages, and it is three of the list's words in a label. The four-distinct-words test is what
@@ -1925,6 +2245,352 @@ def test_a_script_without_a_word_list_is_read_exactly_as_before():
     """`_script_prose` answers True for a script it has no list for, so turning the test on can
     never take away a reading it cannot judge."""
     assert LA._script_prose('whatever', 0, 8, 'Chin') is True
+
+
+# ---- the Ethiopic script carries two languages, and until this it could say one
+#
+# The prose in these four strings is invented for this file: one invented community centre, invented
+# services, and no organization or place that exists.
+AMHARIC_PROSE = ('ማዕከላችን በየሳምንቱ ለስደተኛ ቤተሰቦች ነፃ የሕግ ምክር ይሰጣል። አገልግሎቱ ክፍያ የለውም እንዲሁም ስለ የመኖሪያ ሁኔታ '
+                 'አንጠይቅም። ቢሮው ከሰኞ እስከ ዓርብ ክፍት ነው እና ሁሉ ሰው መምጣት ይችላል።')
+# Tigrinya twice, because the resolution has two halves and a page can carry either. The first
+# string carries none of the seven letters and is named on the WORDS; the second carries መቐበሊ,
+# which is the ordinary word for a reception desk, and is named on the LETTER.
+TIGRINYA_PROSE = ('ማእከልና ኣብ ነፍሲ ወከፍ ሰሙን ንስደተኛታት ስድራቤታት ነጻ ሕጋዊ ምኽሪ ይህብ። ኣገልግሎት ክፍሊት የብሉን ከምኡውን ብዛዕባ '
+                  'ናይ መንበሪ ኩነታት ኣይንሓትትን። ቤት ጽሕፈት ካብ ሰኑይ ክሳብ ዓርቢ ክፉት እዩ ድማ ኩሉ ሰብ ክመጽእ ይኽእል።')
+TIGRINYA_LETTERS = ('ናብ መቐበሊ ምጹ። ነርስ ጸቕጢ ደም ብነጻ ትዕቅን። ቤት ጽሕፈት ካብ ሰኑይ ክሳብ ዓርቢ ክፉት እዩ ድማ ኩሉ ሰብ '
+                    'ክመጽእ ይኽእል።')
+
+
+def test_tigrinya_is_told_from_amharic_inside_the_ethiopic_script():
+    """Both are written in one range and the SCRIPTS entry is called `Amharic`, so before this a
+    Tigrinya page carried no Amharic particle, `_script_prose` refused the run and the page read as
+    carrying no language at all. Both halves of the resolution are exercised here, the words on the
+    first string and the letters on the second."""
+    assert LA.languages_in(TIGRINYA_PROSE, aux=False) == ['Tigrinya']
+    assert LA.languages_in(TIGRINYA_LETTERS, aux=False) == ['Tigrinya']
+    assert LA.languages_in(AMHARIC_PROSE, aux=False) == ['Amharic'], 'Amharic reads as it did'
+
+
+def test_the_tigrinya_letters_are_absent_from_amharic():
+    """The gate is worth something only if the seven letters really do separate the two.
+
+    They are not in the Amharic alphabet at all, which is why one of them is evidence the way ў is
+    evidence of Belarusian, and they are ordinary service vocabulary in Tigrinya rather than a rare
+    sign: መቐበሊ is a reception desk and ጸቕጢ is pressure.
+    """
+    pat = dict(LA.ETHIOPIC)['Tigrinya']
+    assert re.search(pat, TIGRINYA_LETTERS)
+    assert not re.search(pat, TIGRINYA_PROSE), 'the word half of the test needs a string without them'
+    assert not re.search(pat, AMHARIC_PROSE)
+    assert not re.search(pat, 'ማስታወቂያ አገልግሎቱ ነፃ ነው ወደ መቀበያው ይምጡ')
+
+
+def test_a_word_the_two_ethiopic_languages_share_names_neither():
+    """Same subtraction CYR_RX makes: ግን is `but` in both, so it cannot carry a language."""
+    assert 'ግን' in LA.ETH_FUNC['Amharic'] and 'ግን' in LA.ETH_FUNC['Tigrinya']
+    assert not LA.ETH_RX['Amharic'].search('ግን')
+    assert not LA.ETH_RX['Tigrinya'].search('ግን')
+    # and it is still in the union, because naming is a different question from whether the run is
+    # a sentence at all
+    assert 'ግን' in LA.SCRIPT_FUNC['Amharic'].split()
+
+
+# ---- two alphabets of one language each, which is a cleaner range than any of the four below
+#
+# Invented prose again. Armenian is on the reviewer's list; Georgian is beside it because the two
+# ranges are the same kind of evidence and because a Georgian page had no route at all short of the
+# identifier's two-sentence gate.
+ARMENIAN_PROSE = ('Մեր կազմակերպությունը ամեն շաբաթ ներգաղթյալ ընտանիքների համար անվճար '
+                  'իրավաբանական խորհրդատվություն է տրամադրում, և մենք ձեզ ձեր կարգավիճակի մասին '
+                  'չենք հարցնում։')
+GEORGIAN_PROSE = ('ჩვენი ორგანიზაცია ყოველ კვირას მიგრანტი ოჯახებისთვის უფასო იურიდიულ '
+                  'კონსულტაციას სთავაზობს და ჩვენ არ გეკითხებით თქვენი სტატუსის შესახებ.')
+
+
+@pytest.mark.parametrize('lang,text', [('Armenian', ARMENIAN_PROSE), ('Georgian', GEORGIAN_PROSE)])
+def test_an_alphabet_of_one_language_names_that_language(lang, text):
+    """Each of these two ranges is written by one nation's language and by nothing else, so it is
+    cleaner evidence than the Brahmic four, which carry minority languages beside the majority one.
+    Both were reachable before only through the identifier's two-sentence gate."""
+    assert LA.languages_in(text, aux=False) == [lang]
+    assert lang not in LA.SCRIPT_RUN, 'this script takes the table default, not a number of its own'
+
+
+@pytest.mark.parametrize('lang,label', [('Armenian', 'Հայերեն'), ('Georgian', 'ქართული')])
+def test_a_switcher_label_in_these_scripts_is_not_a_paragraph(lang, label):
+    """Rule 7 again: the autonym on a control is a word, and a word is not writing."""
+    assert LA.languages_in('English %s Home About Contact' % label, aux=False) == []
+    # and the label does resolve as a control, which is the other half of the same page
+    assert LA._lookup_language(LA.LANG_TOKEN, label) == lang
+
+
+def test_these_two_scripts_take_the_ordinary_word_boundary():
+    """They write no combining vowel signs, so \\b means what it says here and SCRIPT_FUNC_EDGE is
+    not needed; the Brahmic four are the entries that need it."""
+    for lang in ('Armenian', 'Georgian'):
+        assert lang in LA.SCRIPT_FUNC_SPACED and lang not in LA.SCRIPT_FUNC_EDGE
+    # both spellings of the Armenian `and`, because a page may write either
+    assert 'և' in LA.SCRIPT_FUNC['Armenian'].split()
+    assert 'եւ' in LA.SCRIPT_FUNC['Armenian'].split()
+
+
+# ---- codebook rule 9 inside a script: a conjunction stands in for no verb
+#
+# The regression this closes. Re-judging a 300-site prefix of the gold frame moved exactly one site,
+# an Armenian cultural organization whose settled class is english_only, to true_multilingual on
+# Armenian. What carried it was its event subtitles: an Armenian noun phrase beside its English
+# twin, 55 to 70 characters, no verb, joined by the conjunction. The run cleared the length
+# threshold and the conjunction cleared SCRIPT_FUNC_MIN, and nothing else on the page was Armenian.
+# The subtitles below are invented and have the shape; the real ones are not in this repository.
+ARMENIAN_SUBTITLES = (
+    'Events at the centre. '
+    'Graphic Novels from Two Cities  հայկական գրաֆիկական վեպեր Բեյրութից եւ Ստամբուլից  '
+    'Board Games Evening  նարդի, թղթախաղ եւ շախմատի պատմությունը Հայաստանում  '
+    'Writing Workshop  գրելու աշխատանոց Աննա Գալաչյանի եւ Ալեքսիա Հաթունի ուղեկցութեամբ  '
+    'All events are free and open to the public. Doors open at six in the evening.')
+
+
+def test_a_verbless_bilingual_subtitle_joined_by_a_conjunction_is_not_a_paragraph():
+    """Rule 9's own distinction, in a script. The run is 57 characters against a threshold of 40,
+    so the length test passes; the only Armenian particle on the page is the conjunction, and a
+    conjunction is what a label is built from."""
+    assert LA.languages_in(ARMENIAN_SUBTITLES, aux=False) == ['English']
+    pat = dict(LA.SCRIPTS)['Armenian']
+    assert LA._longest_run(ARMENIAN_SUBTITLES, pat) >= LA.SCRIPT_RUN_DEFAULT, (
+        'the length test has to PASS, or this fixture is testing the wrong gate')
+    assert LA._longest_run(ARMENIAN_SUBTITLES, pat, (), 'Armenian') == 0
+
+
+def test_the_same_line_with_a_verb_in_it_still_counts():
+    """The other half of rule 9, and the passage this instrument most wants to read: a help notice
+    is one clause, and one clause carries a copula."""
+    notice = ('Հայտարարություն. եթե ձեզ օգնություն է պետք հայերենով, եկեք ընդունարան '
+              'երկուշաբթիից ուրբաթ։ Խորհրդատվությունը անվճար է և մենք չենք հարցնում ձեր '
+              'ներգաղթի կարգավիճակի մասին։')
+    assert LA.languages_in(notice, aux=False) == ['Armenian']
+    # and the conjunction is still IN the list, because beside a copula it is evidence of prose
+    assert 'և' in LA.SCRIPT_FUNC['Armenian'].split()
+
+
+@pytest.mark.parametrize('script', sorted(LA.SCRIPT_CONNECTIVE))
+def test_a_coordinator_alone_never_clears_the_script_paragraph_test(script):
+    """Uniform over every script that has a coordinator in its list, so this is a rule and not a
+    patch for one language. A window carrying one coordinator and nothing else fails; the same
+    window with one qualifying particle added passes.
+    """
+    conj = LA.SCRIPT_CONNECTIVE[script].split()[0]
+    qualifying = sorted(set(LA.SCRIPT_FUNC[script].split())
+                        - set(LA.SCRIPT_CONNECTIVE[script].split()))
+    assert qualifying, '%s has no qualifying particle left, so the class is too wide' % script
+    alone = ' %s ' % conj
+    assert LA._script_prose(alone, 0, len(alone), script) is False, script
+    with_one = ' %s %s ' % (conj, qualifying[0])
+    assert LA._script_prose(with_one, 0, len(with_one), script) is True, script
+
+
+def test_every_coordinator_is_a_word_of_the_list_it_is_subtracted_from():
+    """The set is a partition of the lists and not a second vocabulary. A word here that is not in
+    its own SCRIPT_FUNC entry is a typo that would silently subtract nothing, and a conjunction
+    added to a list later without being classified here is the way this rule quietly stops
+    holding."""
+    for script, words in LA.SCRIPT_CONNECTIVE.items():
+        have = set(LA.SCRIPT_FUNC[script].split())
+        missing = [w for w in words.split() if w not in have]
+        assert missing == [], (script, missing)
+
+
+def test_the_class_is_coordinators_and_not_the_whole_grammar():
+    """Where the judgement is, asserted so that widening the class has to be deliberate.
+
+    A complementizer stays qualifying, because a word meaning `that` introduces a subordinate clause
+    and so is evidence of the verb rule 9 asks for; the causal subordinators stay qualifying for the
+    same reason. Burmese is the one entry with no coordinator at all, which is why it needs no
+    exclusion: its list is the sentence-final verb markers and was built that way.
+    """
+    assert 'Burmese' not in LA.SCRIPT_CONNECTIVE
+    for w in ('因为', '因為'):
+        assert w in LA.SCRIPT_FUNC['Chinese'].split()
+        assert w not in LA.SCRIPT_CONNECTIVE['Chinese'].split()
+    for w in ('和', '或'):
+        assert w in LA.SCRIPT_CONNECTIVE['Chinese'].split()
+    # a copula, a pronoun and a case marker are qualifying in the scripts added with this work
+    assert 'է' not in LA.SCRIPT_CONNECTIVE['Armenian'].split()
+    assert 'არის' not in LA.SCRIPT_CONNECTIVE['Georgian'].split()
+    assert 'ኣብ' not in LA.SCRIPT_CONNECTIVE['Amharic'].split()
+
+
+# ---- four Brahmic ranges that are their own proof, the way Khmer and Thai already were
+#
+# Invented prose, one invented community centre, in the two shapes the coverage work uses: a
+# paragraph and a help notice.
+BRAHMIC = {
+    'Punjabi': ('ਸਾਡੀ ਸੰਸਥਾ ਹਰ ਹਫ਼ਤੇ ਪਰਵਾਸੀ ਪਰਿਵਾਰਾਂ ਨੂੰ ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਸਲਾਹ ਦਿੰਦੀ ਹੈ ਅਤੇ ਅਸੀਂ ਤੁਹਾਨੂੰ '
+                'ਕਿਸੇ ਵੀ ਹਾਲਤ ਬਾਰੇ ਨਹੀਂ ਪੁੱਛਦੇ।',
+                'ਜੇ ਤੁਹਾਨੂੰ ਮਦਦ ਦੀ ਲੋੜ ਹੈ ਤਾਂ ਸੋਮਵਾਰ ਤੋਂ ਸ਼ੁੱਕਰਵਾਰ ਤੱਕ ਆਓ ਅਤੇ ਅਸੀਂ ਕੋਈ ਫ਼ੀਸ ਨਹੀਂ ਲੈਂਦੇ।'),
+    'Gujarati': ('અમારી સંસ્થા દર અઠવાડિયે સ્થળાંતરિત પરિવારો માટે મફત કાનૂની સલાહ આપે છે અને અમે તમને '
+                 'કોઈ પણ સ્થિતિ વિશે પૂછતા નથી।',
+                 'જો તમને મદદની જરૂર હોય તો સોમવારથી શુક્રવાર સુધી આવો અને અમે કોઈ ફી લેતા નથી।'),
+    'Tamil': ('எங்கள் அமைப்பு ஒவ்வொரு வாரமும் குடிபெயர்ந்த குடும்பங்களுக்கு இலவச சட்ட ஆலோசனை '
+              'வழங்குகிறது மற்றும் உங்கள் நிலை பற்றி நாங்கள் கேட்பதில்லை.',
+              'உங்களுக்கு உதவி தேவைப்பட்டால் திங்கள் முதல் வெள்ளி வரை வாருங்கள், இந்த ஆலோசனை இலவசம்.'),
+    'Telugu': ('మా సంస్థ ప్రతి వారం వలస కుటుంబాల కోసం ఉచిత న్యాయ సలహా ఇస్తుంది మరియు మీ స్థితి గురించి '
+               'మేము అడగము.',
+               'మీకు సహాయం అవసరమైతే సోమవారం నుండి శుక్రవారం వరకు రండి, ఈ సలహా ఉచితం కానీ సమయం కావాలి.'),
+}
+
+
+@pytest.mark.parametrize('lang', sorted(BRAHMIC))
+def test_a_brahmic_range_is_its_own_proof_of_the_language(lang):
+    """Each of the four is written by one language of this vocabulary and by nothing else, so the
+    range is evidence the way the Khmer and Thai ranges already are. Both shapes are held, because
+    the notice is the one these four could not reach: the identifier wants two sentences of 140
+    characters each and a help notice has none."""
+    para, notice = BRAHMIC[lang]
+    assert LA.languages_in(para, aux=False) == [lang]
+    assert LA.languages_in(notice, aux=False) == [lang]
+
+
+@pytest.mark.parametrize('lang', sorted(BRAHMIC))
+def test_the_new_brahmic_scripts_are_held_to_the_paragraph_standard(lang):
+    """Rule 7 in a new script, and the threshold is the table's own default rather than a number
+    chosen for these four. A label row is under it and a sentence is over it."""
+    assert lang not in LA.SCRIPT_RUN, 'this script must take the default, not a number of its own'
+    para = BRAHMIC[lang][0]
+    pat = dict(LA.SCRIPTS)[lang]
+    assert LA._longest_run(para, pat, (), lang) >= LA.SCRIPT_RUN_DEFAULT
+    # the label a language menu writes, which is a word and not a sentence
+    label = {'Punjabi': 'ਪੰਜਾਬੀ', 'Gujarati': 'ગુજરાતી', 'Tamil': 'தமிழ்', 'Telugu': 'తెలుగు'}[lang]
+    assert LA.languages_in('English %s Home About Contact' % label, aux=False) == []
+
+
+def test_the_four_new_scripts_carry_a_word_list_matched_on_their_own_edge():
+    """Every script with a run threshold needs a word list, and these four write combining vowel
+    signs, so the list has to be matched on the script's range rather than on \\b."""
+    for lang in BRAHMIC:
+        assert lang in LA.SCRIPT_FUNC and lang in LA.SCRIPT_FUNC_EDGE
+        para = BRAHMIC[lang][0]
+        assert LA.SCRIPT_FUNC_RX[lang].search(para), lang
+
+
+# ---- the Bengali script carries two languages, and the letter that separates them is the r
+#
+# Invented prose again: one invented community centre and no organization or place that exists.
+BENGALI_PROSE = ('আমাদের সংস্থা প্রতি সপ্তাহে অভিবাসী পরিবারের জন্য বিনামূল্যে আইনি পরামর্শ দেয়। '
+                 'পরামর্শ বিনামূল্যে এবং আমরা আপনার অবস্থা সম্পর্কে কিছু জিজ্ঞাসা করি না।')
+ASSAMESE_PROSE = ('আমাৰ সংস্থাই প্ৰতি সপ্তাহত প্ৰব্ৰজনকাৰী পৰিয়ালৰ বাবে বিনামূলীয়া আইনী পৰামৰ্শ দিয়ে। '
+                  'পৰামৰ্শ বিনামূলীয়া আৰু আমি আপোনাক অৱস্থাৰ বিষয়ে একো নুসুধোঁ।')
+
+
+def test_assamese_is_told_from_bengali_inside_the_bengali_script():
+    """Assamese was reachable only through the identifier, which wants two sentences of 140
+    characters each, so an Assamese page of ordinary length read as Bengali."""
+    assert LA.languages_in(BENGALI_PROSE, aux=False) == ['Bengali'], 'Bengali reads as it did'
+    assert LA.languages_in(ASSAMESE_PROSE, aux=False) == ['Assamese']
+
+
+def test_the_assamese_letter_is_the_r_and_not_the_w():
+    """ৰ is the consonant r, so it is in almost every Assamese sentence rather than being a rare
+    sign, and Bengali writes র instead. ৱ is the letter usually named beside it and it is out for
+    the reason ۆ is out of the Sorani gate: Bengali writes it too, in transliterated names, so it
+    would put Assamese on a Bengali page that mentions a person. Dropping it costs nothing, because
+    no Assamese passage carries ৱ without carrying ৰ."""
+    pat = dict(LA.BENGALI)['Assamese']
+    assert pat == 'ৰ' and 'ৱ' not in pat
+    assert len(re.findall(pat, ASSAMESE_PROSE)) >= 5, 'the letter has to be frequent, not rare'
+    assert not re.search(pat, BENGALI_PROSE)
+
+
+def test_the_words_the_two_bengali_script_languages_share_name_neither():
+    """These two share most of their grammatical vocabulary, so the subtraction does more work here
+    than in the Cyrillic or Ethiopic tables."""
+    shared = sorted(w for w, n in LA._BEN_ALL.items() if n > 1)
+    assert len(shared) >= 4, shared
+    for w in shared:
+        assert not LA.BEN_RX['Bengali'].search(w) and not LA.BEN_RX['Assamese'].search(w), w
+        assert w in LA.SCRIPT_FUNC['Bengali'].split(), w
+
+
+def test_the_bengali_entry_keeps_every_word_it_held():
+    """The same union the Devanagari entry became, and the same reason for checking it."""
+    held = 'এবং এর করে থেকে জন্য আমরা আমাদের এই তার না যে হয় আছে সঙ্গে সব'.split()
+    now = set(LA.SCRIPT_FUNC['Bengali'].split())
+    assert [w for w in held if w not in now] == []
+
+
+def test_bengali_falls_back_to_the_reading_it_had_before():
+    assert LA._bengali_language('নমস্কার কেন্দ্র') == 'Bengali'
+    assert LA._bengali_language('') == 'Bengali'
+
+
+# ---- Devanagari carries three languages, and until this it could say one
+#
+# Invented prose again: one invented community centre and no organization or place that exists.
+HINDI_PROSE = ('हमारी संस्था हर सप्ताह प्रवासी परिवारों को निःशुल्क कानूनी सलाह देती है। यह सेवा नहीं '
+               'बदलती और हम किसी से उसकी स्थिति के बारे में नहीं पूछते हैं।')
+NEPALI_PROSE = ('हाम्रो संस्थाले हरेक हप्ता आप्रवासी परिवारहरूलाई निःशुल्क कानुनी सल्लाह दिन्छ। सल्लाह '
+                'निःशुल्क छ र हामी तपाईंलाई अवस्थाबारे सोध्दैनौं, कार्यालय बिहानदेखि साँझसम्म खुला छ।')
+MARATHI_PROSE = ('आमच्या संस्थेत दर आठवड्याला स्थलांतरित कुटुंबांना मोफत कायदेशीर सल्ला दिला जातो. सल्ला '
+                 'मोफत आहे आणि आम्ही तुम्हाला तुमच्या स्थितीबद्दल विचारत नाही, कार्यालय सदैव उघडे असते.')
+
+
+def test_nepali_and_marathi_are_told_from_hindi_inside_devanagari():
+    """One alphabet, three languages, and one name for all of them until now. A Nepali page was not
+    missed, it was reported as Hindi, which is one community's name on another's page and is the
+    failure CYRILLIC was built for in the other shared script."""
+    assert LA.languages_in(HINDI_PROSE, aux=False) == ['Hindi'], 'Hindi reads as it did'
+    assert LA.languages_in(NEPALI_PROSE, aux=False) == ['Nepali']
+    assert LA.languages_in(MARATHI_PROSE, aux=False) == ['Marathi']
+
+
+def test_the_devanagari_words_separate_the_three_with_room():
+    """The scoring bar is CYR_RX's, two distinct words and strictly more than any other, so the
+    margins are worth pinning rather than the verdict alone."""
+    for text, want in ((HINDI_PROSE, 'Hindi'), (NEPALI_PROSE, 'Nepali'), (MARATHI_PROSE, 'Marathi')):
+        score = {k: len({m.group(0) for m in rx.finditer(text)}) for k, rx in LA.DEV_RX.items()}
+        best = max(score, key=score.get)
+        assert best == want and score[best] >= 2, (want, score)
+        assert score[best] > sorted(score.values())[-2], (want, score)
+
+
+def test_devanagari_falls_back_to_the_reading_it_had_before():
+    """Below the bar the answer is Hindi, which every Devanagari page read before this existed, so
+    the resolution can move a page off Hindi and can never move one to nothing."""
+    assert LA._devanagari_language('नमस्ते केंद्र') == 'Hindi'
+    assert LA._devanagari_language('') == 'Hindi'
+
+
+def test_a_devanagari_word_test_is_not_a_fragment_test():
+    """The boundary defect this closes, asserted on both sides.
+
+    `\\b` is defined against `\\w`, a Devanagari vowel sign is a combining mark and so is not `\\w`,
+    and the effect was not that such a word matched less often. `\\bका\\b` could not match `का`
+    standing alone and COULD match the first two characters of `कार्यक्रम`, so the entry tested for
+    fragments. Both directions are held here, because fixing only the first would leave a name
+    clearing rule 7 on a fragment.
+    """
+    assert LA.SCRIPT_FUNC_RX['Hindi'].search(' का '), 'the word standing alone has to match'
+    assert not LA.SCRIPT_FUNC_RX['Hindi'].search('कार्यक्रम कार्यालय'), 'and a fragment must not'
+    # the words that could never match under the old boundary, all of them ordinary Hindi
+    for w in ('है', 'हैं', 'के', 'की', 'में', 'से', 'नहीं'):
+        assert LA.SCRIPT_FUNC_RX['Hindi'].search(' %s ' % w), w
+        assert not re.search(r'\b(?:%s)\b' % re.escape(w), ' %s ' % w), (
+            '%s is matchable under \\b after all, so the note above SCRIPT_FUNC_EDGE is wrong' % w)
+
+
+def test_the_devanagari_entry_keeps_every_word_it_held():
+    """The entry became the union of DEV_FUNC plus the shared connectives, and a union that dropped
+    one of the twenty it had would be a silent narrowing of rule 7 in this script."""
+    held = 'है हैं के की का को में से और पर यह वह हम आप नहीं कि लिए हुए था थे'.split()
+    now = set(LA.SCRIPT_FUNC['Hindi'].split())
+    assert [w for w in held if w not in now] == []
+
+
+def test_ethiopic_falls_back_to_the_reading_it_had_before():
+    """`_cyrillic_language` can answer with the script name and this cannot, because `Amharic` is
+    the SCRIPTS entry. So the fallback is Amharic, which is what every Ethiopic page read before."""
+    assert LA._ethiopic_language('ሰላም ማዕከል') == 'Amharic'
+    assert LA._ethiopic_language('') == 'Amharic'
 
 
 # ---- F1: the document the server sent settles authored against widget
@@ -2861,6 +3527,636 @@ def test_the_stripper_is_linear_in_the_document():
         'ten times the document cost %.1f times the work, which is not linear' % (large / small))
 
 
+# ---------------------------------------------------------------- somebody else's feed, removed
+#
+# The prose below is invented and no real account's posts are reproduced. What the tests assert is
+# which ELEMENT goes, which is the whole of what the rule looks at.
+_FEED_SPANISH = ('Gracias a todos los que vinieron a nuestra fiesta en el parque; fue una tarde '
+                 'muy bonita para cada familia de nuestra comunidad y para todos los que nos '
+                 'ayudaron desde temprano hasta el final de la jornada.')
+_FEED_ENGLISH = ('Our centre helps families with school enrolment, housing questions and legal '
+                 'appointments every weekday morning at the front desk.')
+
+
+def _wrapped(open_tag, tag):
+    return ('<html><body><p>' + _FEED_ENGLISH + '</p>' + open_tag + '<p>' + _FEED_SPANISH
+            + '</p></' + tag + '></body></html>')
+
+
+@pytest.mark.parametrize('open_tag,tag', [
+    ('<div id="sb_instagram">', 'div'),
+    ('<div class="sbi_item">', 'div'),
+    ('<li class="cff-item">', 'li'),
+    ('<div id="cff">', 'div'),
+    ('<div class="powr-social-feed">', 'div'),
+    ('<div class="juicer-feed">', 'div'),
+    ('<div class="elfsight-app-3f2a1b4c">', 'div'),
+    ('<div class="widget sk-ww-instagram-feed">', 'div'),
+    ('<blockquote class="instagram-media">', 'blockquote'),
+    ('<iframe src="https://www.facebook.com/plugins/page.php?href=x">', 'iframe'),
+    ('<iframe src="https://www.instagram.com/p/AbCd/embed">', 'iframe'),
+])
+def test_a_feed_container_leaves_before_the_text_is_read(open_tag, tag):
+    """Every container in the five lists, each holding a member's post in another language."""
+    doc = _wrapped(open_tag, tag)
+    assert 'Spanish' in LA.languages_in(LA._text_from_html(doc)), (
+        'this case would pass on a document with no Spanish in it at all')
+    assert 'Spanish' not in LA.languages_in(LA._page_text(doc))
+    assert 'English' in LA.languages_in(LA._page_text(doc)), 'the page itself survived'
+
+
+def test_a_feed_container_that_is_never_closed_leaves_the_document_alone():
+    """The failure this refuses is the one `_main_text` already met from the other direction: an
+    element with no end tag would otherwise take every byte after it and the page reads as nothing."""
+    doc = ('<html><body><div class="sbi_item"><p>' + _FEED_SPANISH + '</p><p>' + _FEED_ENGLISH
+           + '</p></body></html>')
+    assert LA._without_feeds(doc) == doc
+    assert 'English' in LA.languages_in(LA._page_text(doc))
+
+
+def test_a_feed_container_closes_at_its_own_end_tag_and_not_the_first_one():
+    """A container holds elements of its own name, and a scanner that stopped at the first `</div>`
+    would leave half the feed in the text and take half the page out with the other half."""
+    doc = ('<html><body><div id="sb_instagram"><div class="post"><p>' + _FEED_SPANISH
+           + '</p></div></div><p>' + _FEED_ENGLISH + '</p></body></html>')
+    out = LA._page_text(doc)
+    assert _FEED_SPANISH.split()[0] not in out
+    assert _FEED_ENGLISH.split()[0] in out
+
+
+def test_a_document_with_no_feed_marker_is_read_exactly_as_it_was():
+    """The cheap refusal, and the promise that this changes nothing on the pages it is not about."""
+    doc = '<html><body><p>' + _FEED_ENGLISH + '</p><p>' + _FEED_SPANISH + '</p></body></html>'
+    assert LA._without_feeds(doc) == doc
+    assert LA._page_text(doc) == LA._text_from_html(doc)
+
+
+def test_a_feed_container_is_found_through_an_attribute_that_carries_a_greater_than():
+    """The shape the tag stripper was rewritten for, asked of the container scan as well."""
+    doc = ('<html><body><p>' + _FEED_ENGLISH + '</p>'
+           '<div data-styles="{&quot;sel&quot;:&quot;.a > b&quot;}" class="sbi_item"><p>'
+           + _FEED_SPANISH + '</p></div></body></html>')
+    assert 'Spanish' not in LA.languages_in(LA._page_text(doc))
+
+
+def test_the_feed_scan_is_linear_in_a_document_that_never_closes_one():
+    """The shape that made the first version quadratic, held so it cannot come back.
+
+    A container the document never closes used to be searched for to the end of the document, and
+    the next one searched the same tail again: 0.02 seconds for 200 of them against 2.10 for 2,000,
+    ten times the document for a hundred times the work. Not a wall-clock assertion, which would be
+    flaky on a contended machine; the shape held is that ten times the document is about ten times
+    the work.
+    """
+    unit = '<div class="sbi_item"><p>A member post of ordinary length sits here.</p>'
+
+    def cost(n):
+        doc = '<html><body>' + unit * n + '</body></html>'
+        return min(_timed(LA._without_feeds, doc) for _ in range(3))
+
+    small, large = cost(200), cost(2000)
+    assert large < small * 30, (
+        'ten times the document cost %.1f times the work, which is not linear' % (large / small))
+    # and the document is still whole, because none of those containers was ever closed
+    doc = '<html><body>' + unit * 3 + '</body></html>'
+    assert LA._without_feeds(doc) == doc
+
+
+def test_a_feed_container_an_ancestor_closes_first_is_left_alone():
+    """Malformed the other way: the container is still open when its parent's end tag arrives. It
+    is popped with no end of its own, so no cut is recorded and the page keeps its bytes."""
+    doc = ('<html><body><section><div class="sbi_item"><p>' + _FEED_SPANISH
+           + '</p></section><p>' + _FEED_ENGLISH + '</p></body></html>')
+    assert LA._without_feeds(doc) == doc
+
+
+# The site builder's own furniture, invented in the shape the platform renders. The prose inside
+# the containers is written for this file and names no organization; the five sentences in
+# PLACEHOLDER_TEXT are the platform's own interface strings and are quoted from the constant rather
+# than retyped, so a change to that tuple cannot leave this test passing against the old wording.
+_OWN_SPANISH = ('Nuestro centro comunitario ofrece asesoria legal gratuita a las familias que '
+                'llegaron hace poco al condado, y nadie tiene que pagar por la consulta.')
+_PAGE_ENGLISH = ('Welcome to our office on Maple Street, where we help families with legal '
+                 'questions every day of the week and nobody has to pay for a first visit.')
+
+
+def _builder_page(open_tag, body):
+    """One builder container, opened with `open_tag` and properly closed, inside an English page."""
+    return ('<html><body><p>' + _PAGE_ENGLISH + '</p>' + open_tag + '<div>' + body
+            + '</div></div></body></html>')
+
+
+def test_a_site_builders_empty_state_is_not_the_organizations_writing():
+    """A builder ships its interface in every language it supports, so a locale page renders the
+    builder's strings whether or not the organization has written anything. The container is what
+    is matched, never the content, so this works in every language the builder ships."""
+    doc = _builder_page('<div data-hook="empty-state-container">', _OWN_SPANISH)
+    out = LA._page_text(doc)
+    assert _OWN_SPANISH.split()[0] not in out
+    assert _PAGE_ENGLISH.split()[0] in out
+    assert LA.languages_in(out, aux=False) == ['English']
+
+
+def test_the_members_dialog_container_goes_the_same_way():
+    """The second hook, on the sign-up dialog a members page renders when nobody is signed in. On
+    one organization of the design set the whole of two pages was this dialog."""
+    doc = _builder_page('<div data-testid="siteMembersDialogLayout">', _OWN_SPANISH)
+    assert _OWN_SPANISH.split()[0] not in LA._page_text(doc)
+
+
+def test_the_sentence_list_is_the_second_line_when_the_hook_is_absent():
+    """A server document rendered without the attribute, or a builder that renames it. The sentence
+    list is applied to the TEXT and carries only the wording a stored page attests."""
+    sentences = ' '.join(LA.PLACEHOLDER_TEXT)
+    doc = '<html><body><p>' + _PAGE_ENGLISH + '</p><p>' + sentences + '</p></body></html>'
+    out = LA._page_text(doc)
+    for t in LA.PLACEHOLDER_TEXT:
+        assert t not in out, t
+    assert _PAGE_ENGLISH.split()[0] in out
+    assert LA.languages_in(out, aux=False) == ['English']
+    # and a line break where the browser puts one does not save it
+    broken = LA.PLACEHOLDER_TEXT[0].replace(' ', chr(10) + '   ')
+    assert LA._without_placeholder_text(broken).strip() == ''
+
+
+def test_the_organizations_own_spanish_survives_the_strip():
+    """The direction that costs a reading if it is got wrong. The page of the design set this was
+    written for publishes in Spanish on its front door and renders the builder's empty state on its
+    blog, and only the second goes."""
+    doc = ('<html><body><div data-hook="empty-state-container"><div>' + LA.PLACEHOLDER_TEXT[0]
+           + '</div></div><p>' + _OWN_SPANISH + '</p></body></html>')
+    out = LA._page_text(doc)
+    assert LA.PLACEHOLDER_TEXT[0] not in out
+    assert _OWN_SPANISH.split()[0] in out
+    assert LA.languages_in(out, aux=False) == ['Spanish']
+
+
+def test_the_two_readers_remove_the_same_placeholder_containers():
+    """The property the feed pair states and the only thing that keeps a live reading and a
+    re-judge of the stored bytes comparable: one list, two readers."""
+    for h in LA.PLACEHOLDER_HOOK:
+        assert '[data-hook="%s"]' % h in LA.PLACEHOLDER_SEL
+        assert LA._is_placeholder_element('div', 'data-hook="%s"' % h)
+        assert LA._is_placeholder_element('div', 'DATA-HOOK="%s"' % h.upper())
+    for t in LA.PLACEHOLDER_TESTID:
+        assert '[data-testid="%s"]' % t in LA.PLACEHOLDER_SEL
+        assert LA._is_placeholder_element('div', 'data-testid="%s"' % t)
+    assert not LA._is_placeholder_element('div', 'class="empty-state-container"')
+    doc = '<html><body><div data-hook="empty-state-container">x</div></body></html>'
+    assert LA._without_placeholders(doc) != doc
+    assert LA._without_feeds(doc) == doc          # the two families are separate lists
+
+
+def test_a_document_with_no_placeholder_marker_is_read_exactly_as_it_was():
+    doc = '<html><body><div class="ordinary"><p>' + _OWN_SPANISH + '</p></div></body></html>'
+    assert LA._without_placeholders(doc) == doc
+
+
+def test_every_placeholder_sentence_is_attested_and_none_is_translated():
+    """The capture holds one organization's Spanish locale pages and no other locale of the same
+    site, so Spanish is the only wording this package can quote. The English and French forms the
+    builder also ships are deliberately absent rather than guessed, and the container strip above is
+    what carries them."""
+    assert len(LA.PLACEHOLDER_TEXT) == 5
+    for t in LA.PLACEHOLDER_TEXT:
+        assert LA.languages_in(t * 4, aux=False) in ([], ['Spanish']), t
+
+
+def test_a_script_inside_a_feed_container_does_not_close_it():
+    """`</div>` inside a script is a string. A scanner that read it as an end tag would cut the
+    container short and leave the posts after it in the text."""
+    doc = ('<html><body><div class="sbi_item"><script>var t = "</div>";</script><p>'
+           + _FEED_SPANISH + '</p></div><p>' + _FEED_ENGLISH + '</p></body></html>')
+    out = LA._page_text(doc)
+    assert _FEED_SPANISH.split()[0] not in out
+    assert _FEED_ENGLISH.split()[0] in out
+
+
+def test_the_browser_selector_and_the_byte_reader_name_the_same_containers():
+    """One list and two readers. A container named to the browser and not to the stored bytes would
+    be removed from the text the class is read off and left in the document the authorship test
+    re-reads, which puts one finding on two sides of one question."""
+    for marker in (LA.FEED_ID + LA.FEED_CLASS + LA.FEED_CLASS_PREFIX + LA.FEED_IFRAME_SRC
+                   + LA.FEED_BLOCKQUOTE_CLASS):
+        assert marker in LA.FEED_SEL, '%s is not in the selector the browser is handed' % marker
+        assert LA._FEED_HINT.search(marker), '%s is not in the prefilter' % marker
+    assert LA._is_feed_element('div', ' id="sb_instagram"')
+    assert LA._is_feed_element('div', ' class="foo sbi_item bar"')
+    assert not LA._is_feed_element('div', ' class="sbi_items"'), 'a class token is a whole token'
+    assert not LA._is_feed_element('div', ' src="https://www.instagram.com/p/x/embed"'), (
+        'the iframe source names a container only on an iframe')
+
+
+def test_a_re_judged_capture_reads_the_feed_out_too():
+    """The capture keeps the feed, because `page.content()` is taken before the DOM strip. A
+    re-judge that did not take it out again would read a language off the stored bytes that the
+    live audit never saw, and the two would disagree on a site neither had changed."""
+    doc = _wrapped('<div id="sb_instagram">', 'div')
+    record = {'url': 'https://feed.example/', 'verdict': 'english_only', 'languages': ['English'],
+              'evidence': [], 'pages': {'https://feed.example/': doc}}
+    r = LA.rejudge(record)
+    assert r.verdict == 'english_only'
+    assert 'Spanish' not in r.languages
+
+
+# ---------------------------------------------- the translation widget, on both sides of one line
+#
+# WIDGET_SEL has always been handed to the browser and the widget's furniture has always come out of
+# the DOM before the browser text was read. What did not happen until 0.2.0 is the same removal on
+# the BYTES, and `_page_text` is now the reading on both sides of the live/stored line, so the
+# omission was a disagreement between two readers of one page: the store keeps `page.content()`
+# taken before the strip, a Google Translate menu of language autonyms is in that document, and a
+# re-judge read it as the site's own content.
+_WIDGET_EN = ('Our centre helps families with legal questions, housing and school enrolment every '
+              'day of the week, and the first appointment is free of charge.')
+_WIDGET_RU = ('Наша организация каждую неделю предоставляет бесплатную юридическую помощь семьям '
+              'иммигрантов, и мы не спрашиваем вас о вашем статусе в этой стране.')
+
+
+def _widget_wrapped(open_tag, tag):
+    return ('<html><body><p>' + _WIDGET_EN + '</p>' + open_tag + '<p>' + _WIDGET_RU
+            + '</p></' + tag + '></body></html>')
+
+
+@pytest.mark.parametrize('open_tag,tag', [
+    ('<div id="google_translate_element">', 'div'),
+    ('<div class="goog-te-menu-frame">', 'div'),
+    ('<div class="goog-te-menu2">', 'div'),
+    ('<div class="skiptranslate">', 'div'),
+    ('<div class="gtranslate_wrapper">', 'div'),
+    ('<div class="gt_switcher">', 'div'),
+    ('<div class="country-selector weglot_here">', 'div'),
+    ('<div id="weglot-container">', 'div'),
+    ('<div class="conveythis-widget">', 'div'),
+    ('<div id="conveythis-1">', 'div'),
+])
+def test_the_widgets_own_furniture_leaves_the_bytes_as_well_as_the_dom(open_tag, tag):
+    """Every clause of WIDGET_SEL, each holding a menu's worth of another language."""
+    doc = _widget_wrapped(open_tag, tag)
+    assert 'Russian' in LA.languages_in(LA._text_from_html(doc)), (
+        'this case would pass on a document with no Russian in it at all')
+    assert 'Russian' not in LA.languages_in(LA._page_text(doc))
+    assert 'English' in LA.languages_in(LA._page_text(doc)), 'the page itself survived'
+
+
+def test_the_widget_selector_and_the_byte_reader_name_the_same_furniture():
+    """One list and two readers, the way the feed containers are one list. A vendor named to the
+    browser and not to the bytes is a menu the live audit removes and a re-judge of the same
+    capture reads."""
+    for marker in LA.WIDGET_ID + LA.WIDGET_CLASS + LA.WIDGET_SUBSTRING:
+        assert marker in LA.WIDGET_SEL, '%s is not in the selector the browser is handed' % marker
+        assert LA._WIDGET_HINT.search(marker), '%s is not in the prefilter' % marker
+    assert LA._is_widget_element('div', ' id="google_translate_element"')
+    assert LA._is_widget_element('div', ' class="foo skiptranslate bar"')
+    assert not LA._is_widget_element('div', ' class="skiptranslated"'), (
+        'a class in WIDGET_CLASS is a whole token, which is what `.skiptranslate` means')
+    # and the two substring vendors are substrings on purpose, in either attribute
+    assert LA._is_widget_element('div', ' class="weglot-container"')
+    assert LA._is_widget_element('aside', ' id="conveythis-widget-1"')
+
+
+def test_a_re_judged_capture_reads_the_widget_furniture_out_too():
+    """The capture keeps the menu, because `page.content()` is taken before the DOM strip. This is
+    the disagreement 0.2.0 removes: the same bytes now read the same way live and re-judged."""
+    doc = _widget_wrapped('<div id="google_translate_element">', 'div')
+    record = {'url': 'https://widget.example/', 'verdict': 'english_only',
+              'languages': ['English'], 'evidence': [],
+              'pages': {'https://widget.example/': doc}}
+    r = LA.rejudge(record)
+    assert 'Russian' not in r.languages
+
+
+# ------------------------------------------- a quoted testimonial, out of the count and on the record
+#
+# The prose below is invented and no real testimonial is reproduced. What the tests assert is which
+# ELEMENT the text was in, which is the whole of what the rule looks at. Every container named here
+# is one the stored markup of the two captures shows; the block above `TESTIMONIAL_RX` in core.py
+# says which site each came from and why three proposed words are not in the list.
+_QUOTED_SPANISH = ('Gracias a todas las personas de este centro por la ayuda que nos dieron '
+                   'cuando llegamos a la ciudad sin conocer a nadie; nos acompanaron a la '
+                   'escuela de los ninos y no nos dejaron solos en ningun momento.')
+_QUOTED_ENGLISH = ('Our centre helps families with school enrolment, housing questions and legal '
+                   'appointments every weekday morning at the front desk.')
+
+
+def _quoted(open_tag, tag):
+    return ('<html><body><p>' + _QUOTED_ENGLISH + '</p>' + open_tag + '<p>' + _QUOTED_SPANISH
+            + '</p><p>- Yolanda</p></' + tag + '></body></html>')
+
+
+@pytest.mark.parametrize('open_tag,tag', [
+    ('<blockquote>', 'blockquote'),
+    ('<q>', 'q'),
+    ('<div class="testimonial-card">', 'div'),
+    ('<div class="testimonials-grid">', 'div'),
+    ('<section id="testimonials">', 'section'),
+    ('<div class="elementor-testimonial__text">', 'div'),
+    ('<div class="et_pb_testimonial_description">', 'div'),
+    ('<div class="ui-e-testimonial-text">', 'div'),
+    ('<div class="board-vol-testimonial animate-in">', 'div'),
+    ('<div class="testimonial-marquee-wrap">', 'div'),
+    ('<div class="type-testimonial">', 'div'),
+    ('<div class="avia-grid-testimonials">', 'div'),
+    ('<aside class="widget widget-reviews">', 'aside'),
+    ('<div class="cff-all-reviews">', 'div'),
+])
+def test_a_quoted_container_leaves_the_counted_text(open_tag, tag):
+    """Every shape the two captures show, each holding a visitor's testimonial in another
+    language. The page's own English paragraph survives every one of them."""
+    doc = _quoted(open_tag, tag)
+    assert 'Spanish' in LA.languages_in(LA._text_from_html(doc)), (
+        'this case would pass on a document with no Spanish in it at all')
+    assert 'Spanish' not in LA.languages_in(LA._page_text(doc))
+    assert 'English' in LA.languages_in(LA._page_text(doc)), 'the page itself survived'
+
+
+@pytest.mark.parametrize('open_tag,tag', [
+    ('<blockquote>', 'blockquote'),
+    ('<div class="testimonial-card">', 'div'),
+    ('<aside class="widget widget-reviews">', 'aside'),
+])
+def test_a_quoted_container_is_recorded_at_rung_one_and_attributed_to_nobody(open_tag, tag):
+    """Taken out of the count is not taken off the record. The row names the language and the
+    address, carries the rung the codebook gives a quoted testimonial, and carries no authorship,
+    because that axis says who produced the text and has no value for a visitor's words."""
+    doc = _quoted(open_tag, tag)
+    ev = LA.testimonial_evidence('https://quoted.example/', doc)
+    assert [(e.mechanism, e.language, e.sufficiency, e.authorship) for e in ev] == [
+        (LA.MECH_TESTIMONIAL, 'Spanish', LA.SUFF_TOKEN, LA.AUTHOR_NONE)]
+    assert _QUOTED_SPANISH.split()[0] in ev[0].quote
+    assert ev[0].url == 'https://quoted.example/'
+    assert ev[0].rules == [], 'no classification rule counts it, so it names none'
+
+
+def test_the_english_inside_a_quoted_container_is_not_recorded_either():
+    """`Result.evidence` never receives a piece of English evidence and a quotation is not the
+    exception: an English testimonial is out of the counted text and carries no row."""
+    doc = ('<html><body><p>' + _QUOTED_ENGLISH + '</p><div class="testimonial-card"><p>'
+           + _QUOTED_ENGLISH + ' It changed everything for our family.</p></div></body></html>')
+    assert LA.testimonial_evidence('https://quoted.example/', doc) == []
+
+
+def test_a_quotation_cannot_count_towards_a_verdict():
+    """Three constructions hold it out of the count and this asserts all three, because a rule
+    that suppresses a reading has to be unable to create one."""
+    assert LA.MECH_TESTIMONIAL not in LA.OWN_MECHANISMS
+    assert LA.MECH_SUFFICIENCY[LA.MECH_TESTIMONIAL] == LA.SUFF_TOKEN
+    assert LA.SUFF_TOKEN < LA.SUFFICIENCY_COUNTS
+    row = LA.Evidence(LA.MECH_TESTIMONIAL, 'https://quoted.example/', _QUOTED_SPANISH, 'Spanish',
+                      authorship=LA.AUTHOR_NONE, sufficiency=LA.SUFF_TOKEN)
+    assert LA.counted_evidence([row], '') == []
+    assert LA.sufficiency_of(row) == LA.SUFF_TOKEN
+    assert LA.authorship_of(row, '') == LA.AUTHOR_NONE, (
+        'a recorded authorship wins, so the row cannot lift a site up the axis')
+    assert LA.verdict_for([row], '') == 'english_only'
+
+
+def test_a_word_inside_a_longer_word_is_not_a_container():
+    """`preview` is not a review, and that is why the rule is a pattern and not a CSS selector:
+    ten class tokens of the 72-site capture carry `preview` and none of them is a testimonial."""
+    for cls in ('ios-preview-native-scroll', 'wplinkpreview-description', 'audio-preview',
+                'fw-preview-button', 'preview_content', 'big-preview', 'reviewer-photo',
+                'tweak-quote-block-alignment-center', 'modern-quote', 'icon-quote-right'):
+        assert not LA._is_quoted_element('div', ' class="%s"' % cls), (
+            '%s is not a container a testimonial is published in' % cls)
+    for cls in ('testimonial-card', 'elementor-testimonial__text', 'et_pb_testimonial_1',
+                'insurancehome_section5_testimonial', 'testimonials', 'widget-reviews',
+                'TESTIMONIAL-CARD'):
+        assert LA._is_quoted_element('div', ' class="%s"' % cls), (
+            '%s is a container the corpus shows' % cls)
+
+
+def test_the_document_itself_is_never_a_quotation():
+    """The guard that keeps a theme's style setting from taking the whole page. Squarespace writes
+    its site-wide settings onto the body element, and without this the word rule took the entire
+    document off every Squarespace site of the 72-site capture, one of them an organization
+    publishing help pages in eight languages."""
+    attrs = ' class="tweak-testimonial-alignment-center"'
+    for tag in LA.QUOTED_NEVER:
+        assert not LA._is_quoted_element(tag, attrs), '%s is the document, not a part of it' % tag
+    assert LA._is_quoted_element('div', attrs), 'the same class on a div is still a container'
+
+
+def test_a_link_to_a_page_of_testimonials_is_not_a_container():
+    """The attribute is read from `class` and `id` and from nowhere else. An anchor pointing at a
+    page of reviews is navigation, and a wrapper naming a record in a data attribute is drawing
+    the quotation rather than being it."""
+    assert not LA._is_quoted_element('a', ' href="/reviews/"')
+    assert not LA._is_quoted_element('div', ' data-testimonial-id="4182"')
+
+
+def test_a_figure_is_a_quotation_only_when_it_names_who_is_quoted():
+    """A `<figure>` is equally how a photograph and a code listing are published, so the `<cite>`
+    inside it is what makes this one a quotation."""
+    with_cite = ('<html><body><p>' + _QUOTED_ENGLISH + '</p><figure><p>' + _QUOTED_SPANISH
+                 + '</p><figcaption><cite>Yolanda P.</cite></figcaption></figure></body></html>')
+    without = ('<html><body><p>' + _QUOTED_ENGLISH + '</p><figure><p>' + _QUOTED_SPANISH
+               + '</p><figcaption>A summer afternoon in the park</figcaption>'
+                 '</figure></body></html>')
+    assert 'Spanish' not in LA.languages_in(LA._page_text(with_cite))
+    assert 'Spanish' in LA.languages_in(LA._page_text(without))
+
+
+def test_a_cite_names_the_nearest_figure_and_not_every_one():
+    """The inner figure's cite is the inner figure's, which is what the stack answers and what a
+    search for the outermost ancestor would get wrong."""
+    doc = ('<html><body><figure><p>' + _QUOTED_ENGLISH + '</p><figure><p>' + _QUOTED_SPANISH
+           + '</p><cite>Yolanda P.</cite></figure></figure></body></html>')
+    out = LA._page_text(doc)
+    assert _QUOTED_SPANISH.split()[0] not in out
+    assert _QUOTED_ENGLISH.split()[0] in out
+
+
+def test_a_quoted_container_that_is_never_closed_leaves_the_document_alone():
+    """The same refusal `_without_feeds` makes: a container with no end tag would otherwise take
+    every byte after it and the page would read as nothing."""
+    doc = ('<html><body><div class="testimonial-card"><p>' + _QUOTED_SPANISH + '</p><p>'
+           + _QUOTED_ENGLISH + '</p></body></html>')
+    assert LA._without_testimonials(doc) == doc
+    assert 'English' in LA.languages_in(LA._page_text(doc))
+
+
+def test_a_document_with_no_quotation_marker_is_read_exactly_as_it_was():
+    doc = '<html><body><p>' + _QUOTED_ENGLISH + '</p></body></html>'
+    assert LA._without_testimonials(doc) == doc
+    assert LA._testimonial_blocks(doc) == []
+
+
+def test_a_container_inside_a_container_is_recorded_once():
+    """A wrapper holding two quotations is one quotation region. Overlapping rows would say the
+    page carried several findings where it carries one shape."""
+    doc = ('<html><body><section id="testimonials"><blockquote><p>' + _QUOTED_SPANISH
+           + '</p></blockquote><blockquote><p>' + _QUOTED_SPANISH
+           + '</p></blockquote></section><p>' + _QUOTED_ENGLISH + '</p></body></html>')
+    assert len(LA._testimonial_blocks(doc)) == 1
+    assert _QUOTED_ENGLISH.split()[0] in LA._page_text(doc)
+
+
+def test_a_quotation_inside_somebody_elses_feed_is_read_as_the_feed():
+    """The feed containers go first, so a testimonial slider rendered inside an embedded feed is
+    not recorded twice under two mechanisms."""
+    doc = ('<html><body><p>' + _QUOTED_ENGLISH + '</p><div id="sb_instagram">'
+           '<div class="testimonial-card"><p>' + _QUOTED_SPANISH
+           + '</p></div></div></body></html>')
+    assert LA._testimonial_blocks(doc) == []
+    assert 'Spanish' not in LA.languages_in(LA._page_text(doc))
+
+
+def test_the_browser_reader_and_the_byte_reader_are_built_from_one_pattern():
+    """One list and two readers, and the browser is handed this pattern's own source rather than a
+    selector, because `[class*="review"]` cannot refuse `preview` and `[class$="review"]` cannot
+    refuse `audio-preview`. The pattern that reaches the browser is applied here to the class
+    values the corpus shows, and it has to decide every one of them the way the byte reader does.
+    What the browser DOES with it is JavaScript and is exercised on a real page in
+    tests/test_live.py, exactly as `_CHROME_JS` is."""
+    calls = []
+
+    class _Page(object):
+        async def evaluate(self, js, arg=None):
+            calls.append((js, arg))
+            return 0
+
+    asyncio.run(LA._lift_testimonials(_Page()))
+    assert len(calls) == 1
+    js, arg = calls[0]
+    assert js is LA._QUOTED_JS
+    assert arg == [LA.TESTIMONIAL_RX.pattern, list(LA.QUOTED_TAGS), LA.QUOTED_FIGURE_CHILD,
+                   list(LA.QUOTED_NEVER)]
+    for word in LA.TESTIMONIAL_WORDS:
+        assert word in LA.TESTIMONIAL_RX.pattern, '%s is not in the pattern' % word
+        assert LA._QUOTED_HINT.search(word), '%s is not in the prefilter' % word
+        assert word not in js, (
+            'the browser reads the word list off the pattern it is handed and never holds a copy '
+            'of its own')
+    browser_rx = re.compile(arg[0])
+    for cls in ('testimonial-card', 'ios-preview-native-scroll', 'et_pb_testimonial_1',
+                'audio-preview', 'widget-reviews', 'reviewer-photo', 'modern-quote',
+                'avia-grid-testimonials'):
+        assert bool(browser_rx.search(cls)) == LA._is_quoted_element('div', ' class="%s"' % cls), (
+            'the two readers disagree about %s' % cls)
+    for tag in LA.QUOTED_TAGS:
+        assert LA._QUOTED_HINT.search('<' + tag + '>'), '%s is not in the prefilter' % tag
+    assert LA._QUOTED_HINT.search('<' + LA.QUOTED_FIGURE_CHILD + '>')
+
+
+def test_a_re_judged_capture_reads_the_quotation_out_too_and_puts_it_on_the_record():
+    """The capture keeps the container, because `page.content()` is taken before the DOM strip. A
+    re-judge has to take it out of the same text and record the same row, or the live audit and a
+    re-judge of its own capture answer differently about a site neither of them has changed."""
+    doc = _quoted('<div class="testimonial-card">', 'div')
+    record = {'url': 'https://quoted.example/', 'verdict': 'true_multilingual',
+              'languages': ['English', 'Spanish'], 'evidence': [],
+              'pages': {'https://quoted.example/': doc}}
+    r = LA.rejudge(record)
+    assert r.verdict == 'english_only'
+    assert 'Spanish' not in r.languages
+    quoted = [e for e in r.evidence if e.mechanism == LA.MECH_TESTIMONIAL]
+    assert [(e.language, e.sufficiency) for e in quoted] == [('Spanish', LA.SUFF_TOKEN)]
+    assert LA.counted_evidence(r.evidence, r.machine_translation) == []
+    assert r.by_language['Spanish'] == {'authorship': LA.AUTHOR_NONE,
+                                        'sufficiency': LA.SUFF_NONE}, (
+        'a language seen only in a quotation is on by_language and off languages, which is where '
+        'a language on an archive page has always been')
+
+
+def test_one_sitewide_slider_is_recorded_once_and_not_once_per_page():
+    """A testimonial slider in a footer is on every page. Thirty copies of one quotation would
+    bury the findings that decided the site under the one the verdict declined to count."""
+    doc = _quoted('<div class="testimonial-card">', 'div')
+    pages = {'https://quoted.example/': doc,
+             'https://quoted.example/services': doc,
+             'https://quoted.example/contact': doc}
+    r = LA.rejudge({'url': 'https://quoted.example/', 'verdict': 'english_only',
+                    'languages': ['English'], 'evidence': [], 'pages': pages})
+    assert len([e for e in r.evidence if e.mechanism == LA.MECH_TESTIMONIAL]) == 1
+
+
+def test_the_quoted_rows_come_last_on_the_evidence_list():
+    """The hand-coding queue prints the first three rows of the list, so a quotation the verdict
+    declined to count must not displace the finding the verdict rests on."""
+    doc = ('<html><body><p>' + _QUOTED_ENGLISH + '</p><p>Ofrecemos ayuda con la escuela de los '
+           'ninos, con la vivienda y con las citas legales todas las mananas de la semana en '
+           'nuestra oficina del centro, y no hay que pagar nada por este servicio.</p>'
+           '<div class="testimonial-card"><p>' + _QUOTED_SPANISH + '</p></div></body></html>')
+    r = LA.rejudge({'url': 'https://quoted.example/', 'verdict': 'english_only',
+                    'languages': ['English'], 'evidence': [],
+                    'pages': {'https://quoted.example/': doc}})
+    assert r.verdict == 'true_multilingual'
+    assert [e.mechanism for e in r.evidence][-1] == LA.MECH_TESTIMONIAL
+    assert r.evidence[0].mechanism == 'inline_text'
+
+
+# --------------------------------------- a block of contact details is not prose in any language
+#
+# The five blocks below are shapes, not quotations: the two from docs/KNOWN_ISSUES.md are rewritten
+# with invented street names and invented numbers, because a real address belongs in a measurement
+# report and not in a test.
+_CONTACT_PANEL = ('Riverbend Centre 4821 Marlow Rd, Suite 210, Fairhaven, NY 14022 '
+                  'Main 555-217-4480 Espanol 555-217-4488 Fax 555-217-4499 '
+                  'Monday 9am - 2pm Tuesday 9am - 2pm Wednesday 9am - 2pm Thursday 9am - 4pm')
+_LISTING_RESIDUE = ('Fairhaven NY,14022 Save $310,000 House just listed Save 1 2 3 4 5 '
+                    '820 Marlow Rd, Riverbend, NY 14031 $340,000 820 Marlow Rd, Riverbend, '
+                    'NY 14031 Save 1 2 3 4 5 $268,000 17 Calder Ln, Fairhaven, NY 14022')
+_DIRECTORY = ('Box 95086 Fairhaven, NY 14022 555-471-2522 Riverbend State Athletic Commission '
+              '(RSAC) 1313 Marlow Street Riverbend, NY 14031 Box 94907 Fairhaven, NY 14022 '
+              '555-471-4545 Riverbend State Patrol (RSP) Troop A')
+_PROSE = ('Shirika letu la jamii linatoa msaada wa sheria na makazi kwa familia zote katika mji '
+          'wetu kila wiki bila malipo yoyote na wafanyakazi wetu wanazungumza lugha yako.')
+_PROSE_WITH_DETAILS = ('Tafadhali wasiliana nasi kwa simu 555-217-4480 au barua pepe ili kupanga '
+                       'miadi na mshauri wetu kuhusu huduma za makazi elimu na afya kwa wakazi '
+                       'wote wapya katika eneo letu kabla ya tarehe 14 Machi 2026.')
+
+
+@pytest.mark.parametrize('block', [_CONTACT_PANEL, _LISTING_RESIDUE, _DIRECTORY])
+def test_a_block_of_contact_details_is_not_offered_to_the_identifier(block):
+    """A street address, a telephone number and a table of opening hours are not prose, and the
+    identifier answers a language for any text it is handed. These are the three shapes it was
+    measured answering a language on: Esperanto on an English footer, Slovenian on a property
+    listing, Swedish on a state agency directory."""
+    assert len(block) >= LA.AUX_MIN_BLOCK, 'a block this short never reached the identifier anyway'
+    assert LA.listing_share(block) > LA.AUX_LISTING_SHARE
+    assert not LA._aux_asked(block)
+
+
+@pytest.mark.parametrize('block', [_PROSE, _PROSE_WITH_DETAILS])
+def test_prose_is_offered_to_the_identifier_even_when_it_carries_a_number(block):
+    """The half that costs recall if it is wrong. A paragraph that names a telephone number and a
+    date is still a paragraph, and the ceiling is set where the genuine blocks of a measured
+    capture run to 0.250 rather than where the shapes above begin at 0.320."""
+    assert LA.listing_share(block) <= LA.AUX_LISTING_SHARE
+    assert LA._aux_asked(block)
+
+
+def test_the_listing_test_reads_an_address_the_way_an_address_is_written():
+    """Case is the rule and not a convenience. `de`, `la`, `in`, `or` and `me` are ordinary words
+    in the languages this reader exists to find and are also state codes in upper case, and
+    matching them either way pushed a Spanish and an Estonian block over the ceiling."""
+    spanish = ('Nuestra oficina de la comunidad ayuda a las familias con la escuela y la vivienda '
+               'en el barrio, y nosotros podemos buscar un interprete para usted cuando lo pida.')
+    assert LA.listing_share(spanish) == 0.0
+    assert LA.listing_share('VA NE PA TX') == 1.0
+    assert LA.listing_share('Rd St Ave Blvd') == 1.0
+    assert LA.listing_share('$40 EUR 20 3pm') == pytest.approx(0.75)
+
+
+def test_the_floor_is_asked_in_every_place_the_auxiliary_reader_splits_blocks():
+    """AUX_SPLIT's own note says a reader that counted blocks one way and quoted them another would
+    quote a passage it had not counted. The three places are `_aux_languages`, `language_coverage`
+    and `_aux_quote`, and all three ask `_aux_asked`."""
+    import inspect
+    for fn in (LA._aux_languages, LA.language_coverage, LA._aux_quote):
+        assert '_aux_asked' in inspect.getsource(fn), (
+            '%s splits blocks without asking the floor' % fn.__name__)
+
+
+def test_the_coverage_denominator_is_not_narrowed_by_the_floor():
+    """Taking a refused block out of the denominator would RAISE the coverage of a page that is
+    mostly contact panels, which is the opposite of what the floor is for."""
+    import inspect
+    src = inspect.getsource(LA.language_coverage)
+    assert 'if len(b) >= AUX_MIN_BLOCK]' in src, 'the denominator stopped being every long block'
+
+
 def test_a_latin_langid_answer_needs_corroboration():
     """AUX_SCRIPT has always refused langid's Pashto without a Pashto letter on the page. A
     Latin-script answer had no gate to meet, and langid names a language for any text it is
@@ -2993,13 +4289,23 @@ def test_tibetan_and_sorani_are_in_the_auxiliary_table():
     assert 'Tibetan' not in LA.COVERED, 'a covered name is filtered out of the auxiliary reading'
 
 
-def test_nepali_is_left_out_on_purpose():
-    """It is not an oversight and the reason is that Nepali is not MISSED, it is misnamed. Nepali is
-    written in Devanagari and Devanagari already resolves to Hindi in SCRIPTS, so adding the code
-    would put two names on the same text and settle neither. Separating the two is a measurement
-    nobody has taken, and this pins the decision so that taking it is deliberate."""
+def test_nepali_is_left_out_of_the_identifier_and_read_by_the_script_instead():
+    """This test said, until the Devanagari resolution landed, that Nepali was not missed but
+    misnamed, that adding `ne` would put two names on one text, and that separating Nepali from
+    Hindi was a measurement nobody had taken. The measurement has been taken and the pin did its
+    work: it is what made the separation a decision rather than a gap nobody could see.
+
+    Both halves hold now for a stronger reason than before. `ne` is still out, because Nepali is in
+    COVERED and `_aux_languages` filters a covered name, so an entry could never fire. And the name
+    has left SWITCHER_ONLY, which is what that set is for: the asymmetry it records is that a
+    switcher can offer what the reader cannot read, and the reader can read this one.
+    """
     assert 'ne' not in LA.AUX_ISO
-    assert 'Nepali' in LA.SWITCHER_ONLY
+    assert 'Nepali' in LA.COVERED
+    assert 'Nepali' not in LA.SWITCHER_ONLY
+    assert LA.SWITCHER_ONLY == frozenset(), (
+        'a name in this set is a name the switcher reports and the reader cannot: %s'
+        % sorted(LA.SWITCHER_ONLY))
 
 
 def test_the_tibetan_entry_is_wired_and_the_solo_run_is_what_releases_it():
@@ -3047,7 +4353,22 @@ _FAILURE_NOTES = [
     ('TimeoutError (home read retried once)', 'timeout'),
     ('ValueError: Invalid IPv6 URL', 'malformed_address'),
     ('Error (home read retried once)', 'unspecified_error'),
+    ("a parked or expired domain, not the organization's own website", 'parked_domain'),
 ]
+
+# The transport failures, whose notes come from a different measurement and are marked as such. The
+# 1,000-site capture could not carry one of these, because until 2026-09-18 the note on a failed
+# read was the exception's CLASS and every one of them arrived as the bare word `Error`. These are
+# the strings `_error_note` now writes, and the causes behind them were read off a probe of the 144
+# addresses the gold-frame run of 2026-09-08 recorded unreachable, taken on 2026-09-18.
+_TRANSPORT_NOTES = [
+    ('Error: net::ERR_HTTP2_PROTOCOL_ERROR (home read retried once)', 'protocol_error'),
+    ('Error: net::ERR_EMPTY_RESPONSE (home read retried once)', 'protocol_error'),
+    ('Error: net::ERR_CONNECTION_CLOSED (home read retried once)', 'connection_closed'),
+    ('Exception: Connection closed while reading from the driver', 'connection_closed'),
+    ('Error: net::ERR_CONNECTION_TIMED_OUT (home read retried once)', 'timeout'),
+]
+_FAILURE_NOTES += _TRANSPORT_NOTES
 
 
 @pytest.mark.parametrize('note,want', _FAILURE_NOTES,
@@ -3171,6 +4492,7 @@ def _written_off_note(attempts=3, last=''):
     'Error (home read retried once)',
     'robots.txt disallowed the home page, so the site was not read',
     'TimeoutError (home read retried once)',
+    'Error: net::ERR_HTTP2_PROTOCOL_ERROR (home read retried once)',
 ])
 def test_a_site_that_answered_nothing_on_every_driver_has_its_own_kind(last):
     """A site that came back empty and instantly on every driver it was offered is not a finding

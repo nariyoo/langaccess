@@ -14,10 +14,13 @@ import pytest
 pytest.importorskip('fastapi')
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# app.py finds the package the same way when it is run from a checkout
-for _cand in (os.path.join(HERE, '..', 'web'),):
-    if os.path.isdir(_cand):
-        sys.path.insert(0, _cand)
+# app.py finds the package the same way when it is run from a checkout. The front end is not part
+# of the wheel, so a copy of `tests/` beside an installed package has no `web/` to import and these
+# tests skip with the path they wanted.
+_WEB = os.path.join(HERE, '..', 'web')
+if not os.path.isfile(os.path.join(_WEB, 'app.py')):
+    pytest.skip('no web front end beside these tests: %s' % _WEB, allow_module_level=True)
+sys.path.insert(0, _WEB)
 import app as APP                                                              # noqa: E402
 from fastapi import HTTPException                                              # noqa: E402
 
@@ -63,6 +66,18 @@ def test_only_http_and_https(monkeypatch):
     with pytest.raises(HTTPException) as e:
         APP.public_http_url('ftp://example.com/file')
     assert e.value.status_code == 400
+
+
+def test_the_two_front_doors_agree_about_a_scheme_that_is_not_the_web(monkeypatch):
+    """`public_http_url` layers a DNS test on `auditable_url` and decides nothing about shape on
+    its own, so the schemes the command line now refuses have to come back 400 here. The resolver
+    is stubbed to answer, which is what makes this a test of the shape rule and not of a lookup."""
+    _resolves_to(monkeypatch, '93.184.216.34')
+    for raw in ('mailto:a@b.example', 'tel:+15550000000', 'javascript:alert(1)',
+                'data:text/plain,x', 'https://user:pw@host.example/'):
+        with pytest.raises(HTTPException) as e:
+            APP.public_http_url(raw)
+        assert e.value.status_code == 400, raw
 
 
 def test_only_the_standard_web_ports(monkeypatch):

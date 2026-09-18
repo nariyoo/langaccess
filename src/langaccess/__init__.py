@@ -106,13 +106,13 @@ from .core import (MT_ERROR, audit, audit_async, audit_many, audit_many_async, R
                    AUTHOR_UNKNOWN_WIDGET, AUTHOR_NONE,
                    widget_name, unnamed_control,
                    SUFF_NONE, SUFF_TOKEN, SUFF_NOTICE, SUFF_PAGE, SUFF_SECTION,
-                   SUFFICIENCY_NAMES,
+                   SUFFICIENCY_NAMES, MECH_TESTIMONIAL,
                    RULES, Rule, rule_titles, verdict_rules,
                    rejudge, rejudge_store, read_store, REJUDGE_LIMITS,
                    read_quality_of, capture_acceptance, READ_ENOUGH_PAGES,
                    set_page_delay, set_acceptance,
                    sector_caveat, GOVERNMENT_TM_CAVEAT,
-                   failure_kind, FAILURE_KINDS,
+                   failure_kind, FAILURE_KINDS, RETRY_PASS_KINDS, build_id,
                    page_language, undeclared_languages)
 # The names the authorship axis carried in earlier revisions, re-exported for one release and then
 # removed. See the block at the foot of core.py for what each one now is; a stored capture's
@@ -150,10 +150,10 @@ from .depth import depth_of, depth_run
 from .retry import (retry_unreachable_async, retry_text, write_retry,
                     DEFAULT_CDP as RETRY_DEFAULT_CDP)
 
-# 0.1.0 is the released version, and it names this tree. The agreement figure measured against it,
-# the kappa and the sample are in LIMITATIONS.md. A figure repeated here would be a second record of
-# one fact and would fall out of step with the scoring the first time either moved.
-__version__ = "0.1.0"
+# 0.2.0 is the released version, and it names this tree. The agreement figures, the build each one
+# was measured on, the kappa and the sample are in LIMITATIONS.md. A figure repeated here would be a
+# second record of one fact and would fall out of step with the scoring the first time either moved.
+__version__ = "0.2.0"
 
 __all__ = ['audit', 'audit_async', 'audit_many', 'audit_many_async', 'Result', 'Evidence',
            'BrowserUnavailable',
@@ -162,13 +162,15 @@ __all__ = ['audit', 'audit_async', 'audit_many', 'audit_many_async', 'Result', '
            'AUTHOR_UNKNOWN_WIDGET', 'AUTHOR_NONE',
            'widget_name', 'unnamed_control',
            'SUFF_NONE', 'SUFF_TOKEN', 'SUFF_NOTICE', 'SUFF_PAGE', 'SUFF_SECTION',
-           'SUFFICIENCY_NAMES',
+           'SUFFICIENCY_NAMES', 'MECH_TESTIMONIAL',
            'RULES', 'Rule', 'rule_titles', 'verdict_rules',
            'rejudge', 'rejudge_store', 'read_store', 'REJUDGE_LIMITS',
            'read_quality_of', 'capture_acceptance', 'READ_ENOUGH_PAGES',
            'set_page_delay', 'set_acceptance',
            'sector_caveat', 'GOVERNMENT_TM_CAVEAT',
-           'failure_kind', 'FAILURE_KINDS', 'page_language', 'undeclared_languages',
+           'failure_kind', 'FAILURE_KINDS', 'RETRY_PASS_KINDS',
+           'page_language', 'undeclared_languages',
+           'build_id',
            'auditable_url', 'AddressRejected',
            'explain', 'explain_text', 'diff_runs', 'diff_text',
            'needs_human', 'unsettled_kind', 'unsettled_reason', 'review_queue', 'review_row',

@@ -17,10 +17,12 @@ unreachable. The bare word `captcha` matched inside `reCAPTCHA` in the footer se
 GoDaddy, Wix and Squarespace contact page prints, and left 64 live organization pages unreachable.
 Both were fixed in the release; nothing stopped the third.
 
-WHAT IT DOES NOT COVER, and the corpus says so in its own fixture. A left boundary says nothing
-about the right-hand side: `security check` matches inside `security checklist` under both forms and
-this gate is silent about it. Whether the vocabulary needs a right boundary as well is a
-measurement over the census render store, not a transcription.
+THE RIGHT-HAND SIDE, `test_every_right_boundary_is_one_the_corpus_shows_the_need_for`. A left
+boundary says nothing about the character behind a match, and until 0.2.0 `security check` matched
+inside `security checklist` under both forms. Eleven alternatives of the three wall patterns now
+carry a right boundary, and this gate holds each of them to a committed sentence that the
+alternative would match without it, because a right boundary can only take matches away and one
+nobody can point at a string for is a catch given up for nothing.
 
 THE UNREACHABLE WARD, `test_the_ward_has_not_moved`. `unreachable` is the class that says a site was
 never read, and a pattern that widens moves live organization pages into it silently: the same
@@ -85,7 +87,7 @@ INTENDED_DIFFERENCE = {
         'why': "The same alternative and the same reason as in MT_RX. This one decides whether a "
                "locale route coming back in English says the widget translates nothing, so losing "
                "the marker would move a site from machine_translate toward english_only."},
-    ('WALL_UNGATED_RX', 'site not found'): {
+    ('WALL_UNGATED_RX', r'site not found\b'): {
         'covered': True,
         'why': "Found by this gate on the day it was written, and it is redundancy rather than "
                "reach: `site not found` matches inside `website not found`, which is the very next "
@@ -94,7 +96,9 @@ INTENDED_DIFFERENCE = {
                "wordings are a host saying there is nothing at this address, so no live page is at "
                "risk from the reach, and no reading moves whichever way this is settled. Left as "
                "shipped because a change to a wall pattern is a change to which sites are reported "
-               "as never read, and this one buys nothing to pay for that."},
+               "as never read, and this one buys nothing to pay for that. The alternative gained a "
+               "RIGHT boundary in 0.2.0, against `founded` and `foundation`; the reach on the left "
+               "is the same reach it always was and this entry is unchanged in substance."},
     ('MT_RX', 'prisna-google-website-translator'): {
         'covered': False,
         'why': "The vendor writes its own id as `widget_prisna-google-website-translator-2`, with "
@@ -222,6 +226,59 @@ def test_no_alternative_matches_inside_a_longer_word(name, alt):
         'positive rate near 100 percent, and one character to fix it. Either put the boundary in, '
         'or add the pair to INTENDED_DIFFERENCE with the reason.'
         % (name, alt, '\n'.join('  %r' % s for s in moved)))
+
+
+# `\\b` as it is written in a pattern: the two characters, not the escape they
+# spell. Built from `chr(92)` so that nothing here depends on how this file's own literals
+# are read.
+RIGHT_BOUNDARY = chr(92) + 'b'
+
+
+def _right_bounded():
+    """(constant name, alternative) for every alternative carrying a right word boundary.
+
+    Read off the live pattern, as everything else here is, so an alternative that gains or loses
+    one is covered without anybody editing this file.
+    """
+    return [(n, a) for n, a in _alternatives() if a.endswith(RIGHT_BOUNDARY)]
+
+
+@pytest.mark.parametrize('name,alt', _right_bounded(),
+                         ids=['%s:%s' % (n, a[:40]) for n, a in _right_bounded()])
+def test_every_right_boundary_is_one_the_corpus_shows_the_need_for(name, alt):
+    """The mirror of the gate above, and the answer to what it said it did not cover.
+
+    A right boundary can only take matches away, so one added without cause is a catch quietly
+    lost. This requires a committed string that the alternative WOULD match without the boundary
+    and does not match with it, which is the trap the boundary exists for, and it fails when that
+    string leaves the corpus. Eleven alternatives carry one, added in 0.2.0: `just a moment`,
+    `security check` and `not authorized`, the three `found` wordings of WALL_UNGATED_RX, the
+    maintenance and private-site wordings of WALL_GATED_RX, and three of WALL_NOTFOUND_RX.
+    """
+    flags = getattr(LA, name).flags
+    shipped = re.compile(alt, flags)
+    unbounded = re.compile(alt[:-len(RIGHT_BOUNDARY)], flags)
+    reached = [s for s in BOUNDARY_STRINGS
+               if unbounded.search(s) and not shipped.search(s)]
+    assert reached, (
+        '%s / %r carries a right word boundary and no string in '
+        'tests/fixtures/pattern_boundary.json shows what it refuses. A right boundary can only '
+        'take matches away, so one nobody can point at a string for is a catch given up for '
+        'nothing. Either write the trap sentence, or take the boundary off.' % (name, alt))
+
+
+def test_no_trap_sentence_is_read_as_a_wall_or_a_placeholder():
+    """What the boundaries are worth, said once over the whole trap set.
+
+    Every trap is a sentence a person would write on an organization page, and `is_wall` and
+    `is_parked` are the two functions that stop the audit and report a site nobody read. None of
+    these sentences may reach either one.
+    """
+    caught = [t['text'][:60] for t in BOUNDARY['traps']
+              if LA.is_wall(t['text']) or LA.is_parked(t['text'])]
+    assert caught == [], (
+        'these sentences are read as a site that was never read:\n%s'
+        % '\n'.join('  %r' % c for c in caught))
 
 
 def test_every_alternative_is_exercised_by_the_corpus():

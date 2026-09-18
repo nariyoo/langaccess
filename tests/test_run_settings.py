@@ -71,10 +71,10 @@ def test_the_pause_is_applied_where_a_page_is_opened():
                                   '--max-thin-share'])
 def test_each_setting_is_offered_on_the_command_line(flag):
     import subprocess
-    p = subprocess.run([sys.executable, '-m', 'langaccess.cli', '--help'],
+    from conftest import cli_argv, cli_env
+    p = subprocess.run(cli_argv() + ['--help'],
                        capture_output=True, text=True, encoding='utf-8', errors='replace',
-                       cwd=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                        'src'))
+                       env=cli_env())
     assert p.returncode == 0, p.stderr[-800:]
     assert flag in p.stdout, '%s is not offered; the help lists %r' % (flag, p.stdout[:400])
 

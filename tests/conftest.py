@@ -25,6 +25,41 @@ if os.path.isdir(_SRC):
     sys.path.insert(0, _SRC)
 
 
+def repo_file(*parts):
+    """A path to a file of the repository these tests came from, or None when it is not there.
+
+    A test that reads README.md, or any other file that is not inside the package, is a test about
+    the REPOSITORY. Run from a copy of `tests/` beside an installed wheel, which is how this suite
+    is run against what users get, those files are absent, and the test used to fail as though the
+    package were broken. It skips instead, and says which file it wanted.
+    """
+    p = os.path.join(os.path.dirname(_HERE), *parts)
+    return p if os.path.exists(p) else None
+
+
+def cli_argv():
+    """The argument list that runs this package's command line in a subprocess.
+
+    `python -m langaccess`, and never `python -m langaccess.cli` with the working directory set to
+    `src`. That form made the WORKING DIRECTORY decide which copy of the package ran, so the
+    subprocess tests were tests of the tree only for as long as the tree sat beside them, and
+    against an installed wheel they failed on `No module named langaccess`.
+    """
+    return [sys.executable, '-m', 'langaccess']
+
+
+def cli_env(**extra):
+    """The environment for that subprocess: this tree first when it is here, and nothing forced
+    when it is not, so the installed package answers, which is the case the suite is run detached
+    for. UTF-8 is set because the console this is developed on is cp949 and the command line
+    prints non-ASCII."""
+    env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
+    if os.path.isdir(os.path.join(_SRC, 'langaccess')):
+        env['PYTHONPATH'] = _SRC + os.pathsep + env.get('PYTHONPATH', '')
+    env.update(extra)
+    return env
+
+
 def test_the_import_is_the_tree_beside_these_tests():
     """The one test that has to run before the others are worth anything.
 

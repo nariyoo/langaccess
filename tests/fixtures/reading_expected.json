@@ -60,6 +60,186 @@
   "switcher_unresolved": 0,
   "verdict": "english_only"
  },
+ "armenian_event_subtitles": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 4
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "armenian_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "Armenian": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Armenian",
+    "mechanism": "translated_page",
+    "quote": "Կենտրոն Մեր կազմակերպությունը ամեն շաբաթ ներգաղթյալ ընտանիքների համար անվճար իրավաբանական խորհրդատվություն է տրամադրում, և մենք ձեզ ձեր",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://armenian-center.example/hy"
+   }
+  ],
+  "languages": [
+   "Armenian",
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "assamese_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "Assamese": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Assamese",
+    "mechanism": "translated_page",
+    "quote": "কেন্দ্ৰ আমাৰ সংস্থাই প্ৰতি সপ্তাহত প্ৰব্ৰজনকাৰী পৰিয়ালৰ বাবে বিনামূলীয়া আইনী পৰামৰ্শ দিয়ে। পৰামৰ্শ বিনামূলীয়া আৰু আমি আপোনাক অৱস্থাৰ",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://assamese-center.example/assamese"
+   }
+  ],
+  "languages": [
+   "Assamese",
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
  "attribute_greater_than_in_the_prose": {
   "authorship": "authored",
   "by_language": {
@@ -246,7 +426,7 @@
     "authorship": "authored",
     "language": "Spanish",
     "mechanism": "inline_text",
-    "quote": "with you at the office. Si necesita ayuda en otro idioma, puede llamar a nuestra oficina y nosotros podemos buscar un interprete para usted.",
+    "quote": "can meet with you at the office. Si necesita ayuda en otro idioma, puede llamar a nuestra oficina y nosotros podemos buscar un interprete para usted.",
     "rules": [
      6,
      8,
@@ -474,6 +654,72 @@
   "switcher_unresolved": 0,
   "verdict": "unreachable"
  },
+ "display_none_language_panel": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "you need an interpreter for the visit. Nuestro centro ayuda a las familias con preguntas de vivienda, inscripcion escolar y citas con un abogado todos los dias de la semana. El",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://hidden-panel.example/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
  "english_only": {
   "authorship": "none",
   "by_language": {
@@ -576,7 +822,7 @@
     "authorship": "client_widget",
     "language": "Spanish",
     "mechanism": "translated_page",
-    "quote": "Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana.",
+    "quote": "Ciudad Bienvenido a nuestro centro comunitario. Ayudamos a las familias con preguntas legales, vivienda e inscripcion escolar todos los dias de la semana.",
     "rules": [
      4,
      6,
@@ -617,6 +863,112 @@
   "switcher_languages": [],
   "switcher_unresolved": 0,
   "verdict": "machine_translate"
+ },
+ "hidden_english_mobile_menu": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
+ "hidden_language_span_pair": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "you need an interpreter for the visit. Nuestro centro ayuda a las familias con preguntas de vivienda, inscripcion escolar y citas con un abogado todos los dias de la semana. El",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://hidden-span.example/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
  },
  "japanese_pages": {
   "authorship": "authored",
@@ -678,6 +1030,74 @@
    4,
    6,
    7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "lithuanian_help_notice": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Lithuanian": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Lithuanian",
+    "mechanism": "translated_page",
+    "quote": "Centras Pranešimas: jei jums reikia pagalbos lietuvių kalba, ateikite į registratūrą nuo pirmadienio iki penktadienio. Konsultacija nemokama ir mes neklausiame",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://lithuanian-center.example/lt"
+   }
+  ],
+  "languages": [
+   "English",
+   "Lithuanian"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
    8,
    9,
    10,
@@ -798,6 +1218,76 @@
   "switcher_unresolved": 0,
   "verdict": "true_multilingual"
  },
+ "nepali_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Nepali": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Nepali",
+    "mechanism": "translated_page",
+    "quote": "केन्द्र हाम्रो संस्थाले हरेक हप्ता आप्रवासी परिवारहरूलाई निःशुल्क कानुनी सल्लाह दिन्छ। सल्लाह निःशुल्क छ र हामी तपाईंलाई अवस्थाबारे",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://nepali-center.example/nepali"
+   }
+  ],
+  "languages": [
+   "English",
+   "Nepali"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
  "offsite_alternate_only": {
   "authorship": "none",
   "by_language": {
@@ -863,7 +1353,7 @@
     "authorship": "authored",
     "language": "Spanish",
     "mechanism": "translated_page",
-    "quote": "Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro",
+    "quote": "Center Nuestro centro comunitario ayuda a las familias con preguntas legales, vivienda y matricula escolar todos los dias de la semana. Nuestro",
     "rules": [
      4,
      6,
@@ -909,6 +1399,151 @@
   "switcher_languages": [
    "Spanish"
   ],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "oromo_word_gate": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Oromo": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Oromo",
+    "mechanism": "translated_page",
+    "quote": "Wiirtuu Dhaabbanni keenya torbee hunda maatii godaansaaf gorsa seeraa kaffaltii malee kenna. Gorsi kun bilisa yoo taane illee nuti haala godaansa keessan hin",
+    "rules": [
+     4,
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://oromo-center.example/om"
+   }
+  ],
+  "languages": [
+   "English",
+   "Oromo"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
+ },
+ "own_paragraph_beside_testimonials": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "authored",
+    "sufficiency": 2
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Spanish",
+    "mechanism": "inline_text",
+    "quote": "minutes until six in the evening. Nuestro centro ofrece servicios a las familias que acaban de llegar: podemos ayudar con la informacion de la escuela, con las preguntas",
+    "rules": [
+     6,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 2,
+    "url": "https://rivermill-family.example/"
+   },
+   {
+    "authorship": "none",
+    "language": "Spanish",
+    "mechanism": "testimonial",
+    "quote": "every line of them out loud. - Dana R. Cuando llegamos a esta ciudad nadie de nosotros sabia donde pedir ayuda, pero en este centro nos recibieron muy bien y nos dieron toda la",
+    "rules": [],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 1,
+    "url": "https://rivermill-family.example/"
+   }
+  ],
+  "languages": [
+   "English",
+   "Spanish"
+  ],
+  "machine_translation": "",
+  "note": "HTTP 403 on the home page, 9-character body (home page read with a plain HTTP fetch)",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   6,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 2,
+  "switcher_languages": [],
   "switcher_unresolved": 0,
   "verdict": "true_multilingual"
  },
@@ -1007,7 +1642,7 @@
     "authorship": "authored",
     "language": "Persian",
     "mechanism": "translated_page",
-    "quote": "انجمن فرهنگی ایرانیان یک سازمان غیرانتفاعی و غیرسیاسی است که به نگهداری و گسترش میراث فرهنگی ما اختصاص دارد. ما هر شنبه کلاس زبان فارسی برای",
+    "quote": "انجمن فرهنگی انجمن فرهنگی ایرانیان یک سازمان غیرانتفاعی و غیرسیاسی است که به نگهداری و گسترش میراث فرهنگی ما اختصاص دارد. ما هر شنبه کلاس زب",
     "rules": [
      4,
      6,
@@ -1122,6 +1757,62 @@
   "switcher_languages": [],
   "switcher_unresolved": 0,
   "verdict": "machine_translate"
+ },
+ "quoted_testimonial_only": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Spanish": {
+    "authorship": "none",
+    "sufficiency": 0
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "none",
+    "language": "Spanish",
+    "mechanism": "testimonial",
+    "quote": "every line of them out loud. - Dana R. Cuando llegamos a esta ciudad nadie de nosotros sabia donde pedir ayuda, pero en este centro nos recibieron muy bien y nos dieron toda la",
+    "rules": [],
+    "server_html": false,
+    "server_plugin": false,
+    "sufficiency": 1,
+    "url": "https://northgate-welcome.example/"
+   }
+  ],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "HTTP 403 on the home page, 9-character body (home page read with a plain HTTP fetch)",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
  },
  "server_plugin_page": {
   "authorship": "server_plugin",
@@ -1271,6 +1962,46 @@
   "switcher_unresolved": 0,
   "verdict": "true_multilingual"
  },
+ "social_feed_container": {
+  "authorship": "none",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [],
+  "languages": [
+   "English"
+  ],
+  "machine_translation": "",
+  "note": "HTTP 403 on the home page, 9-character body (home page read with a plain HTTP fetch)",
+  "pages_read": 1,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": true,
+   "lid_absent": false,
+   "pages_read": 1,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   12
+  ],
+  "sufficiency": 0,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "english_only"
+ },
  "social_page_for_a_website": {
   "authorship": "none",
   "by_language": {},
@@ -1303,6 +2034,145 @@
   "switcher_languages": [],
   "switcher_unresolved": 0,
   "verdict": "unreachable"
+ },
+ "south_asian_locale_tree": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Gujarati": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Punjabi": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Tamil": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Telugu": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Punjabi",
+    "mechanism": "translated_page",
+    "quote": "ਸਾਡੀ ਸੰਸਥਾ ਹਰ ਹਫ਼ਤੇ ਪਰਵਾਸੀ ਪਰਿਵਾਰਾਂ ਨੂੰ ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਸਲਾਹ ਦਿੰਦੀ ਹੈ ਅਤੇ ਅਸੀਂ ਤੁਹਾਨੂੰ ਕਿਸੇ ਵੀ ਹਾਲਤ ਬਾਰੇ ਨਹੀਂ ਪੁੱਛਦੇ। ਦਫ਼ਤਰ ਸੋਮਵਾਰ ਤੋਂ ਸ਼ੁੱਕਰਵਾਰ ਤੱਕ ਖੁੱਲ੍ਹਾ",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://south-asian-center.example/pa"
+   },
+   {
+    "authorship": "authored",
+    "language": "Gujarati",
+    "mechanism": "translated_page",
+    "quote": "કેન્દ્ર અમારી સંસ્થા દર અઠવાડિયે સ્થળાંતરિત પરિવારો માટે મફત કાનૂની સલાહ આપે છે અને અમે તમને કોઈ પણ સ્થિતિ વિશે પૂછતા નથી. કાર્યાલય સોમવારથી",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://south-asian-center.example/gu"
+   },
+   {
+    "authorship": "authored",
+    "language": "Tamil",
+    "mechanism": "translated_page",
+    "quote": "மையம் எங்கள் அமைப்பு ஒவ்வொரு வாரமும் குடிபெயர்ந்த குடும்பங்களுக்கு இலவச சட்ட ஆலோசனை வழங்குகிறது மற்றும் உங்கள் நிலை பற்றி நாங்கள் கேட்பதில்லை.",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://south-asian-center.example/ta"
+   },
+   {
+    "authorship": "authored",
+    "language": "Telugu",
+    "mechanism": "translated_page",
+    "quote": "కేంద్రం మా సంస్థ ప్రతి వారం వలస కుటుంబాల కోసం ఉచిత న్యాయ సలహా ఇస్తుంది మరియు మీ స్థితి గురించి మేము అడగము. కార్యాలయం సోమవారం నుండి శుక్రవారం",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://south-asian-center.example/te"
+   }
+  ],
+  "languages": [
+   "English",
+   "Gujarati",
+   "Punjabi",
+   "Tamil",
+   "Telugu"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 5,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 5,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": false,
+   "sufficient": true,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 4,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
  },
  "spanish_section": {
   "authorship": "authored",
@@ -1427,7 +2297,7 @@
     "authorship": "authored",
     "language": "Swahili",
     "mechanism": "translated_page",
-    "quote": "Shirika letu la jamii linatoa msaada wa sheria na makazi kwa familia zote katika mji wetu kila wiki bila malipo yoyote na wafanyakazi wetu",
+    "quote": "Huduma Shirika letu la jamii linatoa msaada wa sheria na makazi kwa familia zote katika mji wetu kila wiki bila malipo yoyote na wafanyakazi",
     "rules": [
      4,
      6,
@@ -1517,6 +2387,76 @@
   ],
   "switcher_unresolved": 1,
   "verdict": "english_only"
+ },
+ "tigrinya_pages": {
+  "authorship": "authored",
+  "by_language": {
+   "English": {
+    "authorship": "authored",
+    "sufficiency": 3
+   },
+   "Tigrinya": {
+    "authorship": "authored",
+    "sufficiency": 3
+   }
+  },
+  "declared_off_site": {
+   "alternates": 0,
+   "languages": []
+  },
+  "evidence": [
+   {
+    "authorship": "authored",
+    "language": "Tigrinya",
+    "mechanism": "translated_page",
+    "quote": "ኣብ ነፍሲ ወከፍ ሰሙን ንስደተኛታት ስድራቤታት ነጻ ሕጋዊ ምኽሪ ይህብ። ኣገልግሎት ክፍሊት የብሉን ከምኡውን ብዛዕባ ናይ መንበሪ ኩነታት ኣይንሓትትን። ቤት ጽሕፈት ካብ ሰኑይ ክሳብ ዓርቢ ክፉት እዩ ድማ ኣብ መቐበሊ ትግርኛ ዝዛረብ ሰብ ኩሉ ግዜ",
+    "rules": [
+     4,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "server_html": true,
+    "server_plugin": false,
+    "sufficiency": 3,
+    "url": "https://tigrinya-center.example/tigrinya"
+   }
+  ],
+  "languages": [
+   "English",
+   "Tigrinya"
+  ],
+  "machine_translation": "",
+  "note": "",
+  "pages_read": 2,
+  "read_quality": {
+   "budget_exhausted": false,
+   "clock_exhausted": false,
+   "escalated": false,
+   "lid_absent": false,
+   "pages_read": 2,
+   "reads_failed": 0,
+   "reads_timed_out": 0,
+   "shallow": true,
+   "sufficient": false,
+   "unread": 0,
+   "unread_locale_links": 0
+  },
+  "rules": [
+   4,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12
+  ],
+  "sufficiency": 3,
+  "switcher_languages": [],
+  "switcher_unresolved": 0,
+  "verdict": "true_multilingual"
  },
  "ukrainian_pages": {
   "authorship": "authored",
@@ -1750,7 +2690,7 @@
     "authorship": "authored",
     "language": "Urdu",
     "mechanism": "translated_page",
-    "quote": "یہاں انٹرنیشنل ریفیوجی ریلیف سینٹر میں، ہم جانتے ہیں کہ بعض اوقات دنیا کو بدلنے کے لیے صرف ایک چھوٹی سی مدد کی ضرورت ہوتی ہے اور اسی یقین کے",
+    "quote": "انٹرنیشنل یہاں انٹرنیشنل ریفیوجی ریلیف سینٹر میں، ہم جانتے ہیں کہ بعض اوقات دنیا کو بدلنے کے لیے صرف ایک چھوٹی سی مدد کی ضرورت ہوتی ہے اور",
     "rules": [
      4,
      6,

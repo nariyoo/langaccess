@@ -4,7 +4,7 @@
 #
 # Build from the REPOSITORY ROOT, not from this directory:
 #   docker build -f web/Dockerfile -t langaccess-web .
-FROM mcr.microsoft.com/playwright/python:v1.49.0-noble
+FROM mcr.microsoft.com/playwright/python:v1.60.0-noble
 
 WORKDIR /app
 COPY . /app
@@ -12,7 +12,7 @@ COPY . /app
 # pinned to the Playwright the base image was built around. A newer pip Playwright looks for a
 # browser build this image does not carry, and the launch then fails with a message about a missing
 # executable rather than anything about the site being audited.
-RUN pip install --no-cache-dir . "playwright==1.49.0" fastapi "uvicorn[standard]"
+RUN pip install --no-cache-dir . "playwright==1.60.0" fastapi "uvicorn[standard]"
 
 # real Chrome rather than bundled chromium, since its fingerprint clears challenges bare chromium
 # does not; the package falls back on the image's own Chromium if the channel is absent. This

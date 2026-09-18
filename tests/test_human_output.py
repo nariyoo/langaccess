@@ -18,11 +18,15 @@ from langaccess.cli import main
 
 
 def _run(args, tmp_path):
-    """The CLI in a subprocess, so the exit code is the real one a pipeline sees."""
-    env = dict(os.environ, PYTHONPATH=os.path.join(os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__))), 'src'), PYTHONUTF8='1')
-    return subprocess.run([sys.executable, '-m', 'langaccess'] + args,
-                          capture_output=True, text=True, env=env, cwd=str(tmp_path))
+    """The CLI in a subprocess, so the exit code is the real one a pipeline sees.
+
+    The working directory is the test's own temporary one and carries nothing: the copy of the
+    package that answers is decided by the environment, so this reads the tree when the tree is
+    beside these tests and the installed package when it is not.
+    """
+    from conftest import cli_argv, cli_env
+    return subprocess.run(cli_argv() + args, capture_output=True, text=True,
+                          env=cli_env(), cwd=str(tmp_path))
 
 
 def test_depth_on_a_run_holding_no_records_is_exit_nothing(tmp_path):
@@ -117,8 +121,13 @@ def test_the_demo_capture_names_no_real_address():
     """Every page in it was written for this package; nothing here came off the web."""
     import gzip
     from urllib.parse import urlsplit
-    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                        'src', 'langaccess', 'data', 'demo_capture.jsonl.gz')
+    # Off the IMPORTED package and not off the repository: the file ships inside the wheel, so
+    # resolving it through `langaccess.__file__` reads the same file in a checkout and in an
+    # install, where the path below `src/` exists only in the first.
+    path = os.path.join(os.path.dirname(os.path.abspath(LA.__file__)),
+                        'data', 'demo_capture.jsonl.gz')
+    if not os.path.exists(path):
+        pytest.skip('the demo capture is not in this installation: %s' % path)
     with gzip.open(path, 'rt', encoding='utf-8') as fh:
         recs = [json.loads(line) for line in fh if line.strip()]
     assert len(recs) == 4

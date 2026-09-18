@@ -10,9 +10,18 @@ thousand-row file, and the tool used to answer it with `unreachable` and no hint
 was the problem.
 
 A string is auditable when, after the normalisation this package has always applied, it parses to an
-http or https URL whose host carries at least one dot or is `localhost`, and holds no whitespace
-anywhere. Everything else is a REJECTED INPUT, which is not a reading: it produces no verdict, no
+http or https URL whose host carries at least one dot or is `localhost`, holds no whitespace
+anywhere, names no user and no password before the host, and does not open with a scheme of any
+other kind. Everything else is a REJECTED INPUT, which is not a reading: it produces no verdict, no
 JSON line and no stored row, and it is named on stderr with the reason.
+
+`mailto:a@b.c` is the second shape that matters, and it was accepted until 0.2.0. It carries no
+`//`, so the normalisation put `https://` in front of it, and `urlsplit` read the result as a URL
+whose userinfo is `mailto:a` and whose host is `b.c`: an email address in a column of websites came
+back a site, and whatever the audit made of `b.c` was recorded against the organization. A scheme
+token followed by a colon and something that is not a port number is now refused, which answers
+`tel:`, `sms:`, `javascript:`, `data:`, `file:`, `ftp:` and `about:` in the same rule, and userinfo
+is refused on its own account, since no public website address carries credentials.
 
 The rule is deliberately syntactic. Nothing here resolves a name or opens a socket, so the answer is
 the same on a machine with no network as on one with, and a run over a thousand addresses does not
@@ -29,6 +38,27 @@ from urllib.parse import urlsplit
 # `https://htp://example.org`, whose scheme is https, so the scheme test below never saw the typo
 # it exists to catch.
 _SCHEME = re.compile(r'^[a-zA-Z][a-zA-Z0-9+.-]*://')
+
+# A scheme token, a colon, and something that is neither `//` nor a port number. `mailto:a@b.c` is
+# the shape this catches and the reason the rule exists: it carries no `//`, so the normalisation
+# below prepended `https://`, and `urlsplit` then read `mailto:a` as userinfo and `b.c` as the host,
+# so an email address came back an auditable website. The same normalisation admitted `tel:`,
+# `javascript:`, `data:` and the rest of them.
+#
+# The one string of this shape that IS an address is a host and a port, `localhost:8000` or
+# `example.org:8080/x`, so the group after the colon is read up to the first `/`, `?` or `#` and the
+# address is kept when that group is a run of digits. A host whose first character is a digit
+# (`93.184.216.34:8080`) never reaches this test, because a scheme cannot start with one.
+_SCHEMELESS_COLON = re.compile(r'^([a-zA-Z][a-zA-Z0-9+.-]*):(?!//)([^/?#]*)')
+_PORT = re.compile(r'^[0-9]+$')
+
+# Named so the message can say which scheme was typed. The general rule above covers these and
+# every other scheme nobody has thought of; the list exists because `mailto:` and `tel:` are what
+# actually turn up in a column of websites copied out of a directory, and a person reading
+# `its scheme is 'mailto'` acts on it faster than a person reading a sentence about colons.
+_NON_WEB_SCHEME = frozenset((
+    'mailto', 'tel', 'sms', 'javascript', 'data', 'file', 'ftp', 'about',
+))
 
 # The one host with no dot in it that names something real. A bare word is otherwise a search term,
 # a machine name on somebody's own network, or a typo, and none of the three is a site this package
@@ -71,6 +101,16 @@ def auditable_url(raw, ports=None):
     if any(ch.isspace() for ch in u):
         raise AddressRejected(raw, 'it holds a space, and no web address does')
     if not _SCHEME.match(u):
+        m = _SCHEMELESS_COLON.match(u)
+        if m and not _PORT.match(m.group(2)):
+            token = m.group(1).lower()
+            if token in _NON_WEB_SCHEME:
+                raise AddressRejected(
+                    raw, 'its scheme is %r, and only http and https can be read. That is an '
+                         'address of another kind, not a website' % token)
+            raise AddressRejected(
+                raw, 'it opens with %r and a colon, which is a scheme and not a host, and what '
+                     'follows the colon is not a port number' % m.group(1))
         u = 'https://' + u
     try:
         p = urlsplit(u)
@@ -85,6 +125,13 @@ def auditable_url(raw, ports=None):
                  'true is the usual cause' % p.scheme)
     if not host:
         raise AddressRejected(raw, 'there is no host in it')
+    # No public website address carries credentials, and this is also the second half of the
+    # `mailto:` defect: `https://mailto:a@b.c` is a URL whose userinfo is `mailto:a`, so anything
+    # of that shape has to be refused whether the string arrived with its own scheme or not.
+    if p.username is not None or p.password is not None:
+        raise AddressRejected(
+            raw, 'it carries a user name or a password before the host, and no public website '
+                 'address does')
     if '.' not in host and host != _DOTLESS_HOST:
         raise AddressRejected(
             raw, 'its host %r holds no dot, so it names no site on the internet' % host)

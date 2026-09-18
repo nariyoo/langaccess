@@ -149,6 +149,10 @@ MECHANISM_MEANING = {
     'translation_plugin': (
         'a marker of a translation plugin in the document the server sent. It names a tool and no '
         'language, and on its own it is not a translation'),
+    'testimonial': (
+        'a quotation in this language, inside an element the markup marks as a quotation or names '
+        'as a testimonial or a review. It is on the record and it counts for nothing: the words '
+        "are a visitor's and not the site's, so no class rests on them"),
     HAND_CODING: 'a reading a person took by hand, recorded beside the reading this package took',
 }
 
@@ -444,7 +448,7 @@ def report_text(r):
         out.extend(_wrap('Translation widget on the site: %s' % d['machine_translation']))
     out.extend(_wrap('Authorship over the site: %s, meaning %s.'
                      % (d['authorship'], d['authorship_meaning'] or 'unrecorded')))
-    out.extend(_wrap('Extent over the site: %s, meaning %s.'
+    out.extend(_wrap('Sufficiency over the site: %s, meaning %s.'
                      % (d['sufficiency_name'], d['sufficiency_meaning'] or 'unrecorded')))
     out.extend(_wrap('Languages the classification counted: %s'
                      % (', '.join(d['counted_languages']) or 'none')))
@@ -637,7 +641,7 @@ def report_html(r):
         add('<dt>Translation widget on the site</dt><dd>%s</dd>' % _e(d['machine_translation']))
     add('<dt>Authorship over the site</dt><dd>%s, meaning %s.</dd>'
         % (_e(d['authorship']), _e(d['authorship_meaning'] or 'unrecorded')))
-    add('<dt>Extent over the site</dt><dd>%s, meaning %s.</dd>'
+    add('<dt>Sufficiency over the site</dt><dd>%s, meaning %s.</dd>'
         % (_e(d['sufficiency_name']), _e(d['sufficiency_meaning'] or 'unrecorded')))
     add('<dt>Languages the classification counted</dt><dd>%s</dd>'
         % _e(', '.join(d['counted_languages']) or 'none'))

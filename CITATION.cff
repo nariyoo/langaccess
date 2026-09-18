@@ -4,10 +4,13 @@
 # present only .zenodo.json is used and this file is ignored entirely
 # (https://help.zenodo.org/docs/github/describe-software/).
 #
-# `doi` and `date-released` are absent on purpose. Both are known only once a GitHub Release has
-# been archived by Zenodo, and a placeholder in either would be an invalid value rather than a
-# missing one. Add the VERSION doi, not the concept doi: a verdict is the output of one rule set, so
-# a citation that does not name the version has not said which instrument produced its numbers.
+# `doi` is absent on purpose. It is known only once a GitHub Release has been archived by Zenodo,
+# and a placeholder would be an invalid value rather than a missing one. Add the VERSION doi, not
+# the concept doi: a verdict is the output of one rule set, so a citation that does not name the
+# version has not said which instrument produced its numbers.
+#
+# `date-released` is the date of the CHANGELOG section this version ships under, and it moves when
+# the version does.
 cff-version: 1.2.0
 message: "If you use this software, cite the specific version you ran."
 type: software
@@ -24,7 +27,8 @@ authors:
     orcid: "https://orcid.org/0000-0002-8467-7048"
     email: nariyoo@umich.edu
     affiliation: University of Michigan School of Social Work
-version: 0.1.0
+version: 0.2.0
+date-released: 2026-09-18
 repository-code: "https://github.com/nariyoo/langaccess"
 license:
   - MIT

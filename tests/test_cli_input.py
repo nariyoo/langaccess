@@ -70,6 +70,63 @@ def test_what_is_not_an_address_is_rejected_with_a_reason(raw, in_reason):
     assert e.value.raw == raw, 'the rejected string has to come back, to be found in the input file'
 
 
+@pytest.mark.parametrize('raw', [
+    'example.org:8080/x', 'localhost:8000', 'http://example.org', 'EXAMPLE.ORG',
+    'https://example.org:443/', '93.184.216.34:8080',
+])
+def test_a_host_and_a_port_are_not_a_scheme(raw):
+    """The rule that rejects `mailto:a@b.c` reads a colon, and a colon is also how a port is
+    written. Everything here carries one and is still an address. An IPv6 literal is not in the
+    list because `[::1]` has no dot in it and the host rule has always refused it, which is a
+    separate question from this one."""
+    assert auditable_url(raw).lower().startswith(('http://', 'https://'))
+
+
+@pytest.mark.parametrize('raw', [
+    'mailto:a@b.example', 'MAILTO:a@b.example', 'tel:+15550000000', 'sms:+15550000000',
+    'javascript:alert(1)', 'data:text/html,<b>x</b>', 'file:/etc/hosts', 'ftp:example.example',
+    'about:blank', 'mailto:', 'tel:',
+])
+def test_a_scheme_that_is_not_the_web_is_rejected(raw):
+    """0.1.0 accepted every one of these. None of them carries `//`, so the normalisation put
+    `https://` on the front, and what came out the other side was a URL: `https://mailto:a@b.c`
+    parses with userinfo `mailto:a` and host `b.c`, which has a dot in it and passed every test the
+    function had. An email address in a column of websites became a site, and a verdict was
+    recorded against whatever `b.c` turned out to be."""
+    with pytest.raises(AddressRejected) as e:
+        auditable_url(raw)
+    assert e.value.raw == raw
+    assert e.value.reason, 'a rejection with no reason is what the caller cannot act on'
+
+
+def test_the_mailto_host_is_never_what_gets_fetched():
+    """The defect stated as the thing that must not happen: no address whose host was invented by
+    reading an email address as userinfo comes back out of this function."""
+    with pytest.raises(AddressRejected) as e:
+        auditable_url('mailto:staff@office.example')
+    assert 'mailto' in e.value.reason
+
+
+@pytest.mark.parametrize('raw', [
+    'https://user:pw@host.example/', 'http://user@host.example/', 'https://mailto:a@b.example',
+])
+def test_credentials_before_the_host_are_rejected(raw):
+    """No public website address carries them, and userinfo is the half of the `mailto:` defect
+    that survives an explicit scheme: `https://mailto:a@b.c` arrives already carrying `https://`,
+    so the scheme test passes it and only this one catches it."""
+    with pytest.raises(AddressRejected) as e:
+        auditable_url(raw)
+    assert 'password' in e.value.reason or 'user name' in e.value.reason
+
+
+def test_the_general_rule_covers_a_scheme_nobody_listed():
+    """The named list is for the message. The rule is the shape, so a scheme that is not on any
+    list is refused too, and the reason says what was wrong with the string."""
+    with pytest.raises(AddressRejected) as e:
+        auditable_url('bitcoin:1BoatSLRHtKNngkdXEeobR76b53LETtpyT')
+    assert 'scheme' in e.value.reason
+
+
 def test_the_scheme_typo_is_not_swallowed_by_the_normalisation():
     """The defect underneath the defect. The old normalisation prepended https:// to anything that
     did not start with `http`, so `htp://example.org` became `https://htp://example.org`, whose

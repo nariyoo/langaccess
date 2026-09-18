@@ -21,7 +21,7 @@ the three things this does differently from a naive reader:
 
   reading a stored copy measures the page as it was, not as it is. This fetches live, every time.
 """
-import re, html as _html, asyncio, collections, contextvars, gzip, itertools, json, os, socket, unicodedata, warnings, ipaddress
+import re, html as _html, asyncio, collections, contextvars, gzip, hashlib, itertools, json, os, socket, unicodedata, warnings, ipaddress
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from urllib import robotparser
@@ -53,6 +53,43 @@ def _tool_version():
         return version('langaccess')
     except Exception:
         return ''
+
+
+def build_id():
+    """The twelve hex digits that name the bytes of this file, which is the instrument.
+
+    A version label names a release. It does not name a build, and on a working tree it names the
+    last release the version literal was set to, which is why 334 records of one organization
+    census carry a reading taken by one `core.py` while the package label beside it says 0.1.0 for
+    another. Two instruments were published under one name, and nothing in the data said so; the
+    discrepancy was found by hashing the file by hand, months later, and it could as easily not
+    have been. This makes the file's own identity a field, so the question is answered by the row.
+
+    THE FILE AND NOT THE PACKAGE. `core.py` holds the rules, the constants and the crawl, so the
+    readings move when it moves; hashing the whole installed tree would also move on a change to
+    `report.py`, which renders a finished reading and decides nothing, and a build identity that
+    moves for reasons unrelated to the reading is one a consumer learns to ignore. The constant
+    freeze in the test suite is the finer instrument and stays the finer instrument: it says WHICH
+    constant moved, where this says only that something did.
+
+    Twelve digits, which is six bytes, because the field is read by people comparing two rows and
+    the full sixty-four defeats that. A collision inside one project's stores is not a risk worth
+    the width.
+
+    Computed once and cached on the function, not in a module constant, so that the constant
+    freeze does not move for a cache. Empty when the bytes cannot be read, which is what an
+    installation running from a zip archive can honestly say, and empty is the same answer a
+    record written before this field existed gives.
+    """
+    cached = getattr(build_id, '_cached', None)
+    if cached is None:
+        try:
+            with open(os.path.abspath(__file__), 'rb') as fh:
+                cached = hashlib.sha256(fh.read()).hexdigest()[:12]
+        except Exception:
+            cached = ''
+        build_id._cached = cached
+    return cached
 
 # ------------------------------------------------------------------ the numbered rules, as records
 #
@@ -122,7 +159,7 @@ RULES = {r.number: r for r in (
                    'placeholder is unreachable, as a bot wall is'),
         # read on the home text and answered as unreachable, for the same reason a bot wall is
         enforced_in=('PARKED_RX', 'PARKED_EXPIRED_RX', 'PARKED_SOON_RX', 'is_parked',
-                     '_audit_async')),
+                     'PARKED_HOST', '_parked_host', '_audit_async')),
     Rule(
         3, 'rendered pages as the unit', '3. Rendered pages as the unit',
         criterion=('a downloadable document or an off-site form is not the site; what a '
@@ -284,25 +321,24 @@ def _evidence_rules(lang, mechanism, home=True):
     return sorted(out)
 
 
-UA_BASE = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-           'Chrome/121.0.0.0 Safari/537.36')
-# A crawler that will not say who it is leaves a site administrator no way to ask it to stop, which
-# is the thing a reviewer of a published instrument asks about. The token is a comment appended to
-# the browser string, which is where the convention puts it, so a server that keys on the Chrome
-# fingerprint still sees one.
-# The address here has to answer TODAY, for whoever reads it in a server log. It named a repository
-# that is private, so every administrator who followed it got a 404 and the token was worse than
-# nothing: it looked like an answer and was not one. An institutional mailbox reaches a person
-# whatever the repository's visibility, and it does not change when the repository does.
-UA_CONTACT = UA_BASE + ' (+mailto:nariyoo@umich.edu; langaccess research crawler)'
-# Which of the two is sent was MEASURED and not chosen: 30 sites drawn at random from the held-out
-# validation sample were audited under each, at concurrency 2, and the bot-wall and unreachable
-# rates are reported in the pass-3 notes. The token cost nothing measurable there, and coverage is
-# what a change to this string trades, so it is the default. That measurement was taken with a
-# repository URL in the token and the token now carries a mailbox, so what it establishes is that a
-# contact comment costs nothing measurable, not that these exact bytes do. Rerunning it would be
-# cheap and has not been done.
-UA = UA_CONTACT
+# The one string every route sends: the browser context opens with it and the plain fetch and the
+# robots.txt fetch send it as a header, so the two ways a home page can be read are the same client
+# to the server, which is what makes the plain fetch a second attempt at the same site rather than a
+# second site. Until 2026-09-18 a contact comment was appended to it, `(+mailto:...; langaccess
+# research crawler)`, so that a site administrator reading a server log had somewhere to write. It
+# was measured that day against the 144 addresses the gold-frame run had recorded unreachable, each
+# address probed once under each string at concurrency 2, counting an answer as a 200 with a body
+# over 200 characters: 54 answered the plain Chrome string, 41 answered the string with the token,
+# and the 13 that answered only the plain one failed under the token with
+# net::ERR_HTTP2_PROTOCOL_ERROR on 7, HTTP 403 on 4 and a destroyed execution context on 2, with
+# nothing answering the token that did not answer the plain string. A contact token cost 13 of 144
+# unreachable addresses and it was removed. What is here carries no comment, no mailbox and no
+# product token, and it is SET rather than left to the browser's own default because a headless
+# Chromium's default names itself `HeadlessChrome`, which is an identification of a different kind
+# and one no measurement here covers. robots.txt is still read and obeyed, which is the part of
+# conduct that decides what gets fetched; see `_robots_allowed`.
+UA = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+      'Chrome/121.0.0.0 Safari/537.36')
 
 # A script the page could not be showing by accident. Each range is its own proof of a language,
 # with one exception: Cyrillic is written by Ukrainian, Bulgarian, Serbian, Macedonian, Belarusian
@@ -336,6 +372,29 @@ SCRIPTS = [('Cyrillic', r'[Ѐ-ӿ]'), ('Hebrew', r'[֐-׿]'),
            # corpus here; caught by testing what the widening ADMITS rather than only what it finds.
            ('Arabic', '[؀-ۿݐ-ݿࡰ-ࣿﭐ-﷿ﹰ-ﻼ]'),
            ('Hindi', r'[ऀ-ॿ]'), ('Bengali', r'[ঀ-৿]'), ('Thai', r'[฀-๿]'),
+           # Four Brahmic scripts added 2026-09-17, and they are the mechanical change the ranges
+           # beside them already are: each is written by one language of this instrument's
+           # vocabulary and by nothing else, so the range is its own proof exactly as the Khmer and
+           # Thai ranges are. They were reachable before only through the identifier, behind a gate
+           # that wants two sentences of 140 characters each, so a help notice in any of them was
+           # unreadable and a 600-character paragraph was readable only because one of its sentences
+           # happened to be long. All four are on the reviewer's list of languages found on pages
+           # this instrument read as english_only.
+           #
+           # WHAT EACH RANGE DOES NOT SETTLE, stated the way the Burmese entry states its own.
+           # Gurmukhi is written by Punjabi and by nothing else here, and the Punjabi of Pakistan is
+           # written in the Arabic script instead, where it is not separated from Urdu; a Shahmukhi
+           # page therefore does not read as Punjabi and this does not change that. The other three
+           # each carry one language and a handful of minority languages of the same regions, which
+           # read here under the majority name, as Shan and Mon read as Burmese.
+           ('Punjabi', r'[਀-੿]'), ('Gujarati', r'[઀-૿]'),
+           ('Tamil', r'[஀-௿]'), ('Telugu', r'[ఀ-౿]'),
+           # Armenian and Georgian, added the same day and for the same reason, with one difference
+           # worth naming: each of these is an alphabet of one nation's language and the ranges are
+           # therefore cleaner still than the four above, which carry minority languages beside the
+           # majority one. Armenian is on the reviewer's list. Neither script writes combining vowel
+           # signs, so their particle lists take the ordinary word boundary and not SCRIPT_FUNC_EDGE.
+           ('Armenian', r'[԰-֏]'), ('Georgian', r'[Ⴀ-ჿ]'),
            ('Amharic', r'[ሀ-፿]'), ('Khmer', r'[ក-៿]'), ('Burmese', r'[က-႟]'),
            # kana and kanji together, because a Japanese sentence alternates them
            ('Japanese', r'[぀-ヿ一-鿿]'), ('Chinese', r'[一-鿿]'), ('Korean', r'[가-힯]')]
@@ -387,12 +446,30 @@ CJK_CALENDAR = re.compile(r'[〇零一二三四五六七八九十百千两廿卅
 
 
 def _script_prose(text, start, end, lang):
-    """Does the neighbourhood of this run carry the script's own grammatical particles?"""
-    rx = SCRIPT_FUNC_RX.get('Cyrillic' if lang in _CYR_LANGS else lang)
+    """Does the neighbourhood of this run carry the script's own grammatical particles?
+
+    Two questions, and the second is codebook rule 9. SCRIPT_FUNC_MIN distinct particles have to be
+    there at all, and at least one of them has to be something other than a coordinating
+    conjunction, because `X and Y` is how a verbless bilingual subtitle is written and the particle
+    list is standing in for the verb rule 9 asks for. See SCRIPT_CONNECTIVE for the class and for
+    the site that showed it.
+    """
+    if lang in _CYR_LANGS:
+        lang = 'Cyrillic'
+    elif lang in _ETH_LANGS:
+        lang = 'Amharic'          # the SCRIPTS name, under which the Ethiopic union is filed
+    elif lang in _DEV_LANGS:
+        lang = 'Hindi'            # likewise for Devanagari
+    elif lang in _BEN_LANGS:
+        lang = 'Bengali'          # and for the Bengali script
+    rx = SCRIPT_FUNC_RX.get(lang)
     if rx is None:
         return True                  # no list for this script: unchanged from before
     around = text[max(0, start - SCRIPT_FUNC_WINDOW):end + SCRIPT_FUNC_WINDOW]
-    return len({m.group(0).lower() for m in rx.finditer(around)}) >= SCRIPT_FUNC_MIN
+    seen = {m.group(0).lower() for m in rx.finditer(around)}
+    if len(seen) < SCRIPT_FUNC_MIN:
+        return False
+    return bool(seen - SCRIPT_CONNECTIVE_SET.get(lang, frozenset()))
 
 
 def _longest_run(text, pat, names=(), lang=None):
@@ -553,14 +630,89 @@ FUNC = {
     #   Content words, the list's own artefacts (`amoungst`, `cant`, `hasnt`) and its company
     #   furniture (`inc`, `ltd`, `bill`, `mill`) are out because they are not function words.
     #
-    # MEASURED. Not one of the 136 occurs in any of the other twenty lists, which is checked by
+    # MEASURED. Not one of the 136 occurs in any of the other non-English lists, which is checked by
     # `test_english_shares_no_word_with_another_language` rather than asserted here, and it is what
     # makes `_SHARED` below provably the set it was before English existed. Corpus counts for what
     # English reads and what it declines to read are held with the study records and are not
     # distributed here.
     'English': 'about above across after again against all almost along although always among and another any anyone anything are around because been before behind being below beside besides between beyond both but can cannot could during each enough every everyone everything except few for from had has have here hers herself him himself his how however indeed into its itself many may might more moreover most much must myself never nobody nor not nothing often only onto other others our ours ourselves over perhaps rather she should since some someone something such than that the their them themselves then there therefore these they this those though through throughout too toward towards under until upon very well were what when where whereas which while who whom whose why with within without would yet you your yours yourself yourselves',
-    'French': 'aide aussi autre aux ces cette chaque comme communaute depuis elles entre faire familles ils jusqu les leur leurs mais nos notre nous ont par parce peut peuvent plus pour programmes quand que qui ressources sans services sont sur tous tout toute toutes tres une vos votre vous',
-    'German': 'aber alle alles auch bei das dienste diese dieser dieses ein eine einem einen eines familien fuer gemeinschaft haben hilfe kann koennen kostenlos mehr nach nicht oder ohne programme sehr sind ueber und unsere unserem unseren unter von werden wird zum zur zwischen',
+    # Widened 2026-09-18 from 48 words to 126, under the screen on the Spanish entry below, and it
+    # is the one list of the pass that also LOST words.
+    #
+    # THE EIGHTY-ONE, by class. The determiners and demonstratives (cet, ceux, certains, certaines,
+    # aucun, aucune, quelques, plusieurs, chacun, telle, meme), the pronouns (elle, eux, rien,
+    # personne), the relatives and interrogatives (quoi, pourquoi, lequel, quels, quelles, combien),
+    # the prepositions, conjunctions and adverbs (avec, avant, alors, ainsi, donc, encore, toujours,
+    # moins, beaucoup, trop, chez, contre, pendant, puis, selon, parmi, malgre, lorsque, tandis,
+    # cependant, pourtant, enfin, surtout, egalement, mieux, oui, juste, vraiment, soit, faut,
+    # autant, plutot, maintenant, loin, voici, voila, nombreux), the auxiliary, copular and modal
+    # forms (est, etre, etait, etaient, ete, avoir, avait, avez, avons, etes, suis, sommes, seront,
+    # doit, doivent, peux, pouvez, veut, veux, fait, fais) and the two numerals deux and trois, which
+    # the Spanish entry's `dos` is the precedent for. Nouns are out, and monde, jour, mois, annee,
+    # homme, femme, travail, cours, histoire and politique were all in the pool.
+    #
+    # WHAT THE SCREEN REFUSED. Vietnamese writes moi, toi, soi and bien, and the first two are in
+    # the Vietnamese list already, so they are refused twice. Romanian writes lui, celui and deja;
+    # Italian quel, quelle, celle and ceci; Catalan apres, sous, pres, font, dit and gratuit;
+    # Portuguese sera and jamais; Latvian cela; Turkish tel and ici; Hungarian vers; English comment
+    # and dont. `aujourd` and `hui` are the two halves of one word split by an apostrophe and are
+    # too rare apart to mean anything.
+    #
+    # AND THREE WORDS REMOVED, which is the only removal in this pass and the only one that was
+    # measured. The screen was run over the words that were here BEFORE it existed, and four of them
+    # score under 1.5: `les` at 1.48 against Catalan, `nos` at 0.20 against Portuguese and Spanish,
+    # `par` at 0.43 against Latvian, and `services` at 0.83 against ENGLISH, which is that word's own
+    # language on an American nonprofit page. `nos` stays, and it is the one that shows the mechanism
+    # working: the Portuguese list writes it too, so `_SHARED` takes its licence away and it can
+    # count toward the four without ever licensing anything. The other three were French-only inside
+    # these inventories, because the Spanish list writes `los`, `por` and `servicios`, so each of
+    # them licensed a French reading by itself, and TWO PAGES OF THE CAPTURE READ FRENCH FOR THAT
+    # REASON: two Spanish-language organizations whose four firing words were `les`, `nos`, `que` and
+    # either `par` or the English `services`, every one of them ordinary Spanish or ordinary English.
+    #
+    # THE REMOVAL WAS MEASURED IN BOTH DIRECTIONS BEFORE IT WAS TAKEN, because a removal costs
+    # readings and this file does not ship one on an argument. Over the 936 stored pages, **the two
+    # Spanish pages stop reading French and no page loses anything else**: the three pages of the
+    # capture that genuinely publish in French, on two organizations, read French before and after,
+    # and no page gains a language. Both French coverage paragraphs read French before and after, and
+    # no cell of the 152-paragraph table moves. No English control names any language. `_SHARED` does
+    # not move, since none of the three was shared. What it costs is margin: the corpus paragraph
+    # goes from 20 distinct words to 17 and the help notice from 9 to 8, both still well over four.
+    #
+    # MEASURED, for the eighty-one added. Over the 152 coverage paragraphs and the ten English
+    # controls, nothing moved. Over the 936 stored pages, NO page gained French and none lost a
+    # language, so the widening recovers nothing on this frame and the zero is the honest figure for
+    # it; what it does is take the corpus paragraph from 14 distinct words to 20 and the notice from
+    # 5 to 9, and the two organizations that publish in French from 8 and 5 to 11 and 8. Of the
+    # eighty-one, exactly three match anywhere outside French in any of these corpora: `chez` and
+    # `juste` on one English page each, and `est` on one Spanish page and three English ones, where
+    # it is `Est. 1985` and the time zone rather than the verb. One word cannot carry a reading.
+    'French': 'aide ainsi alors aucun aucune aussi autant autre aux avait avant avec avez avoir avons beaucoup cependant certaines certains ces cet cette ceux chacun chaque chez combien comme communaute contre depuis deux doit doivent donc egalement elle elles encore enfin entre est etaient etait ete etes etre eux faire fais fait familles faut ils jusqu juste lequel leur leurs loin lorsque maintenant mais malgre meme mieux moins nombreux nos notre nous ont oui parce parmi pendant personne peut peuvent peux plus plusieurs plutot pour pourquoi pourtant pouvez programmes puis quand que quelles quelques quels qui quoi ressources rien sans selon seront soit sommes sont suis sur surtout tandis telle toujours tous tout toute toutes tres trois trop une veut veux voici voila vos votre vous vraiment',
+    # Widened 2026-09-18 from 43 words to 86, under the screen on the Spanish entry below. The
+    # forty-three are the articles and determiners the list did not carry (die, der, dem, einer,
+    # keine, ihr, ihre, meine), the pronouns (sich, wir, mir, mich), the prepositions, conjunctions
+    # and adverbs (auf, fur, aus, noch, wenn, schon, uber, dann, durch, doch, immer, jetzt, wieder,
+    # gegen, viel, denn, damit, einfach, ganz, dass) and the auxiliary and modal forms (ist, wurde,
+    # habe, hatte, konnen, muss, gibt, geht, waren, konnte, machen). Nouns are out, and `zeit` was
+    # in the pool.
+    #
+    # BOTH SPELLINGS OF AN UMLAUT ARE HERE ON PURPOSE. `fuer` and `ueber` and `koennen` were already
+    # entries and they are the transliteration a German page writes when it cannot set the
+    # diacritic; `fur`, `uber` and `konnen` are what the fold produces from `für`, `über` and
+    # `können`. Neither spelling covers the other, so both are listed.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no
+    # page of the 936 gained German or lost a language, so this recovers nothing on this frame; the
+    # corpus paragraph goes from 10 distinct words to 18 and the help notice from 8 to 14, both of
+    # which were already over the bar. Five of the forty-three match outside German: `die` on one
+    # other paragraph and four pages and `der` on three pages, which is the English word and the
+    # German article inside a name, and `dem`, `noch` and `wurde` once each. Four distinct words
+    # inside one window is what stops any of that, and no page moved.
+    #
+    # ONE SITE OF THAT CAPTURE ALREADY READS GERMAN OFF INJECTED ONLINE ADVERTISING, which
+    # LIMITATIONS 7.3 describes and this change neither causes nor repairs. It was read German
+    # before this widening and after it, on the same blocks.
+    'German': 'aber alle alles auch auf aus bei damit dann das dass dem denn der die dienste diese dieser dieses doch durch ein eine einem einen einer eines einfach familien fuer fur ganz gegen geht gemeinschaft gibt habe haben hatte hilfe ihr ihre immer ist jetzt kann keine koennen konnen konnte kostenlos machen mehr meine mich mir muss nach nicht noch oder ohne programme schon sehr sich sind uber ueber und unsere unserem unseren unter viel von waren wenn werden wieder wir wird wurde zum zur zwischen',
     'Haitian Creole': 'anpil avèk ayisyen bay epi kap kominote konsa kote kounye lot nan nou paske pou pwogram resous sevis sila sou tou tout yon',
     # White Hmong in the Romanized Popular Alphabet, added 2026-08-01. Hmong is written in Latin
     # script and shares it with every other language on this list, so function words are the only
@@ -591,14 +743,237 @@ FUNC = {
     # Dari, Urdu, Pashto, Sorani Kurdish, Burmese, Thai and Khmer. The four-distinct-words-in-one-
     # paragraph test passes on both Hmong documents and fails on all eighteen others.
     'Hmong': 'cov daim hais haujlwm hauv kawm kev koj kom kuv lawm lawv lossis lub muaj mus neeg nrog ntau ntawd ntawm ntxiv nws nyob pab paub peb puas qhov rau raws tau thaum thiab tias tseem tsev tsis tuaj tus twg txhawb txhua txog txoj vim xav yam yog yuav',
-    'Hungarian': 'ahol altal amely amelyek amikor csak csaladok egy elott ezek ezen ezt gyerekeknek hogy illetve ingyenes jelentkezes kell kozosseg kozott lehet lesz magyar mar minden mindig mint nagyon nelkul nem oktatas programok segitseg soha szamara szolgaltatasok tanfolyam tobb utan vagy valamint vannak volt',
-    'Indonesian': 'anda atau bantuan bisa dalam dapat dari dengan ini itu juga kami karena keluarga kita komunitas lain layanan lebih membuat mereka pada sangat sebelum semua setelah setiap tetapi tidak untuk yang',
-    'Italian': 'aiuto altra altro anche che come comunita dal dei del della delle dove famiglie fare fino gli hanno molto nostra nostre nostri nostro ogni perche piu possono programmi puo quando questa queste questi questo senza servizi sono sopra suoi tra tutta tutte tutti tutto una',
-    'Latvian': 'ari bet bezmaksas bija bus cita citas gimenes jus jusu kas katrs kopiena kura kuras kuri lai latviesu loti mes musu nav pakalpojumi palidziba programmas savu savus tas tiek tikai tiks vai vairak var varam vinas vinu visas visi visu',
-    'Lithuanian': 'arba bei bet bus buvo daugiau gali galima jau jusu kad kai kaip kur kuri kurie kurios kuris labai lietuviu musu nera nes savo tada taip tik visa visi visos yra',
-    'Polish': 'aby bardzo bedzie bezplatne dla gdy gdzie ich inne jak jest juz kazdy ktora ktore ktory miedzy mozna nad nasza nasze naszej naszych nie oraz przez przy rodziny spolecznosc takze tego tej tym uslugi wiecej wszystkich zeby',
-    'Portuguese': 'ajuda alem cada como comunidade das desde dos entre esta estao estas este estes fazer mais muito nao nos nossa nossas nosso nossos onde outra outro para pode podem por porque quando que sem servicos seus sobre tambem tem toda todas todo todos uma umas voce',
-    'Romanian': 'aceasta acest aceste acesti ajutor alt alta cand care comunitate deasemenea despre este face familii fara fiecare foarte intre mai noastra noastre nostri nostru pana pentru pentruca poate programe serviciile sunt toata toate toti unde',
+    # Widened 2026-09-18 from 43 words to 73, under the screen on the Spanish entry below. The
+    # thirty are the demonstratives and pronouns (azt, ezt is already here, nekem, amit, egyik,
+    # olyan, ilyen, milyen), the adverbs and particles (meg, akkor, mert, igy, ugy, itt, ott, majd,
+    # pedig, jol, miert, azert, igen, hanem, alatt, miatt, szerint, elso), the negator nincs and the
+    # copular and auxiliary forms (vagyok, volna, lett, tudom).
+    #
+    # THE HUNGARIAN NOTICE IS STILL UNDER THE BAR AND THE WORD LIST IS NOT WHY. Of the 76 languages
+    # in the coverage corpus this is the one whose help notice carries three distinct words against
+    # a bar of four, and it stays at three after this widening. What the notice is made of is
+    # `szüksége`, `nyelven`, `jöjjön`, `tanácsadás` and `kérdezzük`, which are inflected content
+    # words, and the rule this dict states keeps them out. `van`, the copula, would reach it and is
+    # refused twice over: it scores 1.3 against Vietnamese, which writes `vẫn`, and it is the
+    # English word van. The gap is real and it is a limit of the function-word route on an
+    # agglutinating language, not a gap somebody forgot to fill.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no page
+    # of the 936 gained Hungarian or lost a language; the corpus paragraph goes from 6 distinct words
+    # to 7 and the notice from 3 to 3. Two of the thirty match outside Hungarian, `meg` and `mert`,
+    # on one page each. `_SHARED` did not move.
+    'Hungarian': 'ahol akkor alatt altal amely amelyek amikor amit azert azt csak csaladok egy egyik elott elso ezek ezen ezt gyerekeknek hanem hogy igen igy illetve ilyen ingyenes itt jelentkezes jol kell kozosseg kozott lehet lesz lett magyar majd mar meg mert miatt miert milyen minden mindig mint nagyon nekem nelkul nem nincs oktatas olyan ott pedig programok segitseg soha szamara szerint szolgaltatasok tanfolyam tobb tudom ugy utan vagy vagyok valamint vannak volna volt',
+    # Oromo, added 2026-09-17, and it is here for the reason Hmong is: Latin script shared with
+    # every other language on this list, no script test to fall back on, and lid.176 answers
+    # Finnish at 0.24 and 0.16 on the two coverage paragraphs, which is under FT_MIN_CONF, so the
+    # identifier route was closed as well. Oromo is on the reviewer's list of languages found on
+    # pages this instrument read as english_only.
+    #
+    # WHAT THE WORDS ARE. The demonstratives (kana, sana, kun), the pronouns and possessive
+    # concords (isaan, isaanii, nuti, keenya, keessan), the postpositions and adpositional relators
+    # (keessa, irratti, irra, irraa, itti, gidduu, waliin, booda, dura, hanga, dhaan), the
+    # conjunctions and connectives (akka, akkuma, akkasumas, garuu, ammoo, immoo, malee, yookaan,
+    # yoo, osoo, illee, kanaaf, sababii), the negator hin, the quantifiers (hunda, hedduu, tokko,
+    # lama) and the existential and possessive verbs (jira, jiru, qabna). Service nouns are out,
+    # for the reason the note above this dict gives.
+    #
+    # WHAT WAS LEFT OUT. `fi`, which is the ordinary word for `and` and the most frequent word in
+    # the language, because two letters cannot separate a language from an abbreviation any more
+    # than a two-letter name key can; see NAME_KEY_MIN and the Hmong entry, which drops `ua` and
+    # `ib` on the same rule. `moo` and `tan` for the same reason of shortness and ambiguity.
+    #
+    # MEASURED. The forty words share nothing with any of the other twenty non-English lists, which is why
+    # `_SHARED` does not move when this list is added and no other language's licence thins. Over
+    # the 152 coverage paragraphs written for this work, in 76 languages, they match 12 distinct
+    # items on the Oromo paragraph and 6 on the Oromo notice, against a bar of four; on every other
+    # paragraph they match at most ONE, and the two that match one are `yoo` in Yoruba and `kun` in
+    # Uzbek, neither of which can reach four. On the ten English negative controls they match
+    # nothing at all.
+    'Oromo': 'akka akkasumas akkuma ammoo booda dhaan dura garuu gidduu hanga hedduu hin hunda illee immoo irra irraa irratti isaan isaanii itti jira jiru kana kanaaf keenya keessa keessan kun lama malee nuti osoo qabna sababii sana tokko waliin yookaan yoo',
+    # Widened 2026-09-18 from 31 words to 56, under the screen on the Spanish entry below. The
+    # twenty-five are the pronouns (aku, saya, seorang), the existential and future markers (ada,
+    # akan, adalah, sudah, telah, masih, pernah), the conjunctions and adverbs (tapi, jadi, lagi,
+    # seperti, oleh, jika, hanya, sebagai, bahwa, banyak, sekarang, tersebut), the modal harus and
+    # the negators bukan and jangan. Nouns and adjectives are out, and orang, tahun, hari, anak,
+    # baik and baru were all in the candidate pool.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no
+    # page of the 936 gained Indonesian or lost a language; the corpus paragraph goes from 13
+    # distinct words to 16 and the help notice from 10 to 11, both already well over the bar. Three
+    # of the twenty-five match outside Indonesian and each on one other paragraph: `ada`, `telah`
+    # and `seorang`, all of them on the Malay paragraph, which is the neighbour this pair has and
+    # which the identifier already answers `id` on. `_SHARED` did not move.
+    'Indonesian': 'ada adalah akan aku anda atau bahwa bantuan banyak bisa bukan dalam dapat dari dengan hanya harus ini itu jadi jangan jika juga kami karena keluarga kita komunitas lagi lain layanan lebih masih membuat mereka oleh pada pernah sangat saya sebagai sebelum sekarang semua seorang seperti setelah setiap sudah tapi telah tersebut tetapi tidak untuk yang',
+    # Widened 2026-09-18 from 45 words to 116, under the screen on the Spanish entry below, and the
+    # Italian help notice now reads Italian where it read nothing.
+    #
+    # THE SEVENTY-ONE, by class. The determiners and articulated prepositions the list did not carry
+    # (nella, nelle, dalla, dallo, dello, nello, sulla, sullo, degli, dagli, agli), the
+    # demonstratives (quello, quella, quelli, stesso, qualche), the quantifiers (altri, alcuni,
+    # alcune), the relatives (quale, quali), the pronouns (loro, cio, qualcosa, niente, nessuno,
+    # chiunque, vostro), the prepositions, conjunctions and adverbs (dopo, poi, ancora, quindi,
+    # secondo, contro, oggi, sotto, oltre, troppo, allora, invece, forse, meglio, appena, comunque,
+    # inoltre, infatti, ormai, davvero, nemmeno, neppure, perfino, subito, grazie) and the auxiliary,
+    # copular and modal forms (essere, siamo, abbiamo, abbiate, avete, aveva, erano, sarebbe, aver,
+    # stato, fatto, detto, potete, possiamo, dobbiamo, devono, vogliamo). `servizio` is here as the
+    # singular of `servizi`, which was already an entry, and not as a new service noun.
+    #
+    # THE FIRST SIXTY-NINE MOVED NOTHING, which is worth recording because it says where this
+    # language's problem is. With the demonstratives, quantifiers and adverbs alone the corpus
+    # paragraph went from 9 distinct words to 10 and the help notice from 2 to 2, and no page moved.
+    # What a real Italian notice is built from is the second person and the articulated preposition:
+    # `se avete bisogno di aiuto in italiano, rivolgetevi alla reception`. `avete` and `servizio` are
+    # what take the notice from 2 to 4 and over the bar.
+    #
+    # WHAT THE SCREEN REFUSED, and on this language it refuses the commonest words in it. `alla`
+    # scores 20 against Spanish, `alle` is in the German list and scores 0.9 against it, and `allo`,
+    # `nei`, `sul`, `nel`, `dalle` and `sui` all fall to Catalan, Lithuanian, Portuguese, Hungarian
+    # and French. The possessives go the same way: `vostra`, `vostri` and `vostre` fall to Catalan
+    # and Romanian and only `vostro` survives. `sua`, `suo`, `siete`, `deve`, `prima`, `sempre`,
+    # `mentre`, `cosa`, `altre`, `tanto`, `poco`, `durante`, `essa` and `esse` are all Portuguese,
+    # Spanish or Catalan words. `chi`, `noi` and `voi` are in the Vietnamese list, `una` in the
+    # Spanish one and `quando` in the Portuguese one.
+    #
+    # MEASURED. The only cell that moves on the 152 coverage paragraphs and the ten English controls
+    # is the Italian notice, from nothing to Italian; the paragraph goes from 9 distinct words to 12
+    # and the notice from 2 to 4. No page of the 936 gained Italian or lost a language. One of the
+    # seventy-one matches anywhere outside Italian in these corpora, `sotto`, on one page.
+    'Italian': 'abbiamo abbiate agli aiuto alcune alcuni allora altra altri altro anche ancora appena aver avete aveva che chiunque cio come comunita comunque contro dagli dal dalla dallo davvero degli dei del della delle dello detto devono dobbiamo dopo dove erano essere famiglie fare fatto fino forse gli grazie hanno infatti inoltre invece loro meglio molto nella nelle nello nemmeno neppure nessuno niente nostra nostre nostri nostro oggi ogni oltre ormai perche perfino piu poi possiamo possono potete programmi puo qualche qualcosa quale quali quando quella quelli quello questa queste questi questo quindi sarebbe secondo senza servizi servizio siamo sono sopra sotto stato stesso subito sulla sullo suoi tra troppo tutta tutte tutti tutto una vogliamo vostro',
+    # Widened 2026-09-18 from 40 words to 64, under the screen on the Spanish entry below. The
+    # twenty-four are the prepositions and adverbs (pec, lidz, pirms, kopa, tagad, tiesi, vienmer,
+    # daudz, labi, cik, neka, tomer, kapec, tapec, kaut), the pronouns and determiners (tev, tevi,
+    # kads, kadu, viss) and the verb forms (esmu, varetu, tika). Nouns and place names are out, and
+    # gada, gadu, valsts, rigas, majas and latvijas were all in the candidate pool, the last three
+    # of them being a capital city, a house and the name of the country.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no page
+    # of the 936 gained Latvian or lost a language; the corpus paragraph goes from 7 distinct words
+    # to 10 and the help notice from 6 to 7. NOT ONE of the twenty-four matches anywhere outside
+    # Latvian in any of these corpora, which is the cleanest result of the twelve languages this
+    # screen was run over. `_SHARED` did not move.
+    'Latvian': 'ari bet bezmaksas bija bus cik cita citas daudz esmu gimenes jus jusu kads kadu kapec kas katrs kaut kopa kopiena kura kuras kuri labi lai latviesu lidz loti mes musu nav neka pakalpojumi palidziba pec pirms programmas savu savus tacu tagad tapec tas tev tevi tiek tiesi tika tikai tiks tomer vai vairak var varam varetu vienmer vinas vinu visas visi viss visu',
+    # Widened 2026-09-17, and it is the shape the Bosnian entry was widened for in August: a help
+    # notice of 232 characters, which is the passage that most directly IS the provision this
+    # instrument measures, carried two words of this list against a bar of four and read as nothing.
+    # Lithuanian is on the reviewer's list of languages found on pages read as english_only.
+    #
+    # The fourteen added are the ordinary furniture of a community page in this language and not
+    # that notice's vocabulary: the conditional and the pronouns (jei, jums, visiems), the
+    # adpositions (apie, iki, nuo, prie, kartu), the modals (galite, turite, reikia), the
+    # quantifier kiekvienas and the adverb dar. `kada` was the fifteenth candidate and it is out,
+    # because Bosnian/Croatian/Serbian writes it too and a word entering `_SHARED` takes it out of
+    # that language's licence.
+    #
+    # MEASURED over the 152 coverage paragraphs in 76 languages: the fourteen match at most ONE
+    # word on any language other than Lithuanian, and the three that match one are `iki` in
+    # Turkish, which is its numeral two, and `jums` in the two Latvian paragraphs. `jums` is
+    # ordinary Latvian and is NOT in the Latvian list, so it thins nothing; what it does is give a
+    # Latvian page one Lithuanian word, and four distinct words inside one window is the bar. On
+    # the ten English negative controls the fourteen match nothing. The Lithuanian paragraph goes
+    # from four distinct words to eight and the notice from two to eight.
+    # Widened again 2026-09-18, from 43 words to 62, under the screen on the Spanish entry below.
+    # The fourteen added in September were chosen by hand for one help notice; these nineteen come
+    # off a frequency list and through the same arithmetic every other list here went through.
+    #
+    # THE NINETEEN. The pronouns (jis, jie, juos), the prepositions (ant, pries, pagal, tarp), the
+    # conjunctions and adverbs (taciau, nors, dabar, tikrai, todel, jeigu, kiek, tiesiog, daug), the
+    # relative kuriu and the determiner kitu, and the infinitive buti. Nouns and place names are out,
+    # and lietuvos, lietuvoje, vilniaus, kauno, europos, zmones, metu, metais, miesto, valstybes,
+    # laiko and kulturos were all in the candidate pool, six of them the names of places.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no page
+    # of the 936 gained Lithuanian or lost a language; the corpus paragraph goes from 7 distinct
+    # words to 10 and the help notice stays at 7, which the September widening had already taken over
+    # the bar. Seven of the nineteen match outside Lithuanian and each of them on the same single
+    # page. `ant` is the one to watch, since it is the English word for the insect, and it matches
+    # nothing in the corpus and one page here. `_SHARED` did not move.
+    'Lithuanian': 'ant apie arba bei bet bus buti buvo dabar dar daug daugiau gali galima galite jau jei jeigu jie jis jums juos jusu kad kai kaip kartu kiek kiekvienas kitu kur kuri kurie kurios kuris kuriu labai lietuviu musu nera nes nors nuo pagal prie pries reikia savo taciau tada taip tarp tiesiog tik tikrai todel turite visa visi visiems visos yra',
+    # Widened 2026-09-18 from 37 words to 88, under the screen on the Spanish entry below, and it is
+    # the one of these widenings that moves the coverage table: the Polish help notice carried three
+    # words of the old list against a bar of four and read as nothing, and it now reads Polish.
+    #
+    # THE FIFTY-ONE, by class. The pronouns (mnie, sobie, jego, jej, kto, ktos, ktorzy, moja, tych,
+    # innych, nic, wszystko), the determiners and quantifiers (takie, wiele), the conjunctions,
+    # particles and adverbs (czy, tylko, jesli, jeszcze, jako, kiedy, nawet, teraz, wiec, jednak,
+    # chyba, niz, rowniez, zawsze, dobrze, własnie, albo, podczas, przed, bardziej, dlaczego, nigdy,
+    # tutaj, troche, raz, dzieki) and the copular and auxiliary forms (byc, był, było, była, jestem,
+    # jestes, masz, mamy, chce, wiem, został). Nouns are out, and ludzie, osob, czas, dzieci, pracy,
+    # zycie and dnia were all in the candidate pool.
+    #
+    # `ł` DOES NOT FOLD TO `l`. It is U+0142, NFKD leaves it alone the way it leaves the Vietnamese
+    # `đ` alone, so `był` folds to `był` and an entry written `byl` would match nothing. The four
+    # entries here that carry it are written the way the fold produces them, and this is the first
+    # time this list has held one.
+    #
+    # MEASURED. On the 152 coverage paragraphs and the ten English controls the only cell that moves
+    # is the Polish notice, which goes from nothing to Polish; the Polish paragraph goes from 9
+    # distinct words to 14 and the notice from 3 to 5. No page of the 936 gained Polish or lost a
+    # language. Five of the fifty-one match anywhere outside Polish in these corpora and each of them
+    # once: `jako` and `tych` on one page each, `kto`, `moja` and `raz` on one other language's
+    # paragraph each. `_SHARED` did not move.
+    'Polish': 'aby albo bardziej bardzo bedzie bezplatne byc był była było chce chyba czy dla dlaczego dobrze dzieki gdy gdzie ich inne innych jak jako jednak jego jej jesli jest jestem jestes jeszcze juz kazdy kiedy kto ktora ktore ktory ktorzy ktos mamy masz miedzy mnie moja mozna nad nasza nasze naszej naszych nawet nic nie nigdy niz oraz podczas przed przez przy raz rodziny rowniez sobie spolecznosc takie takze tego tej teraz troche tutaj tych tylko tym uslugi wiec wiecej wiele wiem wszystkich wszystko własnie zawsze zeby został',
+    # Widened 2026-09-18 from 46 words to 111, under the screen written out on the Spanish entry
+    # below: the candidate and the whole frequency list of English, Spanish and every other language
+    # of these inventories that a frequency list exists for are folded the same way, and a word is
+    # kept only where its Portuguese frequency is at least a hundred times its highest folded
+    # frequency in any of them.
+    #
+    # THE SIXTY-FIVE, by class. The demonstratives (isso, disso, nisso, esses, essas, aquele,
+    # aquela, aqueles, aquelas, naquele, nesta), the quantifiers and indefinites (tudo, muitos,
+    # algum, alguma, algumas, nenhum, nenhuma, qualquer, demais, outros, outras, mesmo, mesma,
+    # mesmos, mesmas), the pronouns (ela, elas, quem, alguem, ninguem, minha, minhas, suas, dele,
+    # deles, lhe, lhes, comigo), the relative cujo, the prepositions, conjunctions and adverbs
+    # (agora, ainda, assim, depois, entao, enquanto, embora, apos, atraves, quase, pouco, bem,
+    # melhor, aos, pela, pelas) and the auxiliary and copular forms (estou, tinha, tenho, sendo,
+    # fez, fazem, fazendo, serao, vou). No service noun, and pessoas, coisas, cidade, trabalho,
+    # mulher and dinheiro were all in the candidate pool and are all out for that reason.
+    #
+    # WHAT THE SCREEN REFUSED, and on this pair it refuses a great deal, which is the point. Spanish
+    # writes ambos, antes, nunca, podia, estamos and somos as Portuguese does, all at ratios under
+    # 1.3, and pelo and pelos are Spanish words for hair. Catalan writes alguns, meu, meus, haver,
+    # havia and num. Italian writes quanto, sempre, posso and sua. French writes dela and foi,
+    # Romanian ele, Hungarian eles, Indonesian logo, Latvian muitas, Lithuanian temos, German faz,
+    # Vietnamese sao and vao. `vai` is refused twice over, by the ratio against Latvian and by being
+    # in the Latvian list already.
+    #
+    # `foram` IS OUT, AND IT IS THE ONE REFUSED ON ITS OUTPUT RATHER THAN ITS FREQUENCY. It is
+    # ordinary Portuguese, the third person plural preterite of ser and ir, and it passes the screen
+    # at 17,371. With it in, a second page is admitted, and that page is a list of press clippings on
+    # a Spanish-language organization's site: five of its six Portuguese hits are words Portuguese
+    # shares with Spanish and come from Spanish headlines, and the whole licence is one Brazilian
+    # news headline, `foram expulsos dos EUA`. That is the Spanish-and-Portuguese cross-licence the
+    # note on `dos` and ORTHO_ONLY describes, running in the other direction, and one real
+    # Portuguese headline in a Spanish clipping list is a title in a list, which rule 6 puts at rung
+    # 1. Without it the widening admits one page and that page is right.
+    #
+    # MEASURED. Over the 152 coverage paragraphs in 76 languages and the ten English controls,
+    # nothing moved in any cell. Over the 936 stored pages of the reviewer's capture, 1 page gained
+    # Portuguese and none lost a language: a Portuguese cultural centre's enrolment notice,
+    # `Aprenda portugues agora. Para todas as idades. Inscreva-se por e-mail ou pessoalmente...`,
+    # which went from three distinct words to four and whose licence is `agora`. No verdict moved,
+    # since that organization already read true_multilingual in Portuguese off its front page.
+    # `_SHARED` did not move, because no word added is in another language's list.
+    'Portuguese': 'agora ainda ajuda alem alguem algum alguma algumas aos apos aquela aquelas aquele aqueles assim atraves bem cada comigo como comunidade cujo das dele deles demais depois desde disso dos ela elas embora enquanto entao entre essas esses esta estao estas este estes estou fazem fazendo fazer fez isso lhe lhes mais melhor mesma mesmas mesmo mesmos minha minhas muito muitos nao naquele nenhum nenhuma nesta ninguem nisso nos nossa nossas nosso nossos onde outra outras outro outros para pela pelas pode podem por porque pouco qualquer quando quase que quem sem sendo serao servicos seus sobre suas tambem tem tenho tinha toda todas todo todos tudo uma umas voce vou',
+    # Widened 2026-09-18 from 35 words to 67, under the screen on the Spanish entry below. The
+    # thirty-two are the demonstratives and quantifiers (unui, unei, unul, multe, atat, cea, ceea,
+    # nici), the pronoun lor, the prepositions, conjunctions and adverbs (prin, iar, doar, fie,
+    # intr, catre, acum, atunci, chiar, decat, aici, astfel, dupa, bine), the auxiliary and modal
+    # forms (fost, trebuie, avea, avut, fiind, facut, putea) and the numerals doua and trei. Nouns
+    # are out, and timp, viata, fata, anul, perioada and lucru were all in the pool.
+    #
+    # `daca` IS OUT AND IT IS THE MOST USEFUL REFUSAL IN THIS FILE. It is the Romanian word for
+    # `if`, it passes the screen at 2,664, and over the 936 stored pages of the reviewer's capture
+    # it matches on 19, every one of them the acronym DACA: `What is DACA?`, `DACA Renewal`,
+    # `Deferred Action for Childhood Arrivals (DACA)`, `one of the first DACA recipients in Oregon`.
+    # On a frame of immigrant-serving organizations that acronym is one of the commonest strings
+    # there is, and a frequency list of Romanian prose cannot know it. It is refused on the page
+    # count and not on the ratio.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no page
+    # of the 936 gained Romanian or lost a language; the corpus paragraph goes from 10 distinct
+    # words to 14 and the notice from 5 to 6. With `daca` removed, not one of the thirty-two matches
+    # anywhere outside Romanian in any of these corpora.
+    'Romanian': 'aceasta acest aceste acesti acum aici ajutor alt alta astfel atat atunci avea avut bine cand care catre cea ceea chiar comunitate deasemenea decat despre doar doua dupa este face facut familii fara fie fiecare fiind foarte fost iar intr intre lor mai multe nici noastra noastre nostri nostru pana pentru pentruca poate prin programe putea serviciile sunt toata toate toti trebuie trei unde unei unui unul',
     'Somali': 'aad adeegyada ama ayaa badan barnaamij bilaash bulshada caawimo dhan hadda haddii halka iyo kale kuwa kuwaas lakiin marka qoysaska sidoo taas waa waxa waxaa waxaad waxaan waxay',
     # `dos` was added 2026-08-02 and it is a REMOVAL dressed as an addition. It is the Spanish
     # numeral two, an ordinary word of the language, and its absence here meant `_SHARED` never saw
@@ -610,11 +985,150 @@ FUNC = {
     # seguidos, de magnitud 7.2 y 7.5", "dos décadas", "No hay dos personas que experimenten el
     # duelo". Making the word shared costs Portuguese nothing it should keep; see ORTHO_ONLY for
     # the two sites where it would have and for what holds them.
-    'Spanish': 'ademas ayuda cada como comunidad cuando del desde donde dos entre esta estan estas este estos hacer hasta informacion muy nosotros nuestra nuestras nuestro nuestros otra otro para pero por porque puede pueden que servicios sobre sus tambien tiene tienen toda todas todo todos una unas unos usted',
+    #
+    # Widened 2026-09-18 from 48 words to 122, and it is the Lithuanian change on the language this
+    # instrument meets most often. A reviewer read 98 organizations this package had published as
+    # `english_only`; on the stored capture of the 72 of them that had an address, four carried a
+    # genuine Spanish paragraph that the identifier names Spanish at 0.82 to 0.98 and that the
+    # corroboration gate refused, because the list held two or three of its words against the four
+    # FUNC_DISTINCT_MIN asks for. The words below are the ordinary grammatical furniture of a
+    # Spanish page and not those four paragraphs' vocabulary.
+    #
+    # WHAT THE SEVENTY-TWO ARE, by the closed classes this dict's note names. The demonstratives the
+    # list did not carry (esos, esas, esto, aquel, aquellos, aquellas), where it already carried
+    # este, esta, estos and estas. The quantifiers and indefinites (otros, otras, mucho, mucha,
+    # muchos, muchas, algunos, algunas, ningun, ninguna, cualquier, demas, mismo, misma, mismos,
+    # mismas), where it already carried cada, todo and otra. The personal and indefinite pronouns
+    # (ellos, ellas, ustedes, alguien, nadie, quien, quienes, suyo, suya), where it carried nosotros
+    # and usted. The relatives and interrogatives (cual, cuales, cuanto, cuantos, cuantas). The
+    # prepositions, conjunctions and adverbs (ahora, asi, aunque, bajo, despues, entonces, fuera,
+    # hacia, luego, mientras, pues, segun, siempre, tampoco). And the auxiliary and copular forms of
+    # the four paradigms the list already had some forms of, estar, ser, haber, poder, tener, deber
+    # and hacer (estoy, estaba, estaban, fue, fueron, siendo, habia, haber, hemos, haya, puedo,
+    # puedes, tenemos, tienes, debe, deben, debemos, hace, hacen, hizo, hacemos, haciendo), and
+    # necesita and necesitan, which are the verb of a help notice, `si necesita ayuda`, and are the
+    # one place the screen below was overruled. No service noun is added, which is the rule the
+    # Oromo entry states.
+    #
+    # THE SCREEN, and it is arithmetic over folded forms rather than a judgement. Every candidate is
+    # folded the way FUNC_RX folds the page, and the same fold is applied to the whole frequency
+    # list of English, Portuguese, Italian, French and Catalan, so that a word which only collides
+    # AFTER its accents are dropped is caught. A candidate is kept only where its Spanish frequency
+    # is at least a hundred times its highest frequency in any of those five. The lowest kept is
+    # ninguna at 115 and the next is ningun at 145; everything else is above 165.
+    #
+    # THE ONE EXCEPTION, recorded because the rule above is otherwise stated as absolute. `necesita`
+    # scores 3.3, not 100: Romanian writes `necesita` as the infinitive of the same verb and folds
+    # `necesita` from the third person as well, at 4.2e-05 against Spanish's 1.38e-04. It is kept
+    # anyway, on two measurements. The word is the verb a Spanish help notice is built on, and the
+    # notice is the passage this instrument exists to measure: one organization's page reads
+    # `necesita ayuda` and `necesita mas informacion` and stops at three distinct words. And the
+    # collision is not exercised, because a Romanian page would have to carry `necesita` AND three
+    # more distinct Spanish words inside one window: over the coverage corpus both Romanian
+    # paragraphs, of 625 and 229 characters, carry exactly ONE Spanish word, `este`, which is shared
+    # and licenses nothing, and neither carries `necesita` at all. `necesitan` needs no exception and
+    # has none, since no other language here writes it. If a Romanian reading ever appears beside a
+    # Spanish one, this word is the first place to look.
+    #
+    # WHAT THE SCREEN REFUSED, which is the half that matters. Catalan writes aquella, seran, algun,
+    # alguna and eres exactly as Spanish does, and the ratio for each is at or under 13. Portuguese
+    # writes podemos identically, and it is the one candidate the coverage corpus caught by itself:
+    # with podemos in the list the 613-character Portuguese paragraph reached six distinct Spanish
+    # words AND a Spanish-only licence, and reported Spanish beside Portuguese. The Chuukese
+    # paragraphs carry ese and the Uzbek one carries esa, and both are also the shape of an English
+    # acronym on a nonprofit page. Dutch, German and Haitian Creole carry gratis. Portuguese,
+    # Italian, French or Catalan write durante, mediante, todavia, gratuito, sabado, domingo,
+    # oficina, recursos, familias, aqui, mas, sino, contra, cerca, dentro, tras, salvo, alla, solo,
+    # sido and ser as Spanish does, so none of them is here. sin, hay, son, soy, era, dice, tan and
+    # ante are ordinary English words. el and y are under three letters, which is the bar NAME_KEY_
+    # MIN and the Hmong entry set, and el is also how a Texas place name begins.
+    #
+    # los AND las ARE NOT HERE AND THE ZERO IS WHY. They are the definite plural articles and the
+    # most conspicuous absence from a list that carries unos and unas, and they were built, measured
+    # and left out: over the 936 stored pages of that capture they admit exactly the same 8 pages
+    # the list below admits without them, so they buy nothing here, and what they would cost is two
+    # things the corpus can name. Portuguese writes the enclitic pronouns -los and -las, which
+    # tokenise as los and las, and a Spanish-only licence word inside Portuguese prose is the defect
+    # ORTHO_ONLY exists for, running the other way. And los matches inside Los Angeles and Los
+    # Alamos on 49 of the 792 pages of that capture which name no language but English, where las
+    # matches on 12. Do not add them off a frequency list.
+    #
+    # MEASURED, on three corpora and in both directions. On the 152 coverage paragraphs in 76
+    # languages and the ten English negative controls, nothing moved at all: no paragraph that was
+    # read stopped being read, no paragraph that was not read started, and no English control named
+    # any language. On the 936 stored pages of the reviewer's capture, 9 pages gained Spanish and
+    # none lost a language; every one of the 9 was opened and carries Spanish prose, on six
+    # organizations. Of the 792 of those pages that named no language but English, the number
+    # reaching the four distinct words inside one window that PARA_WORDS asks for goes from 0 to 9,
+    # and those 9 are those same admissions; the number reaching three, one short of the bar, goes
+    # from 10 to 3, and the number reaching one or two does not move at all, 37 and 10 before and
+    # after, which is the measure of how little of this vocabulary occurs in English text.
+    # `_SHARED` does not move, because no word here is in another language's list, so no other
+    # language's licence thins.
+    'Spanish': 'ademas ahora alguien algunas algunos aquel aquellas aquellos asi aunque ayuda bajo cada como comunidad cual cuales cualquier cuando cuantas cuanto cuantos debe debemos deben del demas desde despues donde dos ellas ellos entonces entre esas esos esta estaba estaban estan estas este esto estos estoy fue fuera fueron haber habia hace hacemos hacen hacer hacia haciendo hasta haya hemos hizo informacion luego mientras misma mismas mismo mismos mucha muchas mucho muchos muy nadie necesita necesitan ningun ninguna nosotros nuestra nuestras nuestro nuestros otra otras otro otros para pero por porque puede pueden puedes puedo pues que quien quienes segun servicios siempre siendo sobre sus suya suyo tambien tampoco tenemos tiene tienen tienes toda todas todo todos una unas unos usted ustedes',
     'Tagalog': 'amin aming ang bawat bilang dahil din hanggang higit iba inyong ito kami kanilang kapag kayo komunidad lahat libre maaari maari mga mula napaka natin ngunit nila para programa saan serbisyo tulong',
-    'Turkish': 'aileler ama ancak arasinda ayrica bir bizim cok cunku daha fakat gibi hepsi hizmetler icin ile kadar olabilir olan olarak olur once onlarin programlar sizin sonra toplum tum ucretsiz veya yapmak yardim',
+    # Widened 2026-09-18 from 32 words to 65, under the screen on the Spanish entry below, and four
+    # of the thirty-three are a repair rather than an addition.
+    #
+    # THE DOTLESS ı DOES NOT FOLD TO i. It is U+0131, NFKD leaves it alone the way it leaves the
+    # Vietnamese `đ` and the Polish `ł` alone, and four entries that were here before are written
+    # with a DOTTED i where Turkish writes the dotless one: `arasinda`, `ayrica`, `onlarin` and
+    # `yardim`. The real words are `arasında`, `ayrıca`, `onların` and `yardım`, so those four
+    # entries could never match a page that spells Turkish properly. Both spellings are now listed,
+    # because the dotted forms do match a page typed without the letter, which is an ordinary habit.
+    # `yardım` is here as the correct spelling of `yardim`, which was already an entry, and not as a
+    # new service noun.
+    #
+    # THE OTHER TWENTY-NINE are the negator degil, the existential yok, the quantifiers and
+    # adverbs (sadece, ilk, hic, bile, boyle, fazla, birlikte, simdi, icinde, aynı, artık, dogru,
+    # neden, nasıl, diger, ise, diye), the pronouns (benim, bana, biz, kendi, sey), the postposition
+    # tarafından and the verb forms (olmak, oldu, oldugu, oldugunu). Adjectives are out, and iyi,
+    # yeni, buyuk, guzel and onemli were all in the pool with the nouns yer, yıl and devam.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and no
+    # page of the 936 gained Turkish or lost a language; the corpus paragraph goes from 7 distinct
+    # words to 8 and the help notice stays at 4.
+    #
+    # FOUR IS EXACTLY THE BAR AND THIS IS THE THINNEST MARGIN IN THE FILE. Of the 76 languages in the
+    # coverage corpus, Turkish is the one whose help notice clears FUNC_DISTINCT_MIN with nothing to
+    # spare: four distinct words against a bar of four. One word of that notice rewritten, or one
+    # organization writing the same notice with a synonym, drops it under. This is a note and not a
+    # reason to lower anything; what it says is where to look first if a Turkish page that plainly
+    # carries a notice comes back reading nothing. Sixteen of the thirty-three match outside Turkish, none
+    # of them more than three times and all of them on the capture's own Turkish pages or on a
+    # single other paragraph.
+    'Turkish': 'aileler ama ancak arasinda arasında artık aynı ayrica ayrıca bana benim bile bir birlikte biz bizim boyle cok cunku daha degil diger diye dogru fakat fazla gibi hepsi hic hizmetler icin icinde ile ilk ise kadar kendi nasıl neden olabilir olan olarak oldu oldugu oldugunu olmak olur once onlarin onların programlar sadece sey simdi sizin sonra tarafından toplum tum ucretsiz veya yapmak yardim yardım yok',
     'Ukrainian': 'abo bezkoshtovno bilshe bude bulo dlia dopomoha duzhe hromada koly mozhna nashe nashi nemaye pislia posluhy prohramy shcho svoyi take tilky tomu tse usi vashi vid vsi vzhe yak yaka yaki yakyy',
-    'Vietnamese': 'ban boi cac chi cho chung chuong cong cua cung dau dich dong duoi giua giup hon khac khi lam mien minh moi ngoai nhu nhung phi tat toi tren trinh voi',
+    # Widened 2026-09-18 from 32 words to 53, under the screen on the Spanish entry below.
+    #
+    # THE TWENTY-ONE, and Vietnamese gives a short list because its grammatical vocabulary is short:
+    # a great many of its function words are two letters, which NAME_KEY_MIN and the Hmong entry
+    # rule out, and the rest fold into other languages. What is here is the preposition trong, the
+    # negators khong and chua, the demonstratives nay and đay, the topic particle thi, the
+    # passive and ability marker đuoc, the progressive đang, the directional đen, the modal phai,
+    # the conjunction hoac, the quantifiers nhieu, đeu, tung and cang, the superlative marker nhat,
+    # the adverbs luon, thuong and thoi, the prepositions theo and truoc. Nouns are out, and nguoi,
+    # viec, ngay and đieu were all in the pool.
+    #
+    # `đ` DOES NOT FOLD TO `d`, which is the thing to know before editing this entry. It is U+0111
+    # and NFKD leaves it alone, so `được` folds to `đuoc` and not to `duoc`, and an entry written
+    # `duoc` would never match a page that spells the word properly. The five entries here that
+    # begin with it are written the way the fold produces them. The consequence for the entries that
+    # were here before is that `dau` and `dong` match `dấu` and `dòng` and do NOT match `đầu` and
+    # `đồng`, which is a limit of those two words rather than a defect of the fold.
+    #
+    # WHAT THE SCREEN REFUSED, and on this language it refuses most of the obvious candidates.
+    # `them` is the English word them; `nao` is in the Portuguese list and `lai` in the Latvian one;
+    # `con` and `hay` are Spanish, `sau` Romanian, `tai` Lithuanian, `van` Hungarian, `moi` French,
+    # `hai` Italian, `neu` and `nen` German, `bang` Indonesian, `qua` and `rat` German and Italian.
+    # `đo` is two letters plus the base and is out for length.
+    #
+    # MEASURED. Nothing moved on the 152 coverage paragraphs or the ten English controls, and NO page
+    # of the 936 gained Vietnamese or lost a language, so this widening recovers nothing on this
+    # frame. What it does is margin: the corpus paragraph goes from 17 distinct words to 24 and the
+    # help notice from 6 to 9. Of the twenty-one, exactly one matches anywhere outside Vietnamese in
+    # any of these corpora, `chua` on a single page, and one word cannot carry a reading.
+    'Vietnamese': 'ban boi cac cang chi cho chua chung chuong cong cua cung dau dich dong duoi giua giup hoac hon khac khi khong lam luon mien minh moi nay ngoai nhat nhieu nhu nhung phai phi tat theo thi thoi thuong toi tren trinh trong truoc tung voi đang đay đen đeu đuoc',
 }
 def _nfc(t):
     """One composed form, for every place a language name is compared against a literal.
@@ -1262,10 +1776,73 @@ PARKED_EXPIRED_RX = re.compile(r'this domain (?:has |is )expired|domain is expir
 # ungated form of this is the third rejected candidate above; it survives only at 200 characters.
 PARKED_SOON_RX = re.compile(r'under construction|coming soon|work in progress|'
                             r'we will be launching soon|will launch soon|launching soon', re.I)
+# WHERE THE ADDRESS LANDED, which the three patterns above cannot answer, because they read the
+# TEXT of a page. A domain that has gone to a registrar's marketplace forwards to that
+# marketplace's own host, and what arrives is the marketplace's page: a search box, a price and a
+# form, written in whatever wording that company uses this month. Over the census render store's
+# 1,162 recorded landings, `hugedomains` accounts for 11, `expiredwixdomain` for 6 and
+# `expireddomains` for 2, and the text test reaches them only where the page happens to carry a
+# sentence one of the patterns knows.
+#
+# Sale and parking hosts ONLY. Nothing here is a site builder: `sites.google.com`, `wixsite.com`
+# and their kind are addresses real organizations run their websites on, and a host list that
+# swallowed one of those would call a live organization unreachable. GoDaddy is left to the text
+# test, because its parked pages are served under names this project cannot state precisely and a
+# guess in a frozen set is worse than an absence; `godaddy.com/domainsearch` is in PARKED_RX and
+# reaches the case the text shows.
+#
+# The bare host and its `www.` form, and no other subdomain, for the same reason the list is short:
+# an exact set can be read and argued with, where a suffix match cannot say what it will catch next
+# year.
+PARKED_HOST = frozenset((
+    'hugedomains.com', 'sedo.com', 'sedoparking.com', 'afternic.com', 'dan.com',
+    'expireddomains.net', 'expiredwixdomain.com', 'parkingcrew.net', 'bodis.com',
+))
+
+
+def _parked_host(url):
+    """Whether an address LANDED on a registrar's sale or parking host."""
+    try:
+        host = _bare_host(urlsplit(url))
+    except Exception:
+        return False
+    if host.startswith('www.'):
+        host = host[4:]
+    return host in PARKED_HOST
+
+
 # A refusal is not a page. One site answers this machine with 145 characters, "Server Error
 # 403 Forbidden You do not have permission to access this document", and none of the patterns above
 # matched, so a site that was never read was reported english_only. A server saying no is exactly
 # what the unreachable class is for.
+#
+# A RIGHT-HAND WORD BOUNDARY, on eleven alternatives of the three patterns and on no others.
+# The left-boundary gate in tests/test_pattern_gates.py has held this family since the release and
+# says in its own docstring what it does not cover: a boundary in front says nothing about the
+# character behind, so `security check` matched inside `security checklist` under both forms. The
+# boundary went on where the alternative ends in a word character AND the longer word is a different
+# statement. It did NOT go on where the only longer word is a plural or an inflection of the same
+# wording, because `ddos protections`, `bad gateways` and `server errors` say what the shipped
+# alternative says and a boundary there would lose a real catch.
+#
+# `found` is the word this was worth doing for, because `founded`, `founder` and `foundation` are
+# three of the commonest words on a nonprofit home page, and `domain not found`, `site not found`
+# and `website not found` are UNGATED, which means they decide on their own at any page length. The
+# same word ends two of the three not-found alternatives. The others are `just a moment` inside
+# `momentary`, `security check` inside `security checklist`, `not authorized` inside
+# `not authorized_users`, `we are doing some work` inside `we are doing some workshops`, and
+# `this site is currently private` inside `currently privately`.
+#
+# Three alternatives that also end on `found` or `exist` were left as they are, because no sentence
+# a person would write extends them: `dns address could not be found`,
+# `deployment (?:cannot be found|...)` and `website you requested does not exist`. The rule applied
+# was that a boundary goes on where a committed trap string can show the reach, and those three have
+# none.
+#
+# The census render store is not on this machine, so the corpus count KNOWN_ISSUES asked for could
+# not be taken: no figure is given here for how many pages this moves. What is held instead is the
+# synthetic ward corpus, which did not move, and one trap string per changed alternative in the
+# boundary fixture.
 #
 # WALL_UNGATED_RX is wording no organization page carries in its own furniture, so it decides on its
 # own. W1 and W2 are the same vendors as the shipped interstitials in newer wording: 12 rows and 239
@@ -1278,11 +1855,11 @@ PARKED_SOON_RX = re.compile(r'under construction|coming soon|work in progress|'
 # is the one page in the corpus that either word reaches above 1,500 characters. The clinic page
 # itself was refused, which is the refused-subpage case the codebook already settles as unreachable,
 # so the two words keep their 72 and 3 rows and the page keeps its class.
-WALL_UNGATED_RX = re.compile(r'just a moment|'
+WALL_UNGATED_RX = re.compile(r'just a moment\b|'
                              r'verify you are human|verifying you are human|'
                              r'please enable cookies|'
-                             r'ddos protection|security check|access denied|'
-                             r'403 forbidden|not authorized|'
+                             r'ddos protection|security check\b|access denied|'
+                             r'403 forbidden|not authorized\b|'
                              r'request blocked|rate limited|'
                              # W1, press-and-hold and prove-you-are-human interstitials
                              r'press ?(?:&|and) ?hold to confirm you are a human|'
@@ -1300,9 +1877,10 @@ WALL_UNGATED_RX = re.compile(r'just a moment|'
                              r'web hosting - courtesy of|powered by cpanel.s site publisher|'
                              # W9, a host or platform that cannot resolve the address
                              r'this site can.t be reached|dns address could not be found|'
-                             r'domain not found|deployment (?:cannot be found|is unavailable|'
+                             r'domain not found\b|deployment (?:cannot be found|is unavailable|'
                              r'is temporarily paused)|deployment_not_found|'
-                             r'no active website at this address|site not found|website not found|'
+                             r'no active website at this address|site not found\b|'
+                             r'website not found\b|'
                              r'this site is not published|not associated with any active site|'
                              r'the domain name in the url is not associated', re.I)
 # Wording a live page can carry in its own furniture, so it decides only on a page that carries
@@ -1373,11 +1951,11 @@ WALL_GATED_RX = re.compile(r'checking the site connection|requires cookies to be
                            # W10, a login or password wall. 25 of its 29 rows are records whose
                            # stored website is an email address, so the browser lands on a mail
                            # provider's sign-in screen and no organization page exists there at all.
-                           r'this site is currently private|please login to continue|'
+                           r'this site is currently private\b|please login to continue|'
                            r'sign in to continue to|site is password protected|'
                            # W11, a maintenance or relaunch interstitial
                            r'(?:down|offline) for maintenance|this site is down for maintenance|'
-                           r'we are (?:doing some|performing) (?:work|maintenance|site-wide updates)|'
+                           r'we are (?:doing some|performing) (?:work|maintenance|site-wide updates)\b|'
                            r'website under maintenance|we.ll be back soon|'
                            r'(?:currently|now) (?:updating|rebuilding|reconstructing) (?:our|the) website',
                            re.I)
@@ -1387,9 +1965,9 @@ WALL_GATED_RX = re.compile(r'checking the site connection|requires cookies to be
 # recorded address with the organization's own 404 page, navigation and an ES toggle included. The
 # codebook calls that unreachable, since the site was not read at the address on file.
 WALL_NOTFOUND_RX = re.compile(
-    r'(?:the )?requested (?:url|resource|page) .{0,60}(?:not be found|not found|does not exist)|'
+    r'(?:the )?requested (?:url|resource|page) .{0,60}(?:not be found|not found|does not exist)\b|'
     r'\b404\b[^a-z0-9]{0,4}(?:not found|page not found|file not found|error|unknown site|'
-    r'that.s an error)|page (?:not found|cannot be found)|file not found \(404 error\)|'
+    r'that.s an error)\b|page (?:not found|cannot be found)\b|file not found \(404 error\)|'
     r'no such website|website you requested does not exist', re.I)
 # Every alternative of both wall lists, ungated. A READ tests all of them, where a hit costs a wait
 # or another address and never a verdict: `_read` waits four times four seconds for a challenge to
@@ -1540,8 +2118,12 @@ RULE17_ROOTS = 5
 # `language_control` is a page reached by clicking a switcher, whose coverage is never measured, so
 # it claims the lower of the two rungs that mean the same thing rather than a number nobody took.
 # A plugin marker names no language and so enables nothing, which is codebook rule 11.
+# `testimonial` is the quotation the codebook has always put on rung 1 and no class has ever
+# counted; the block above `TESTIMONIAL_RX` says what finds one and what it is worth.
+MECH_TESTIMONIAL = 'testimonial'
 MECH_SUFFICIENCY = {'translated_page': SUFF_PAGE, 'inline_text': SUFF_NOTICE,
-                    'language_control': SUFF_NOTICE, 'translation_plugin': SUFF_NONE}
+                    'language_control': SUFF_NOTICE, 'translation_plugin': SUFF_NONE,
+                    MECH_TESTIMONIAL: SUFF_TOKEN}
 
 # ---------------------------------------------------------------- can the reader reach a person
 #
@@ -1690,6 +2272,14 @@ class Result:
     # of these a row in a stored table cannot be compared with a row taken at another time.
     audited_at: str = ''
     tool_version: str = ''
+    # WHICH BYTES OF `core.py` TOOK THE READING, and, below, which judged it. A version label names
+    # a release and not a build: 334 records of one organization census carry a reading taken by one
+    # `core.py` while the label beside it says 0.1.0 for another, so one label named two
+    # instruments and no field on the row could tell them apart. `build_id()` is the first twelve
+    # hex digits of the sha256 of the file, and a row whose two builds differ was judged by code
+    # that did not fetch it, the same signal the two versions carry one level up. Empty on a record
+    # written before the field existed, and empty from an installation whose bytes cannot be read.
+    tool_build: str = ''
     # WHEN THE JUDGEMENT WAS MADE AND BY WHICH BUILD, which on a live audit is the same act as the
     # capture and on a re-judge is not.
     #
@@ -1716,9 +2306,12 @@ class Result:
     # whose four fields agree was judged by the code that fetched it, and a row whose versions
     # differ is a re-judge and says so without anybody having to remember. They are left out of the
     # reading freeze for the same reason `audited_at` is, since a clock that moved is not a reading
-    # that moved.
+    # that moved. `tool_build` and `judged_build` are left out of it on the same ground: the bytes
+    # that took a reading are not the reading, and a comment edited in `core.py` would otherwise
+    # re-record the readings gate.
     judged_at: str = ''
     judged_version: str = ''
+    judged_build: str = ''
     # The two axes the verdict is derived from, summarised over the whole site. `authorship` is the
     # strongest present over ALL the evidence, so a widget-produced language still shows as
     # client_widget; `sufficiency` is the highest rung reached by the evidence the verdict COUNTED.
@@ -1880,6 +2473,119 @@ CYR_RX = {k: re.compile(r'\b(?:' + '|'.join(w for w in sorted(set(v.split()))
 _CYR_LANGS = set(CYR_FUNC) | {n for n, _ in CYRILLIC} | {'Cyrillic'}
 
 
+# NAMING THE ETHIOPIC SCRIPT, which is `_cyrillic_language` applied to the third shared alphabet.
+#
+# The Ethiopic range is written by Amharic and by Tigrinya, and the entry in SCRIPTS is called
+# `Amharic` because Amharic is the language this package was built to find. A Tigrinya page
+# therefore had two ways to go wrong and took the second: SCRIPT_FUNC['Amharic'] held Amharic
+# particles only, so a Tigrinya paragraph carried none of them, `_script_prose` refused the run and
+# the page was read as carrying no language at all. Measured on the coverage paragraphs written for
+# this change: 401 characters of ordinary Tigrinya prose, longest Ethiopic run 311, and the run
+# test answered no. The reviewer's list of missed pages names both languages.
+#
+# ቐ ቑ ቒ ቓ ቔ ቕ ቖ, U+1250 to U+1256, are the labialized letters Tigrinya writes and the Amharic
+# alphabet does not have at all, so one of them is evidence the way ў is evidence of Belarusian.
+# They are not rare in Tigrinya: መቐበሊ (reception) and ጸቕጢ (pressure) are both ordinary service
+# vocabulary and both carry one. Neither the Amharic paragraph of 393 characters nor its 115
+# character notice carries any of the seven.
+#
+# The words are the second test and they are built the way CYR_FUNC is: a word the two languages
+# share is evidence for neither, so ግን, which both write for `but`, is in both entries and is
+# therefore dropped from ETH_RX by the shared count.
+ETHIOPIC = [('Tigrinya', r'[ቐ-ቖ]')]
+ETH_FUNC = {
+    'Amharic': 'እና ነው ናቸው ውስጥ ላይ ወደ ግን ወይም ይህ እኛ ጋር ሁሉ አለ ነበር እንዲሁም ስለ አይደለም ሲሆን',
+    'Tigrinya': 'እዩ እያ እዮም ኣብ ናብ ካብ ንሕና ድማ ከምኡውን እንተ ኣሎ ኣለና ምስ ዘሎ ኣይኮነን እውን ግን ወይ',
+}
+_ETH_ALL = collections.Counter(w for v in ETH_FUNC.values() for w in set(v.split()))
+ETH_RX = {k: re.compile(r'\b(?:' + '|'.join(w for w in sorted(set(v.split()))
+                                            if _ETH_ALL[w] == 1) + r')\b', re.I)
+          for k, v in ETH_FUNC.items()}
+# every name an Ethiopic reading can come back under. `Amharic` is both the SCRIPTS name and a
+# language name here, which Cyrillic avoids by having a neutral script name; the consequence is
+# that an Ethiopic page carrying neither language's evidence reads `Amharic`, which is exactly what
+# it read before this table existed.
+_ETH_LANGS = set(ETH_FUNC) | {n for n, _ in ETHIOPIC}
+
+
+# NAMING THE DEVANAGARI SCRIPT, which is the second half of `_cyrillic_language` and not the first.
+#
+# Devanagari is written by Hindi, by Nepali and by Marathi, and the entry in SCRIPTS is named
+# `Hindi`, so a Nepali page was reported as Hindi. That is the failure the Cyrillic table was built
+# for, in another script: one language's name on another community's page. The reviewer's list of
+# pages the instrument read as english_only names Nepali, and a Nepali page whose language comes
+# back as Hindi is a page whose language was not read.
+#
+# THERE IS NO LETTER HALF HERE, and that is why this table is words alone. Ukrainian has і ї є ґ and
+# Belarusian has ў, letters the neighbour does not have at all; the three Devanagari languages write
+# one alphabet. Marathi's ळ was the one candidate and it is not in this table: Hindi writes it in
+# borrowed words and in Marathi proper names, so it would put Marathi on a Hindi page that mentions
+# a person, which is rule 8's failure rather than a reading. What separates the three is the
+# grammatical furniture, which is exactly what CYR_RX scores, and the same bar applies: at least two
+# distinct words of one language and strictly more than any other, or the answer stays Hindi.
+#
+# THE WORD BOUNDARY IS NOT \b, AND THIS IS THE PART TO READ BEFORE EDITING THE LIST. Python's \b is
+# defined against \w, and \w is alphanumeric, and a Devanagari vowel sign is a combining mark and
+# therefore neither. So `\bहै\b` matches nothing at all: after the ै there is no word character to
+# make a boundary out of, and the same is true of every entry that ends in a vowel sign, which is
+# most of them. Checked on the coverage paragraphs: `\bहै\b`, `\bआहे\b` and `\bअने\b` find zero
+# occurrences in text that carries all three. A list written that way would not fail loudly, it
+# would report nothing, which is the shape of the two silent failures the top of tests/test_core.py
+# describes. The boundary here is the script's own range instead, which is what \b would mean if it
+# could see these characters: no Devanagari letter immediately before or after the word.
+DEV_EDGE = 'ऀ-ॿ'
+DEV_FUNC = {
+    'Hindi': 'है हैं यह वह हम हमारी हमारे आपको किसी कोई नहीं तथा यदि करते सकते रहता बाद लिए जाता थे',
+    'Nepali': 'छ छन् छैन हो हुन् गर्न गर्नुहोस् तपाईं तपाईंलाई हामी हाम्रो भएको भएमा सम्म देखि पनि लागि '
+              'सक्छौं हुनुहुन्छ भने',
+    'Marathi': 'आहे आहेत नाही तुम्हाला तुम्ही आम्ही आमच्या त्यांना मध्ये साठी आणि असेल करतो असते कोणतेही सदैव',
+}
+_DEV_ALL = collections.Counter(w for v in DEV_FUNC.values() for w in set(v.split()))
+DEV_RX = {k: re.compile('(?<![%s])(?:%s)(?![%s])'
+                        % (DEV_EDGE,
+                           '|'.join(re.escape(w)
+                                    for w in sorted(set(v.split()), key=lambda w: (-len(w), w))
+                                    if _DEV_ALL[w] == 1),
+                           DEV_EDGE))
+          for k, v in DEV_FUNC.items()}
+_DEV_LANGS = set(DEV_FUNC)
+
+
+# NAMING THE BENGALI SCRIPT, which has a letter half where Devanagari does not.
+#
+# The Bengali range is written by Bengali and by Assamese, and the entry in SCRIPTS is named
+# `Bengali`. Assamese was reachable before this only through the identifier, which wants two
+# sentences of 140 characters each, so an Assamese page of ordinary length read as Bengali: one
+# community's name on another's page again, and the same defect the Cyrillic and Devanagari tables
+# answer.
+#
+# ৰ, U+09F0, is the letter. Assamese writes it where Bengali writes র, U+09B0, and it is the
+# consonant r, so it is in almost every Assamese sentence rather than being a rare sign: the two
+# coverage paragraphs carry it 14 and 6 times. ৱ, U+09F1, is the other letter usually named beside
+# it and it is NOT in the table, for the reason ۆ is not in the Sorani gate: Bengali writes it too,
+# in transliterated names, so it would put Assamese on a Bengali page that mentions a person, and
+# dropping it costs nothing because no Assamese passage carries ৱ without carrying ৰ.
+#
+# The words are the second test and the subtraction matters more here than in the other two tables,
+# because these two languages share most of their grammatical vocabulary. Five words that both
+# write are in both entries and are therefore dropped from BEN_RX by the shared count.
+BEN_EDGE = 'ঀ-৿'
+BENGALI = [('Assamese', r'ৰ')]
+BEN_FUNC = {
+    'Bengali': 'এবং এর থেকে জন্য আমরা আমাদের তার যে সঙ্গে সব আপনার তাদের হয়েছে অথবা এই হয় আছে কিন্তু বা',
+    'Assamese': 'আৰু পৰা বাবে সৈতে নহয় আপোনাক কৰে থাকে নাই দিয়ে এই হয় আছে কিন্তু বা',
+}
+_BEN_ALL = collections.Counter(w for v in BEN_FUNC.values() for w in set(v.split()))
+BEN_RX = {k: re.compile('(?<![%s])(?:%s)(?![%s])'
+                        % (BEN_EDGE,
+                           '|'.join(re.escape(w)
+                                    for w in sorted(set(v.split()), key=lambda w: (-len(w), w))
+                                    if _BEN_ALL[w] == 1),
+                           BEN_EDGE))
+          for k, v in BEN_FUNC.items()}
+_BEN_LANGS = set(BEN_FUNC) | {n for n, _ in BENGALI}
+
+
 # A script run has to carry function words too, the way Latin already does.
 #
 # The asymmetry this closes: a Latin-script language needs four distinct FUNCTION words inside one
@@ -1921,11 +2627,46 @@ SCRIPT_FUNC = {
     'Korean': '입니다 습니다 합니다 있습니다 하는 에서 으로 그리고 또는 위한 위해 대한 있는 없는 통해 및 하고 부터 까지',
     'Arabic': 'في من على إلى عن مع هذا هذه التي الذي أن ما هو هي نحن كل لكن أو ثم بين عند',
     'Hebrew': 'של את על עם לא זה אנחנו הוא היא כל אבל או גם יש אין כדי אשר מה אנו לנו',
-    'Hindi': 'है हैं के की का को में से और पर यह वह हम आप नहीं कि लिए हुए था थे',
-    'Bengali': 'এবং এর করে থেকে জন্য আমরা আমাদের এই তার না যে হয় আছে সঙ্গে সব',
+    # Hindi AND Nepali AND Marathi, for the reason the Amharic entry is Amharic and Tigrinya: this
+    # answers whether the Devanagari run is a sentence, and DEV_RX answers which language
+    # afterwards. It is the union of DEV_FUNC plus the connectives the three share, which are the
+    # words the entry held before and which DEV_FUNC leaves out precisely because they are shared.
+    # Every one of the twenty words it carried is still here.
+    'Hindi': ' '.join(sorted({w for v in DEV_FUNC.values() for w in v.split()}
+                             | {'के', 'की', 'का', 'को', 'में', 'से', 'और', 'पर', 'हुए', 'कि', 'था',
+                                'आप'})),
+    # Bengali AND Assamese, for the reason the two entries above are unions: this answers whether
+    # the run is a sentence and BENGALI and BEN_RX answer which language afterwards. The two words
+    # in the brace are the ones the entry held that BEN_FUNC leaves out, so nothing it carried is
+    # lost.
+    'Bengali': ' '.join(sorted({w for v in BEN_FUNC.values() for w in v.split()}
+                               | {'করে', 'না'})),
     'Thai': 'และ ที่ ของ ใน เป็น ได้ จาก กับ ไม่ มี เรา ให้ จะ หรือ แต่ ก็',
-    'Amharic': 'እና ነው ናቸው ውስጥ ላይ ወደ ግን ወይም ይህ እኛ ጋር ሁሉ አለ ነበር',
+    # Amharic AND Tigrinya, because this entry answers whether the Ethiopic run is a sentence and
+    # the two languages are told apart afterwards, by ETHIOPIC and ETH_RX. It is the union of
+    # ETH_FUNC rather than a second transcription of it, for the reason the Cyrillic entry above is:
+    # a list that had to be kept in step with another list by hand drifts from it.
+    'Amharic': ' '.join(sorted({w for v in ETH_FUNC.values() for w in v.split()})),
     'Khmer': 'និង នៅ ក្នុង របស់ ដែល សម្រាប់ ជា នេះ យើង អ្នក បាន ការ ដើម្បី ទៅ មាន ខ្ញុំ តាម ពី ឬ',
+    # The four Brahmic scripts added 2026-09-17. Conjunctions, demonstratives, pronouns, the
+    # copula and the negator, which is the same inventory the Cyrillic and Devanagari entries hold
+    # and not the service vocabulary, for the reason those entries give: a noun list matches an
+    # organization's name and a navigation row, and a particle list does not. All four are matched
+    # on the script's own edge rather than on \b, because all four write combining vowel signs; see
+    # SCRIPT_FUNC_EDGE for what \b was doing in a script that has them. Measured on the coverage
+    # paragraphs, each list matches between 3 and 14 distinct items on a 600-character paragraph and
+    # between 3 and 9 on a 250-character notice, against a bar of one.
+    'Punjabi': 'ਅਤੇ ਹੈ ਹਨ ਵਿੱਚ ਲਈ ਤੋਂ ਨਾਲ ਨੂੰ ਜਾਂ ਪਰ ਇਹ ਅਸੀਂ ਤੁਹਾਨੂੰ ਕਿਸੇ ਕੋਈ ਸਾਰੇ ਹੁੰਦਾ ਰਹਿੰਦਾ ਸਕਦੇ ਨਹੀਂ ਜੋ ਕਿ',
+    'Gujarati': 'અને છે માટે સાથે અમે તમને કોઈ પણ કે જે હોય છીએ શકીએ નથી થી પર તથા',
+    'Tamil': 'மற்றும் ஒரு இந்த அந்த நாங்கள் எங்கள் உங்கள் இல்லை உள்ளது உள்ளன ஆகும் மட்டும் ஆனால் '
+             'அல்லது வரை போது கூட என்று என்ற அவர்கள் நமது உள்ள அது இது',
+    'Telugu': 'మరియు ఒక మేము మీకు లేదు ఉంది ఉంటుంది కోసం నుండి వరకు కానీ లేదా అయితే ప్రతి వారు తో',
+    # Armenian and Georgian, on the ordinary word boundary because neither script writes combining
+    # vowel signs. Both spellings of the Armenian `and` are here, the ligature և and the two-letter
+    # եւ, because a page may use either and they are different strings.
+    'Armenian': 'և եւ է են որ այս այն մենք ձեզ ձեր մեր համար կամ բայց նաև ինչպես չի չէ ամեն հետ մեջ առանց ու',
+    'Georgian': 'და არის არიან რომ ეს ჩვენ თქვენ ჩვენი თქვენი მაგრამ ან როგორც არა თუ ყველა შორის შესახებ '
+                'ასევე მათი მისი',
     # Burmese, and it is SENTENCE-FINAL markers rather than case markers, for the reason the Korean
     # list is verb endings rather than the particles 은 는 이 가. Burmese is written without spaces
     # between words, so this list is matched as a SUBSTRING, and a case marker then matches inside
@@ -1951,16 +2692,124 @@ SCRIPT_FUNC = {
 # spaces and take the boundary form. Burmese joins the substring group because it "requires no
 # spaces between words, although modern writing usually contains spaces after each clause"
 # (Burmese language, English Wikipedia): a clause-level space is not a word boundary.
-SCRIPT_FUNC_SPACED = {'Cyrillic', 'Arabic', 'Hebrew', 'Hindi', 'Bengali', 'Amharic'}
-SCRIPT_FUNC_RX = {
-    k: re.compile((r'\b(?:%s)\b' if k in SCRIPT_FUNC_SPACED else r'(?:%s)')
-                  % '|'.join(re.escape(w) for w in sorted(set(v.split()), key=len, reverse=True)),
-                  re.I)
-    for k, v in SCRIPT_FUNC.items()}
+SCRIPT_FUNC_SPACED = {'Cyrillic', 'Arabic', 'Hebrew', 'Hindi', 'Bengali', 'Amharic',
+                      'Armenian', 'Georgian'}
+# WHERE \b IS THE WRONG BOUNDARY, AND WHAT IT WAS DOING INSTEAD.
+#
+# \b is defined against \w, \w is alphanumeric, and a Devanagari vowel sign is a combining mark and
+# so is neither. The consequence is not that such a word matches less often. It is that it matches
+# in exactly the wrong places. `\bका\b` cannot match `का` standing between two spaces, because
+# after the ा there is no word character to make a boundary from; it CAN match the first two
+# characters of कार्यक्रम, because there the ा is followed by a letter and the transition is a
+# boundary. So the entry was a fragment test wearing a word test's clothes.
+#
+# Measured over the entries this file already held, by asking of each word whether the wrapped
+# pattern matches that word standing alone: Devanagari 12 of 20 could not, Bengali 9 of 15 could
+# not, and Cyrillic, Arabic, Hebrew and Ethiopic 0, because those four write no combining vowel
+# signs. So the defect is exactly the two Brahmic entries and it is invisible in the other four.
+#
+# The fix is the boundary the script can express, which is its own range: no letter of this script
+# immediately before or after. It moves the reading in both directions and each is the wanted one.
+# A genuine Devanagari sentence now clears rule 7 on its real particles, which is what lets a Nepali
+# or Marathi help notice be read at all. A Devanagari NAME that used to clear it on a fragment of
+# one no longer does, which is rule 8.
+SCRIPT_FUNC_EDGE = {'Hindi': DEV_EDGE, 'Bengali': BEN_EDGE,
+                    'Punjabi': '਀-੿', 'Gujarati': '઀-૿',
+                    'Tamil': '஀-௿', 'Telugu': 'ఀ-౿'}
+
+
+def _longest_first(words):
+    """The alternation order: longest first, so a prefix cannot shadow the word it is a prefix of.
+
+    The second key is the word itself and it is not decoration. Length alone is not a total order,
+    so two words of the same length come out in the set's iteration order, which Python randomises
+    per process; the constant gate then answers differently in two processes, which is the failure
+    `test_the_fingerprint_is_the_same_in_another_process` exists to catch. The entries that predate
+    this are spared only because the gate's canonical form happens to sort their alternatives again.
+    """
+    return sorted(set(words), key=lambda w: (-len(w), w))
+
+
+def _script_func_pattern(script, words):
+    """The pattern one SCRIPT_FUNC entry is matched by: an edge, a word boundary or a substring."""
+    alts = '|'.join(re.escape(w) for w in _longest_first(words.split()))
+    edge = SCRIPT_FUNC_EDGE.get(script)
+    if edge is not None:
+        return '(?<![%s])(?:%s)(?![%s])' % (edge, alts, edge)
+    return (r'\b(?:%s)\b' if script in SCRIPT_FUNC_SPACED else r'(?:%s)') % alts
+
+
+SCRIPT_FUNC_RX = {k: re.compile(_script_func_pattern(k, v), re.I)
+                  for k, v in SCRIPT_FUNC.items()}
 # One distinct particle. Two was tried and it is too many: "Наша организация предоставляет
 # бесплатную юридическую помощь семьям иммигрантов" is an ordinary Russian sentence carrying exactly
 # one word off this list, and losing a real reading is the expensive direction.
 SCRIPT_FUNC_MIN = 1
+
+# CODEBOOK RULE 9 INSIDE A SCRIPT: A CONJUNCTION STANDS IN FOR NO VERB.
+#
+# Rule 9 says a bilingual line WITH A VERB meets the paragraph standard and a verbless label does
+# not. In Latin script the four-distinct-function-words test enforces that on its own. In a script
+# the particle list stands in for the verb, and one particle is enough, so the whole weight of rule
+# 9 rests on WHICH particle. A coordinating conjunction is the one word that carries none of it: `X
+# and Y` is a label, it is exactly how a bilingual subtitle is written, and it is what an events
+# page repeats down the page.
+#
+# THE SITE THAT SHOWED IT. Re-judging a 300-site prefix of the gold frame against the pre-patch
+# bytes moved exactly one site, an Armenian cultural organization whose settled class is
+# english_only, to true_multilingual. What carried it was its event subtitles: an Armenian noun
+# phrase beside its English twin, 55 to 70 characters, no verb, joined by `և`. The run cleared
+# SCRIPT_RUN_DEFAULT and the conjunction cleared SCRIPT_FUNC_MIN, and nothing else on the page was
+# Armenian. A synthetic page of that shape is in the reading corpus as `armenian_event_subtitles`.
+#
+# WHAT IS REQUIRED NOW. At least one of the distinct particles found must not be a coordinator. The
+# lists keep their conjunctions, because a conjunction beside a copula is still evidence that the
+# run is connected text; what it may no longer be is the ONLY evidence.
+#
+# WHY THIS AND NOT A PER-SCRIPT SCRIPT_FUNC_MIN OF TWO, which was the other candidate the code's
+# shape allows. Two particles is not the property rule 9 asks about. `X և Y կամ Z` is two
+# coordinators and still a label, so a count would pass the very shape this exists to refuse; and
+# raising the count for Armenian alone would cost the genuine one-clause help notice, which is the
+# passage this instrument most wants to read. Requiring a non-coordinator refuses the label and
+# keeps the notice, which is what rule 9 distinguishes.
+#
+# BURMESE ALREADY DID THIS, by list composition rather than by rule: its entry holds the
+# sentence-final verb markers and no connective at all, because a Burmese case marker fires inside
+# the nouns a navigation row is made of. That entry is the precedent, and this generalizes it
+# without having to strip eighteen other lists of words that are useful when something else is
+# there too.
+#
+# THE CLASS IS COORDINATORS AND NOTHING ELSE: and, or, but, and the additive `also` where the
+# language uses it to join two noun phrases. Everything else in every list still qualifies, and the
+# boundary is worth stating because it is where the judgement is. A preposition, a pronoun, a
+# copula, a case marker, a verb ending, a demonstrative, a quantifier and a negator all stay
+# qualifying, because none of them joins two noun phrases into a label. A complementizer stays
+# qualifying too, and that is deliberate: a word meaning `that` introduces a subordinate CLAUSE, so
+# its presence is evidence of the verb rule 9 asks for. The causal subordinators are out of the
+# class for the same reason, so `因为` and `因為` stay qualifying while `和` and `或` do not.
+SCRIPT_CONNECTIVE = {
+    'Amharic': 'እና ወይም ወይ ግን ድማ ከምኡውን እውን እንዲሁም',
+    'Arabic': 'أو ثم لكن',
+    'Armenian': 'և եւ ու կամ բայց նաև',
+    'Bengali': 'এবং আৰু অথবা বা কিন্তু',
+    'Chinese': '和 与 與 或 及 但 并 並 而',
+    'Cyrillic': 'или або също',
+    'Georgian': 'და ან მაგრამ ასევე',
+    'Gujarati': 'અને તથા પણ',
+    'Hebrew': 'או אבל גם',
+    'Hindi': 'और आणि तथा पनि',
+    'Japanese': 'と および また',
+    'Khmer': 'និង ឬ',
+    'Korean': '그리고 또는 및',
+    'Punjabi': 'ਅਤੇ ਜਾਂ ਪਰ',
+    'Tamil': 'மற்றும் அல்லது ஆனால் கூட',
+    'Telugu': 'మరియు లేదా కానీ',
+    'Thai': 'และ หรือ แต่ ก็',
+}
+# lowercased, because `_script_prose` compares lowercased match text; Armenian is the one script
+# here with case, and `Ամեն` and `ամեն` are one word
+SCRIPT_CONNECTIVE_SET = {k: frozenset(w.lower() for w in v.split())
+                         for k, v in SCRIPT_CONNECTIVE.items()}
 # How far either side of the qualifying run the particle may sit, in characters. The run is normally
 # the whole sentence, since SCRIPT_SEP keeps punctuation inside it, but a Latin word in the middle
 # of a paragraph (a URL, COVID-19, an English proper noun) splits one sentence into two runs, and
@@ -1969,12 +2818,13 @@ SCRIPT_FUNC_WINDOW = 200
 
 
 COVERED = (set(FUNC) | {n for n, _ in SCRIPTS} | set(CYR_FUNC) |
-           {n for n, _ in CYRILLIC} | {'Cyrillic'})
+           {n for n, _ in CYRILLIC} | {'Cyrillic'} | _ETH_LANGS | _DEV_LANGS | _BEN_LANGS)
 
 # The languages a reading can come back under because of the SCRIPT it is written in, as opposed to
 # the ones read off a Latin-script word list. Codebook rule 7 is the paragraph standard restated for
 # these, so it is the set `_evidence_rules` tests to decide whether rule 7 decided a finding.
-SCRIPT_LANGUAGES = {n for n, _ in SCRIPTS} | set(CYR_FUNC) | {n for n, _ in CYRILLIC} | {'Cyrillic'}
+SCRIPT_LANGUAGES = ({n for n, _ in SCRIPTS} | set(CYR_FUNC) | {n for n, _ in CYRILLIC}
+                    | {'Cyrillic'} | _ETH_LANGS | _DEV_LANGS | _BEN_LANGS)
 
 
 def _cyrillic_language(text):
@@ -1993,6 +2843,57 @@ def _cyrillic_language(text):
     # Every other Cyrillic language here carries a letter Russian does not, so Cyrillic showing none
     # of them is Russian. Below that much text nothing is claimed beyond the script.
     return 'Russian' if cyr >= 20 else 'Cyrillic'
+
+
+def _ethiopic_language(text):
+    """Name the Ethiopic language from the letters and words that differ.
+
+    Same three steps as `_cyrillic_language`, and the last one differs only because the entry in
+    SCRIPTS is a language name rather than a script name: where Cyrillic can fall back to the
+    script, this falls back to `Amharic`, which is the reading every Ethiopic page took before this
+    function existed. So the function can move a page from Amharic to Tigrinya and can never move
+    one to nothing.
+    """
+    for name, pat in ETHIOPIC:
+        if re.search(pat, text):
+            return name
+    scored = sorted(((len({m.group(0).lower() for m in rx.finditer(text)}), k)
+                     for k, rx in ETH_RX.items()), reverse=True)
+    if scored and scored[0][0] >= 2 and scored[0][0] > scored[1][0]:
+        return scored[0][1]
+    return 'Amharic'
+
+
+def _devanagari_language(text):
+    """Name the Devanagari language from the grammatical words that differ.
+
+    The second half of `_cyrillic_language` and not the first, because the three languages share one
+    alphabet and no letter separates them; see DEV_FUNC for why Marathi's ळ is not treated as one.
+    The bar is the same: two distinct words of one language and strictly more than any other. Below
+    that the answer is `Hindi`, which is what every Devanagari page read before this existed.
+    """
+    scored = sorted(((len({m.group(0) for m in rx.finditer(text)}), k)
+                     for k, rx in DEV_RX.items()), reverse=True)
+    if scored and scored[0][0] >= 2 and scored[0][0] > scored[1][0]:
+        return scored[0][1]
+    return 'Hindi'
+
+
+def _bengali_language(text):
+    """Name the Bengali-script language from the letter and the words that differ.
+
+    Both halves of `_cyrillic_language`, and the fallback is `Bengali`, which is what every page in
+    this range read before this existed, so the resolution can move a page off Bengali and can never
+    move one to nothing.
+    """
+    for name, pat in BENGALI:
+        if re.search(pat, text):
+            return name
+    scored = sorted(((len({m.group(0) for m in rx.finditer(text)}), k)
+                     for k, rx in BEN_RX.items()), reverse=True)
+    if scored and scored[0][0] >= 2 and scored[0][0] > scored[1][0]:
+        return scored[0][1]
+    return 'Bengali'
 
 
 # NAMING THE ARABIC SCRIPT, which is `_cyrillic_language` applied to the other shared alphabet.
@@ -2064,14 +2965,14 @@ def _arabic_language(text):
     return seen[0] if len(seen) == 1 else 'Arabic'
 
 
-# The identifier covers 176 languages and this package's own lists cover twenty besides English, so
+# The identifier covers 176 languages and this package's own lists cover twenty-one besides English, so
 # it is used for exactly the languages the lists cannot express. It is NOT used for a language the
 # lists do cover, because on the gold pages that trades specificity away (one organization reads as
 # Spanish from its name alone) and leaves earlier readings not comparable. Measured: recall 69% ->
 # 75%, specificity 96% either way. A block shorter than this is not enough for it to be right about.
 #
 # LITHUANIAN IS NOT AN EXAMPLE OF THIS AND THIS COMMENT USED TO SAY IT WAS. Lithuanian is one of the
-# twenty word lists, so it is in COVERED, so `_aux_languages` filters it out; it has never come
+# twenty-one word lists, so it is in COVERED, so `_aux_languages` filters it out; it has never come
 # through this path and cannot. It was named here, and again in the note on the fastText swap, as
 # the case the auxiliary reader exists for. Chin is a real example. `test_the_covered_names_are_not
 # _read_twice` pins `lt` and `ga` so the claim cannot come back.
@@ -2145,12 +3046,14 @@ AUX_NOISE = {'en', 'la', 'cy', 'br', 'an', 'gd', 'ga', 'fo'}   # what it returns
 #          Sorani correctly was thrown away while a page it called Persian was renamed. No segment
 #          of the validation capture fires `ckb`, so nothing moves today.
 #
-# WHAT IS DELIBERATELY NOT ADDED. `ne`, Nepali, which the identifier also names correctly and which
-# `SWITCHER_ONLY` records as offerable and unreadable. Nepali is written in Devanagari, and
-# Devanagari already resolves to `Hindi` in SCRIPTS, so a Nepali page is not missed here, it is
-# reported under the wrong name. Adding the code would put two names on the same text and settle
-# neither, and separating Nepali from Hindi is a measurement nobody has taken. It stays out until
-# somebody takes it.
+# WHAT IS DELIBERATELY NOT ADDED, AND WHY THE REASON CHANGED. `ne`, Nepali. This used to say that
+# Devanagari resolves to `Hindi` in SCRIPTS, so a Nepali page was reported under the wrong name
+# rather than missed, that adding the code would put two names on the same text, and that
+# separating Nepali from Hindi was a measurement nobody had taken. The measurement has since been
+# taken: DEV_FUNC and `_devanagari_language` separate the three Devanagari languages on their
+# grammatical words, so Nepali is now in COVERED and `_aux_languages` filters it out. The code
+# stays out, and now for the plainest reason there is, which is that an entry for a covered name
+# can never fire.
 AUX_ISO = {'bo': 'Tibetan', 'ckb': 'Kurdish',
            'lt': 'Lithuanian', 'et': 'Estonian', 'cs': 'Czech', 'sk': 'Slovak', 'sl': 'Slovenian',
            # lid.176 answers `no` (and, rarely, `nn`) for genuine Norwegian far more often than the
@@ -2177,6 +3080,31 @@ AUX_ISO = {'bo': 'Tibetan', 'ckb': 'Kurdish',
            'ta': 'Tamil', 'te': 'Telugu', 'ml': 'Malayalam', 'kn': 'Kannada', 'gu': 'Gujarati',
            'pa': 'Punjabi', 'mr': 'Marathi', 'or': 'Odia', 'as': 'Assamese', 'lo': 'Lao',
            'jv': 'Javanese', 'yo': 'Yoruba', 'ha': 'Hausa', 'zu': 'Zulu', 'xh': 'Xhosa',
+           # TWO PHILIPPINE CODES ADDED 2026-09-18, and what they fix is a WRONG NAME rather than a
+           # missing one, which is why they are worth more than the count suggests. lid.176 answers
+           # `ilo` and `ceb` correctly and the answer was thrown away for want of an entry here, so
+           # an Ilocano or Cebuano page came back reported as TAGALOG: the Tagalog function-word
+           # list fires on both, because the three languages share `ang`, `mga`, `sa`, `ng` and most
+           # of the rest of the grammatical vocabulary, and Tagalog was the only name the reader
+           # had. On the coverage corpus, before this entry the Ilocano paragraph read `Tagalog` and
+           # the Cebuano paragraph read `Tagalog`; after it they read `Ilocano, Tagalog` and
+           # `Cebuano, Tagalog`.
+           #
+           # THE WRONG NAME DOES NOT GO AWAY AND THAT IS THE HONEST HALF. Both texts still report
+           # Tagalog beside the right name, because the word list is what puts it there and no code
+           # in this table can take it off. This is the shape the Nepali note above warned about,
+           # two names on one text, and it is accepted here for a reason Nepali did not have: with
+           # the entry the correct name is PRESENT, and a study reading `Cebuano, Tagalog` off a
+           # Cebuano page has the finding, where a study reading `Tagalog` alone has a false one.
+           # Separating the three on their own grammatical words is the repair this does not make,
+           # and it is the same measurement DEV_FUNC made for the Devanagari three.
+           #
+           # WHAT DOES NOT MOVE. Both help notices are unchanged, because every sentence in them is
+           # under AUX_MIN_BLOCK and neither text offers the two qualifying blocks AUX_MIN_BLOCKS
+           # asks for; a Latin-script auxiliary language can never qualify on one block, which
+           # AUX_SOLO_RUN says in its own note. Over the 936 stored pages of the reviewer's capture
+           # no page gained a language and none lost one, and no English control names anything.
+           'ilo': 'Ilocano', 'ceb': 'Cebuano',
            # 'ga' is also in AUX_NOISE, which is tested first, so this entry never fires and no
            # page is ever reported Irish. It is dead by construction and left that way: langid
            # answers 'ga' on English boilerplate often enough that the noise list wins the
@@ -2336,7 +3264,7 @@ AUX_LATIN_RX = {
 # The Latin-script auxiliary languages written in plain ASCII, where no letter can corroborate:
 # there is nothing in a Javanese, Malay or Swahili block that an English block cannot also carry
 # character by character. These are gated on closed-class words instead, the same standard the
-# package's own twenty word lists apply and the Hmong inventory documents: conjunctions,
+# package's own twenty-one word lists apply and the Hmong inventory documents: conjunctions,
 # adpositions, demonstratives, negators and possessive concords, the grammatical skeleton a real
 # paragraph in the language cannot be written without and an English paragraph never carries. Two
 # DISTINCT items are required, because one alone can be a personal name or a fragment; a genuine
@@ -2351,7 +3279,7 @@ AUX_LATIN_WORDS = {
     'Swahili': re.compile(r'\b(?:kwa|katika|kwamba|lakini|kama|kila|bila|sana|wakati|kwenye|'
                           r'wetu|yetu|zote|wote|hivyo|kuhusu|hadi|tangu|karibu|pia)\b', re.I),
     # Malay is the one list here whose neighbour is READ BY A WORD LIST OF ITS OWN, and that makes
-    # it a different problem from the rest. Indonesian is one of the twenty FUNC lists, so it is in
+    # it a different problem from the rest. Indonesian is one of the FUNC lists, so it is in
     # COVERED and never reaches this reader; Malay sits behind this gate alone. Sixteen of the
     # twenty-three words this list used to carry are ordinary Indonesian as well (`yang`, `dan`,
     # `untuk`, `dengan`, `dalam`, `atau`, `juga`, `lebih`, `tetapi`, `adalah`, `tidak`, `akan`,
@@ -2699,13 +3627,85 @@ def _aux_solo(name, block):
     return _longest_run(block, pat.pattern) >= AUX_SOLO_RUN
 
 
+# ----------------------------------- what a block has to be before the identifier is asked at all
+#
+# THE DEFECT. The identifier returns a language for any text it is handed, and a contact panel is
+# text. On the 2026-09-17 capture of 72 organizations a reviewer had read by hand, it answers
+# Esperanto on three English footers of a street address, a telephone number and a table of opening
+# hours; docs/KNOWN_ISSUES.md records the same shape twice more, langid answering Slovenian on a
+# property listing and Swedish on a state agency directory of post boxes and telephone numbers.
+# None of the five is a language and none of the five is prose. `_script_allows` cannot refuse them,
+# because it asks whether the block could be in that language and an address could be in anything.
+#
+# WHAT IS ASKED, and it is one question and not four. The brief for this was a floor on alphabetic
+# words, a ceiling on digits, telephone shapes, postal abbreviations and currency, and a ceiling on
+# English function words. Measured on that capture, THREE OF THE FOUR SEPARATE NOTHING and are not
+# here: a word floor set where no genuine block is lost refuses 0 of the 5, a repetition ceiling
+# refuses 0, and an English-function-word ceiling refuses 0, because an opening-hours table carries
+# no English function words either. The one that separates them is the share of the block's tokens
+# that are written the way an address, a price and a telephone number are written, and it separates
+# them completely.
+#
+# WHERE THE THRESHOLD IS. The genuine side is 63 blocks the identifier names an auxiliary language
+# on, on the four organizations of that capture whose reading the reviewer confirmed, plus the five
+# blocks of the three corpus fixtures whose reading rests on the identifier. Their listing share
+# runs from 0.000 to 0.250, and 0.250 is one block that is a media-player URL rather than prose;
+# the next is 0.208. The five refuted blocks run from 0.320 to 0.583. **The gap is 0.250 to 0.320
+# and the ceiling is set in the middle of it.** Nothing on either side is within 0.03 of it.
+#
+# A SMALL CALIBRATION, said plainly: four organizations on the genuine side and three on the other,
+# with two more shapes taken from the issues log. It is a floor written to refuse a shape, not a
+# threshold tuned on a sample big enough to place it finely.
+#
+# CASE MATTERS AND THAT IS THE RULE, not a convenience. A state code in an address is written `VA`
+# and a street is `Rd`, while `de`, `la`, `in`, `or` and `me` are ordinary words in the languages
+# this reader exists to find. Matching the abbreviations case-insensitively counted those words as
+# address furniture and pushed a Spanish and an Estonian block over the ceiling; matching them as an
+# address writes them cannot.
+AUX_LISTING_STATE = frozenset((
+    'AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM '
+    'NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY DC').split())
+AUX_LISTING_ABBR = frozenset('St Rd Ave Blvd Ln Dr Ct Hwy Pkwy Ste Suite Apt Fl Rm PO Box Tel Fax '
+                             'USA'.split())
+# A digit or a currency mark anywhere in the token. This is what makes a telephone number, a post
+# code, a price, a room number and an opening time one test rather than five patterns.
+AUX_LISTING_MARK = re.compile(r'\d|[$€£¥₹]')
+AUX_LISTING_SHARE = 0.29
+_AUX_TOKEN = re.compile(r'\S+')
+_AUX_TRIM = '.,;:()[]–—|'
+
+
+def listing_share(block):
+    """How much of this block is written the way an address, a price or a telephone number is."""
+    tokens = _AUX_TOKEN.findall(block or '')
+    if not tokens:
+        return 0.0
+    n = 0
+    for t in tokens:
+        t = t.strip(_AUX_TRIM)
+        if AUX_LISTING_MARK.search(t) or t in AUX_LISTING_STATE                 or t.rstrip('.') in AUX_LISTING_ABBR:
+            n += 1
+    return n / len(tokens)
+
+
+def _aux_asked(block):
+    """May the identifier be asked about this block at all?
+
+    The same question in all three places the auxiliary reader splits blocks, for the reason
+    written on AUX_SPLIT: a reader that counted blocks one way and quoted them another would quote
+    a passage it had not counted. `_aux_languages` keeps its own MENU_SCRIPTS test beside this,
+    because that one has only ever been asked where a language is being NAMED.
+    """
+    return len(block) >= AUX_MIN_BLOCK and listing_share(block) <= AUX_LISTING_SHARE
+
+
 def _aux_languages(text, covered):
     """Languages this package cannot express, read by the identifier a block at a time."""
     if _ft() is None:
         return []
     seen, solo = {}, set()
     for block in AUX_SPLIT.split(text)[:200]:
-        if len(block) < AUX_MIN_BLOCK:
+        if not _aux_asked(block):
             continue
         if _script_count(block) >= MENU_SCRIPTS:
             continue
@@ -2759,6 +3759,12 @@ def languages_in(text, min_chars=200, aux=True, exclude=(), script_words=True):
             name = _cyrillic_language(body)
         elif name == 'Arabic':
             name = _arabic_language(body)
+        elif name == 'Amharic':
+            name = _ethiopic_language(body)
+        elif name == 'Hindi':
+            name = _devanagari_language(body)
+        elif name == 'Bengali':
+            name = _bengali_language(body)
         out.append(name)
     folded, offsets = _fold_offsets(body)
     for name, rx in FUNC_RX.items():
@@ -2828,7 +3834,7 @@ def _paragraph_spans(hits, window=PARA_WINDOW, need=PARA_WORDS):
 #
 # `_SHARED` subtracts the words a language holds in common with another, and for Spanish and
 # Portuguese it takes most of the everyday ones: Spanish keeps 29 of its 47 unique and Portuguese 26
-# of its 46, against 74.2 per cent for the next thinnest of the twenty lists and 100 for six of
+# of its 46, against 74.2 per cent for the next thinnest of the lists as they stood and 100 for six of
 # them. The consequence is measured in both directions. 123 captures in the census render store
 # reach four distinct Spanish function words inside one window and carry no Spanish-only word
 # anywhere on the page, so plain Spanish prose goes unread; and before `dos` was made shared, 297
@@ -2896,6 +3902,13 @@ def _coverage_script(lang):
     # the Cyrillic languages are named from letters and words inside one range
     if lang in CYR_FUNC or lang in {n for n, _ in CYRILLIC}:
         return r'[Ѐ-ӿ]'
+    # and the Ethiopic ones the same way, so a Tigrinya finding is measurable rather than None
+    if lang in _ETH_LANGS:
+        return r'[ሀ-፿]'
+    if lang in _DEV_LANGS:
+        return r'[ऀ-ॿ]'
+    if lang in _BEN_LANGS:
+        return r'[ঀ-৿]'
     return None
 
 
@@ -2945,7 +3958,12 @@ def language_coverage(text, lang):
     # asks `_aux_name`, the reader's own decision, so that the share counted is the share of blocks
     # the reader would have named this language. A code lookup cannot express Sorani, which has no
     # code, and would have returned None for it and left rule 10 with nothing to weigh.
-    return sum(1 for b in blocks if _aux_name(_lid(b)[0], b) == lang) / len(blocks)
+    # The DENOMINATOR is every block long enough, which is what it has always been, and the
+    # numerator is restricted to the blocks the identifier was allowed to be asked about. A block
+    # that was never asked cannot be counted as this language, and taking it out of the
+    # denominator instead would RAISE a coverage on a page of contact panels.
+    return (sum(1 for b in blocks if _aux_asked(b) and _aux_name(_lid(b)[0], b) == lang)
+            / len(blocks))
 
 
 # A control whose visible text names a language, with no href, which swaps the page in place. Following
@@ -3112,6 +4130,19 @@ def _directory_profile(url):
 # Hover was measured on the same fourteen and opened NONE of them, so only the click is taken.
 OPEN_CLICK_MS = 2000
 OPEN_SETTLE_MS = 600
+
+# How long a page is given to finish writing itself after navigation, and after the scroll. Both
+# were bare literals inside `_read` until they were named here, which kept two numbers that decide
+# how much of a page is read outside the constant freeze that exists to notice numbers moving.
+HOME_SETTLE_MS = 2200
+SCROLL_SETTLE_MS = 900
+
+# Ask whether the document has stopped growing instead of waiting the whole of the two numbers
+# above. Measured over forty sites: 1,944 ms a page against 4,695, the language set identical on all
+# forty, and the collapsed text within a median of zero characters. OFF until the same comparison
+# has been made through `audit` itself, on the verdict and the evidence and not on the text alone.
+SETTLE_BY_GROWTH = False
+SETTLE_POLL_MS = 250
 # The nearest ancestor of a hidden candidate that a visitor can see, unless a previous candidate in
 # this same call already proved that clicking it opens nothing. Marking the FAILURES and not the
 # attempts is deliberate: an opener that works is wanted again, because the loop's navigation back
@@ -3177,6 +4208,33 @@ async def _show_widget(page):
         pass
 
 
+# The same pair for the embedded social feeds, with a key of its own so that a node inside both a
+# widget and a feed is put back by whichever hid it. `_read` REMOVES the feeds, as it removes the
+# widget; here they are hidden and restored, because this loop holds element handles across the
+# read and removing a node detaches every handle inside it, which is the defect written above
+# `_WIDGET_HIDE_JS`. Hiding touches the TEXT and never the candidate list: the hide happens
+# immediately before the page is read and the show immediately after, so a control is as visible
+# to this loop as it was before.
+_FEED_HIDE_JS = _WIDGET_HIDE_JS.replace('laWidgetHidden', 'laFeedHidden')
+_FEED_SHOW_JS = _WIDGET_SHOW_JS.replace('laWidgetHidden', 'laFeedHidden')
+
+
+async def _hide_feed(page):
+    """Take the embedded social feeds out of the page's TEXT, reversibly."""
+    try:
+        await page.evaluate(_FEED_HIDE_JS, FEED_SEL)
+    except Exception:
+        pass
+
+
+async def _show_feed(page):
+    """Put back what `_hide_feed` hid."""
+    try:
+        await page.evaluate(_FEED_SHOW_JS, FEED_SEL)
+    except Exception:
+        pass
+
+
 async def _click_can_land(el):
     """Whether a click on this element can land, which is what its three-second timeout waits for.
 
@@ -3226,6 +4284,43 @@ SELECT_OPTION_CANDIDATES = 2
 # The threshold sits in the empty gap rather than on either population's edge, so a switcher would
 # have to grow by ten languages before it were read as a menu.
 MENU_SIZE = 30
+
+# WHICH OPTION OF A FULL VENDOR MENU IS DRIVEN FIRST.
+#
+# A vendor menu is alphabetical, the budget for worked controls is small, and the candidates were
+# taken in page order, so the control that settled what the menu does was whichever language the
+# widget happened to list first. Over the seventeen sites a development round recovered through a
+# menu, seven reported Amharic, which is the first name in this package's vocabulary that a Google
+# Translate menu reaches. Nothing about those sites is Amharic. The row said `language_control`
+# produced Amharic and it was a statement about alphabetical order.
+#
+# The order below is the languages most served in the United States, which is the population a
+# language-access audit is about. It decides WHICH control is clicked first and nothing else: no
+# rule reads it, the same evidence is recorded for whatever the click produces, and a menu whose
+# click produces nothing is the same dead control it was. A language not on the list keeps page
+# order behind the ones that are, and a curated switcher, which is any switcher below MENU_SIZE,
+# keeps page order throughout, because a switcher an organization built itself is a list of the
+# languages that organization serves and its order is a decision somebody made.
+#
+# NOT MEASURED LIVE. No run was taken over sites carrying a vendor menu before and after this, so
+# nothing here is a claim about how many readings it changes. What it changes is which of two
+# controls of one menu is worked first, and the case for it is the seventeen-site record above.
+MENU_PREFERENCE = ('Spanish', 'Chinese', 'Vietnamese', 'Korean', 'Arabic', 'Tagalog', 'Russian',
+                   'French', 'Haitian Creole', 'Portuguese')
+
+
+def _menu_first(cands):
+    """A vendor menu's candidates, most-served language first, page order inside a tie.
+
+    The label is resolved through the switcher vocabulary, which is the same table every other part
+    of this file reads a control's language from, so `Espanol`, `Español`, `Spanish` and `es` are one
+    language here. A label the vocabulary does not resolve whole keeps its place behind the
+    preferred ones: it is a control this package cannot name, and guessing at it is what the
+    vocabulary exists to stop. `sorted` is stable, so everything of equal rank stays in the order
+    the page presented it.
+    """
+    rank = {name: i for i, name in enumerate(MENU_PREFERENCE)}
+    return sorted(cands, key=lambda p: rank.get(_lookup_language(LANG_TOKEN, p[1]), len(rank)))
 
 # Counts this candidate against its parent <select> and answers how many that select has now
 # contributed. -1 when the element is not inside a select at all. The count lives on the node, so it
@@ -3379,6 +4474,25 @@ async def _select_drive(el, tag):
 # locale-route form rule 15 has always had. One constant, because three call sites derive the
 # flag from the note and a drifted copy in any of them is rule 16 silently not firing.
 CONTROL_DEAD_NOTE = 'a clicked language control changed nothing'
+# Said beside CONTROL_DEAD_NOTE when the clock stopped the control scan with candidates still in
+# hand. Rule 16 rests on a control that was worked and answered nothing, and a scan that did not
+# finish is a weaker observation than one that did: a later control might have produced the
+# language. Nothing about the class moves on this, because the shape has never been counted; what
+# the note does is make it countable, which is the first thing the class needs and did not have.
+#
+# The premise this was written against did not survive its own measurement, and the measurement is
+# worth more than the sentence. All 33 machine_translate_error rows of the 2,000-site gold frame
+# were re-operated one site at a time on a 300-second clock on 2026-09-18, against 240 seconds at
+# concurrency 8 in the capture: 27 of the 33 came back machine_translate_error again, and 26 of
+# those 27 finished with clock_exhausted false. The class is not being written for a starved
+# clock. It cannot easily be, either, since `_click_language_controls` is called on the home page
+# in a context of its own BEFORE the interior crawl spends the page budget, so the 15 pages read
+# and the 20 to 136 pages left unread on those rows are what happened after the control was
+# worked, not before it. The 6 that moved all moved to machine_translate because the same control
+# produced a language on the second reading, which is the `produced` guard in `verdict_for`
+# keeping rule 16 quiet, and 4 of the 6 had been clicked on the alphabetically first entry of a
+# vendor menu in the capture, which is what MENU_PREFERENCE replaced in this release.
+CONTROL_SCAN_CUT_NOTE = 'the clock stopped the language controls before they were all worked'
 # Rule 15's sentence, the same way: one constant, four call sites, and a drifted copy in any of
 # them is rule 15 silently not firing.
 ROUTE_ENGLISH_NOTE = 'locale route returned English'
@@ -3388,13 +4502,20 @@ ROUTE_ENGLISH_NOTE = 'locale route returned English'
 MT_ERROR = 'machine_translate_error'
 
 
-async def _click_language_controls(page, home_text, base, limit=8, exclude=(), deadline=None):
+async def _click_language_controls(page, home_text, base, limit=8, exclude=(), deadline=None,
+                                   outcome=None):
     """Work anything whose label is a language name and report what the page says afterwards.
 
     Returns two lists: the controls that produced a language, each as (language, url, label,
     quote), and the controls that were worked and changed nothing, each as (label, url). The
     second list is the observation rule 16 is built on and was discarded in flight until
     2026-08-06.
+
+    `outcome`, when a dict is passed, is filled in with `cut_short`, true where the clock ended
+    the scan with candidates still unworked. It is a dict and not a fourth return value on
+    purpose: the arity of this function is depended on in twenty-odd places and has been got wrong
+    here before, as the comment on the DOM-query exit below records. A caller that passes nothing
+    is unaffected.
 
     Eight controls, each a click, a settle wait and a navigation back, is up to two hundred seconds
     and this knew nothing about the audit's clock: one development site spent 24 seconds here and a
@@ -3418,7 +4539,14 @@ async def _click_language_controls(page, home_text, base, limit=8, exclude=(), d
     single one costs, which is a question about the budget and not about reachability.
     """
     out, dead, stuck = [], [], []
+
+    def _cut():
+        """Record that the clock, and not the page, ended the scan."""
+        if outcome is not None:
+            outcome['cut_short'] = True
+
     if deadline is not None and _left(deadline) <= TIME_BUDGET_RESERVE:
+        _cut()
         return out, dead, stuck   # before the DOM query, itself not free on a large page
     try:
         # `select` and `option` are here for the eighteen sites whose only switcher is a <select>.
@@ -3438,6 +4566,7 @@ async def _click_language_controls(page, home_text, base, limit=8, exclude=(), d
     cands = []
     for el in els[:400]:
         if deadline is not None and _left(deadline) <= TIME_BUDGET_RESERVE:
+            _cut()
             break
         try:
             label = (await el.inner_text() or '').strip()
@@ -3451,8 +4580,9 @@ async def _click_language_controls(page, home_text, base, limit=8, exclude=(), d
 
     if len({lab.lower() for _e, lab in cands}) > MENU_SIZE:
         # A menu, and one worked control settles what a menu does. The rest of the budget is left
-        # for the pages, which is where an organization's own writing is.
-        cands = cands[:SELECT_OPTION_CANDIDATES]
+        # for the pages, which is where an organization's own writing is. WHICH control that is
+        # follows MENU_PREFERENCE rather than the widget's alphabet: see `_menu_first`.
+        cands = _menu_first(cands)[:SELECT_OPTION_CANDIDATES]
 
     # PASS TWO, which works them.
     tried = 0
@@ -3460,6 +4590,7 @@ async def _click_language_controls(page, home_text, base, limit=8, exclude=(), d
         if tried >= limit:
             break
         if deadline is not None and _left(deadline) <= TIME_BUDGET_RESERVE:
+            _cut()
             break
         tag = await _tag_of(el)
         # A <select> is held to a stricter test than a link, because the two fail differently. A
@@ -3622,9 +4753,11 @@ async def _click_language_controls(page, home_text, base, limit=8, exclude=(), d
             ptext = ''
             try:
                 await _hide_widget(pop)
+                await _hide_feed(pop)
                 pwhole = await pop.inner_text('body')
                 pmain = await _main_text(pop)
                 ptext = ' '.join((pwhole if pmain is None else pmain).split())
+                await _show_feed(pop)
             except Exception:
                 ptext = ''
             finally:
@@ -3666,8 +4799,10 @@ async def _click_language_controls(page, home_text, base, limit=8, exclude=(), d
         # The same two narrowings the crawl applies, for the same reasons: the comparison above and
         # the quote are taken on the whole page, and the language reading is taken on the page with
         # its navigation out of it, judged as a sentence rather than as a run of characters.
+        await _hide_feed(page)
         main = await _main_text(page)
         body = ' '.join((whole if main is None else main).split())
+        await _show_feed(page)
         for lg in languages_in(body, exclude=exclude, script_words=True):
             # A clicked control becomes `language_control` evidence, which IS in `Result.evidence`
             # and does reach the verdict, so English cannot go there. What a switcher offers in
@@ -3866,12 +5001,519 @@ def _tag_end(s, p):
             p = v.start()
 
 
+# ------------------------------------------------------------------------- an embedded social feed
+#
+# A feed embed is somebody else's writing rendered inside this page. Smash Balloon, Elfsight, POWR,
+# Juicer and SociableKIT all pull the posts of an Instagram or Facebook account into a container
+# they own, and the posts are written by whoever wrote them: a member's comment, a partner
+# organization's announcement, a reposted notice. A reviewer reading 98 sites this instrument had
+# published `english_only` found ten whose second language was not the organization's at all, and
+# the commonest shape among them is a feed of somebody else's posts sitting under an English page.
+# The organization did not publish in that language; a widget on its page displayed somebody who
+# did.
+#
+# THIS IS THE SAME OPERATION `_strip_widget` PERFORMS on the translation widget, for the same
+# reason. A translation widget's menu is a list of autonyms and reading one counted a Google
+# Translate menu as Russian content; a feed container is a window onto another account and reading
+# one counts that account's language as the site's. Both are furniture that the markup names, and
+# both come out before the text is read rather than being judged afterwards.
+#
+# NAMED BY CONTAINER AND NEVER BY CONTENT. Nothing here looks at what the feed says, which language
+# it is in or who wrote it. What is removed is the element the vendor's own script renders into,
+# identified by the id, the class or the iframe source that vendor documents. A site that writes its
+# own second language inside a `<div class="sbi_item">` is not a shape any of these vendors produce.
+#
+# ONE LIST, TWO READERS. `FEED_SEL` is what the browser is handed and `_without_feeds` is what the
+# stored bytes go through, and both are built from the five tuples below, so the DOM strip and the
+# byte strip cannot name different containers. That matters because the two reads decide different
+# halves of one result: the browser text is what `languages_in` reads, and the server document is
+# what `_confirm_server_html` tests the same language against for authorship. A feed removed from
+# one and left in the other would put a finding on one side of that test and not the other.
+# `cff` is the Custom Facebook Feed wrapper and `cff-` its item classes. Both are here because
+# neither the wrapper nor `cff-item` alone is what the plugin puts on a page: read off the stored
+# markup of the 72 sites of the 2026-09-17 capture, the one organization running it carries
+# `<div id="cff" class="cff ...">` around the feed and names its items `cff-album-item` and
+# `cff-album-items-feed`. A list holding only `cff-item` would have named a class those pages do
+# not carry.
+FEED_ID = ('sb_instagram', 'cff')
+FEED_CLASS = ('sbi_item', 'powr-social-feed', 'juicer-feed')
+FEED_CLASS_PREFIX = ('elfsight-app-', 'sk-ww-', 'cff-')
+# The page plugin and the post embed, which render in an iframe of the platform's own. An iframe's
+# document is not in `inner_text` and not in `page.content()`, so removing these buys nothing on a
+# reading today; they are named because `blockquote.instagram-media` below is the SAME embed before
+# the platform's script has replaced it, and a list that held one and not the other would remove the
+# embed on a slow page and keep it on a fast one.
+FEED_IFRAME_SRC = ('facebook.com/plugins', 'instagram.com/')
+FEED_BLOCKQUOTE_CLASS = ('instagram-media',)
+FEED_SEL = ', '.join(
+    ['#%s' % i for i in FEED_ID]
+    + ['.%s' % c for c in FEED_CLASS]
+    + ['[class^="%s"]' % p for p in FEED_CLASS_PREFIX]
+    + ['[class*=" %s"]' % p for p in FEED_CLASS_PREFIX]
+    + ['iframe[src*="%s"]' % s for s in FEED_IFRAME_SRC]
+    + ['blockquote.%s' % c for c in FEED_BLOCKQUOTE_CLASS])
+# A cheap refusal for the documents that carry none of these, which is nearly all of them. Every
+# marker is a literal, so one search over the document decides whether the scan below runs at all.
+_FEED_HINT = re.compile('|'.join(re.escape(x) for x in (
+    FEED_ID + FEED_CLASS + FEED_CLASS_PREFIX + FEED_IFRAME_SRC + FEED_BLOCKQUOTE_CLASS)), re.I)
+# Named for this reader and not `_ATTR_RX`, which is taken: the attribute pattern further
+# down reads only quoted values, and a second name would silently have become the first at
+# call time.
+_FEED_ATTR_RX = re.compile(r'([\w:.-]+)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>]+))')
+
+
+def _attr_map(text):
+    """The attributes of one start tag, lower-cased names, first value of each."""
+    out = {}
+    for m in _FEED_ATTR_RX.finditer(text or ''):
+        out.setdefault(m.group(1).lower(), m.group(2) or m.group(3) or m.group(4) or '')
+    return out
+
+
+# ---------------------------------------- the site builder's own furniture, which is not the site's
+#
+# THE DEFECT. A site builder ships its interface in every language it supports, and a locale page of
+# a Wix site renders the builder's strings in the locale whether or not the organization has written
+# anything. One immigrant legal service's Spanish blog page carries `Aun no hay ninguna entrada
+# publicada en este idioma. Una vez que se publiquen entradas, las veras aqui.`, which is Wix's
+# empty state and says in so many words that the organization has published nothing; two more of its
+# pages carry the members-area sign-up dialog, whose whole 304 characters are Wix's. The widened
+# function-word lists read all three as the organization writing Spanish. It is the reverse of the
+# feed case above and the same shape: text inside this page that this organization did not write.
+#
+# WHAT IS MATCHED IS THE CONTAINER AND NEVER THE CONTENT, which is the rule the feed list states.
+# `data-hook` is the attribute Wix's blog puts on its empty state and `data-testid` the one its
+# members area puts on the sign-up dialog, and both are the platform's own names for its own
+# furniture. Nothing here reads what the container says or which language it is in, so the strip
+# works in every language the builder ships and needs no translation to follow it.
+#
+# MEASURED over the 936 stored pages of the reviewer's capture: the two hooks appear on 2 pages and
+# the two test ids on 2, all four on one organization, and no other Wix site in the capture has a
+# blog empty state or a members page. Squarespace and WordPress were looked for and are NOT here:
+# the only candidates the capture offers are one WooCommerce empty basket reading `No products in
+# the cart`, which is English and carries no reading, and an events plugin's `messages-not-found`
+# icon class, which wraps an SVG and no text. A container this capture cannot show is a guess, and
+# CONTRIBUTING says a pattern with a measured zero behind it does not ship.
+PLACEHOLDER_HOOK = ('empty-state-container', 'empty-states__title')
+PLACEHOLDER_TESTID = ('siteMembersDialogLayout', 'siteMembersDialogBlockingLayer')
+PLACEHOLDER_SEL = ', '.join(['[data-hook="%s"]' % h for h in PLACEHOLDER_HOOK]
+                            + ['[data-testid="%s"]' % t for t in PLACEHOLDER_TESTID])
+_PLACEHOLDER_HINT = re.compile('|'.join(re.escape(x) for x in
+                                        PLACEHOLDER_HOOK + PLACEHOLDER_TESTID), re.I)
+_PLACEHOLDER_ATTR = frozenset(x.lower() for x in PLACEHOLDER_HOOK + PLACEHOLDER_TESTID)
+
+# THE SECOND LINE, and it is a short list of SENTENCES rather than of containers, for the page whose
+# placeholder arrives without the attribute that names it: a server document Wix renders without the
+# hook, or a builder that changes the attribute. It is applied to the text and not to the markup.
+#
+# EVERY STRING HERE IS ATTESTED FROM A STORED PAGE AND NONE IS TRANSLATED. The capture holds this
+# organization's Spanish locale pages and no other locale of the same site, so Spanish is the only
+# language whose wording this package can quote, and the English, French and other forms Wix ships
+# are deliberately absent rather than guessed. That is the whole reason the container strip above is
+# the first line: it is language-independent and this is not.
+PLACEHOLDER_TEXT = (
+    'Aún no hay ninguna entrada publicada en este idioma',
+    'Una vez que se publiquen entradas, las verás aquí.',
+    '¿Ya tienes un perfil personal?',
+    'Tu perfil se configurará como público automáticamente cuando te registres.',
+    'Puedes cambiarlo más tarde en la configuración de tu perfil.',
+)
+# Whitespace between the words is generalised, because the browser's `inner_text` and the stored
+# markup do not agree on where a line break falls inside one of these sentences. The accents are
+# NOT folded: both readers take their text from the same rendered page, so the accented form is the
+# form that arrives, and folding here would match text this list has never seen.
+_PLACEHOLDER_TEXT_RX = re.compile('|'.join(
+    r'\s+'.join(re.escape(w) for w in t.split()) for t in PLACEHOLDER_TEXT), re.I)
+
+
+def _without_placeholder_text(text):
+    """The builder's own placeholder sentences out of a page's text, by the list above."""
+    if not text or not _PLACEHOLDER_TEXT_RX.search(text):
+        return text
+    return _PLACEHOLDER_TEXT_RX.sub(' ', text)
+
+
+def _is_placeholder_element(tag, attrs_text):
+    """Is this start tag the container a site builder renders its own empty state into?"""
+    at = _attr_map(attrs_text)
+    return (at.get('data-hook', '').strip().lower() in _PLACEHOLDER_ATTR
+            or at.get('data-testid', '').strip().lower() in _PLACEHOLDER_ATTR)
+
+
+def _is_feed_element(tag, attrs_text):
+    """Is this start tag the container one of the named feed embeds renders into?"""
+    at = _attr_map(attrs_text)
+    if at.get('id', '').strip().lower() in FEED_ID:
+        return True
+    classes = at.get('class', '').lower().split()
+    if any(c in FEED_CLASS for c in classes):
+        return True
+    if any(c.startswith(FEED_CLASS_PREFIX) for c in classes):
+        return True
+    if tag == 'iframe':
+        src = at.get('src', '').lower()
+        if src and any(mark in src for mark in FEED_IFRAME_SRC):
+            return True
+    if tag == 'blockquote' and any(c in FEED_BLOCKQUOTE_CLASS for c in classes):
+        return True
+    return False
+
+
+# The elements that have no end tag, so nothing on the stack below waits for one. A feed container
+# is never one of them; they are here because an `<img>` left on the stack would swallow the
+# elements after it.
+_VOID_TAGS = frozenset(('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta',
+                        'param', 'source', 'track', 'wbr'))
+
+
+def _without_containers(html, hint, test):
+    """The document with one family of containers removed, bytes in and bytes out.
+
+    `hint` is a cheap compiled pattern over the attribute values the family is named by, and `test`
+    answers whether one start tag is a container of it. Two families are removed this way and they
+    are removed separately: `_without_feeds`, which takes out somebody else's posts, and
+    `_without_placeholders`, which takes out the site builder's own empty states. The scan is shared
+    and the lists are not, so a change to one family cannot quietly move the other.
+
+    A scanner and not a parser, for the reason written above `_text_from_html`: `_tag_end` already
+    knows where a start tag ends under the quoting rules a browser applies, so a container is found
+    and closed by the same reading of the markup the text reader uses. A raw-text element is
+    skipped whole, because a `</div>` inside a script is a string and not an end tag.
+
+    ONE PASS, over a stack, and the first version was two. Searching forward for each container's
+    own end tag is linear on a well-formed document and QUADRATIC on a malformed one, since a
+    container that is never closed scans to the end of the document and the next one scans it
+    again: measured at 0.02 seconds for 200 unclosed containers and 2.10 for 2,000, which is ten
+    times the document for a hundred times the work. A stack answers every container in the one
+    pass that finds them.
+
+    A container the document never closes is left in the text. It is popped unresolved either by an
+    ancestor's end tag or by the end of the document, and in both cases no cut is recorded, because
+    a cut with a guessed end would take every byte after it: the empty-page failure `_main_text`
+    records from the other direction.
+
+    `hint` is the cheap refusal, one search over the whole document, and `match(tag, attrs)` is the
+    per-element test. Two callers pass two lists, the social feeds and the translation widget's own
+    furniture, and neither list is in this function.
+    """
+    s = html or ''
+    if not s or not hint.search(s):
+        return s
+    cuts = []
+    stack = []
+    i, n = 0, len(s)
+    while i < n:
+        j = s.find('<', i)
+        if j < 0:
+            break
+        k = j + 1
+        closing = k < n and s[k] == '/'
+        at = k + 1 if closing else k
+        m = _TAG_NAME.match(s, at)
+        if m is None:
+            i = j + 1
+            continue
+        tag = m.group(0).lower()
+        after = _tag_end(s, m.end())
+        if not closing and tag in _RAW_TEXT:
+            close = _RAW_END[tag].search(s, after)
+            i = n if close is None else _tag_end(s, close.end())
+            continue
+        if closing:
+            # `pop until the name matches` is what a browser does with a document that closes its
+            # elements out of order, and it is what keeps an unbalanced page from resolving a
+            # container against somebody else's end tag.
+            for pos in range(len(stack) - 1, -1, -1):
+                if stack[pos][0] == tag:
+                    if stack[pos][2]:
+                        cuts.append((stack[pos][1], after))
+                    del stack[pos:]
+                    break
+        elif tag not in _VOID_TAGS:
+            attrs = s[m.end():max(m.end(), after - 1)]
+            stack.append((tag, j,
+                          bool(hint.search(attrs)) and test(tag, attrs)))
+        i = after
+    if not cuts:
+        return s
+    out, keep = [], 0
+    for a, b in sorted(cuts):
+        if a < keep:                 # a container inside a container that is already going
+            keep = max(keep, b)
+            continue
+        out.append(s[keep:a])
+        keep = b
+    out.append(s[keep:])
+    return ''.join(out)
+
+
+def _without_feeds(html):
+    """The document with the embedded social feeds removed. See `_without_containers`."""
+    return _without_containers(html, _FEED_HINT, _is_feed_element)
+
+
+def _without_placeholders(html):
+    """The document with the site builder's own empty states removed. See `_without_containers`."""
+    return _without_containers(html, _PLACEHOLDER_HINT, _is_placeholder_element)
+
+
+# ---------------------------------------------------------------------------- a quoted testimonial
+#
+# WHAT THIS IS, AND WHY IT IS NOT THE FEED STRIP ABOVE. A client testimonial is somebody else's
+# writing inside this page too, and the refusal LIMITATIONS 7.2 records on 2026-09-17 stands for
+# its TEXT: no rule separates the words of a woman the organization helped from the words of the
+# organization's own director by reading them, and a quotation mark with a name under it is how
+# both are published. What is tried here is the CONTAINER, which is a different object. A theme
+# that publishes testimonials publishes them inside an element whose class says so, and three of
+# the shapes below are quotations by definition of HTML rather than by a theme's convention.
+#
+# NOT REMOVED, which is the whole difference from a feed. A feed container is taken out of the
+# document and never heard of again. A quoted container is taken out of the COUNTED stream and put
+# ON THE RECORD: `_testimonial_blocks` hands its text back, `testimonial_evidence` makes one row
+# per language named inside it at SUFF_TOKEN, the rung the codebook has always given "a quoted
+# testimonial", and `counted_evidence` cannot count a mechanism outside OWN_MECHANISMS. So a
+# reader of the record sees the block, the language and the address, and a study that wants to
+# count testimonials can. `class_for` and `verdict_for` are not touched.
+#
+# ONE PATTERN, TWO READERS, and a pattern rather than a selector because CSS cannot express the one
+# boundary this needs. `review` inside `preview` is not a review and `[class*="review"]` cannot say
+# so: read off the stored markup of the 72 sites of the 2026-09-17 capture, ten class tokens carry
+# `preview` (`ios-preview-native-scroll`, `wplinkpreview-description`, `audio-preview`,
+# `fw-preview-button`, `preview_content`) and not one of them is a testimonial. `[class$="review"]`
+# does not help, since `audio-preview` ends in it. So the rule is a word with a non-letter on each
+# side, and the browser side is handed this pattern's own source to build a RegExp from, the way
+# `_strip_feeds` is handed `FEED_SEL`. The DOM strip and the byte strip cannot name different
+# containers, which is the property the feed comment above argues for and which matters here for
+# the same reason: the browser text is what `languages_in` reads and the server document is what
+# `_confirm_server_html` tests the same language against.
+#
+# EVERY WORD IS ONE THE CORPUS SHOWS, counted over the same 72 sites. `testimonial` and
+# `testimonials`: eleven themes, `elementor-testimonial__text`, `et_pb_testimonial_description`,
+# `ui-e-testimonial-text`, `jetpack-testimonial-*`, `gdlr-skin-testimonial-hp`, `card-testimonials`,
+# `home-testimonial`, `board-vol-testimonial`, `testimonial-marquee-wrap`, `testimonials-grid`,
+# `insurancehome_section5_testimonial`. `reviews`: two, `widget-reviews` and `cff-all-reviews`.
+# `what-people-say`, `client-stories` and `success-stories` were proposed with these and NOT ONE
+# PAGE of either corpus carries any of the three, so none of them is here: a word no page shows is
+# a rule nothing tested.
+#
+# `quote` AND `quotes` WERE PROPOSED AND ARE REFUSED, on the measurement. A class holding the word
+# `quote` names a STYLE more often than it names a container of somebody's words, and the corpus
+# says so by a wide margin. Over the first 200 sites of the 2,000-site gold capture, the commonest
+# matching token in the whole tally is Enfold's `modern-quote`, 65 occurrences, which the theme
+# writes onto its `av-special-heading` element: what those containers hold is the page's own
+# headings and the sentence of the site's own prose that sits under them, on one site a domestic
+# violence agency's one-line description of its service model. Second is
+# `icon-quote-right`, 15, an SVG symbol with no text at all. On the 72-site capture the same word
+# takes five containers off an Iranian cultural association's pages and every one of them is that
+# organization's OWN Persian announcement, which would have gone on the record as five
+# testimonials it did not write. What the word buys against that is real: `widget-quote-quote-1`
+# on one gold-frame site is a genuine testimonial slider and `vssl-stripe--pullquote--quote` on
+# another is a genuine pull quote. It is bought at the price of mislabelling one organization's
+# prose in every sample it was measured on, and the tags below already catch a quotation the
+# markup marks AS a quotation, `wp-block-quote` and `sqs-block-quote` among them, because those
+# classes sit on `<blockquote>` elements. Measured cost of leaving it out, over 272 sites of the
+# two captures: no page loses a non-English reading that the word would have kept out of the
+# counted stream, because no site's only non-English prose sat in a `quote`-classed container that
+# was not also a `<blockquote>`.
+TESTIMONIAL_WORDS = ('testimonial', 'testimonials', 'review', 'reviews')
+# Matched against a LOWER-CASED attribute value, which is why the ignore-case flag is left off.
+# `[^a-z]` under IGNORECASE stops excluding `A-Z`, in this engine and in the browser's, and a
+# boundary a capital letter walks through is not a boundary. Both readers lower-case first.
+TESTIMONIAL_RX = re.compile(r'(?:^|[^a-z])(?:%s)(?:[^a-z]|$)' % '|'.join(TESTIMONIAL_WORDS))
+# The elements that ARE a quotation in HTML, whatever a theme calls them. `<blockquote>` and `<q>`
+# say so in the specification. A `<figure>` says so only when it carries the `<cite>` that names
+# who is being quoted, and not otherwise, because a figure is equally how a photograph, a table and
+# a code listing are published.
+QUOTED_TAGS = ('blockquote', 'q')
+QUOTED_FIGURE_CHILD = 'cite'
+# THE ELEMENTS THAT ARE THE DOCUMENT, which no quotation inside it can also be. This is not a
+# tidiness rule and it is not optional: measured on the 72 sites of the 2026-09-17 capture, the
+# word rule WITHOUT it took the whole page off every Squarespace site in the sample, because
+# Squarespace writes its site-wide style settings onto the body element and one of them is
+# `tweak-quote-block-alignment-center`. Five sites moved, and one of them is a South Asian domestic
+# violence organization publishing help pages in eight languages, which came back `english_only`
+# with an empty language list. A class on `<body>` is a setting for the whole document; a
+# quotation is a part of one. The word `quote` is no longer in the list, for reasons of its own
+# written above, so that particular token cannot reach here any more; the guard stays, because the
+# shape it refuses is a theme writing a style setting on the document and no word list is safe
+# from that.
+QUOTED_NEVER = ('html', 'head', 'body', 'main')
+# The cheap refusal, for the documents that carry none of this, which is most of them. Loose on
+# purpose and case-insensitive on purpose: it decides whether the scan below runs at all, and
+# `_is_quoted_element` is what decides anything about an element.
+_QUOTED_HINT = re.compile('|'.join(
+    [r'<blockquote', r'<q[\s/>]', r'<cite'] + [re.escape(w) for w in TESTIMONIAL_WORDS]), re.I)
+
+
+def _is_quoted_element(tag, attrs_text):
+    """Is this start tag a container a quotation is published in?"""
+    if tag in QUOTED_TAGS:
+        return True
+    if tag in QUOTED_NEVER:
+        return False
+    at = _attr_map(attrs_text)
+    # `class` and `id` and nothing else. An `<a href="/reviews/">` is a link to a page of
+    # testimonials and is not one, and `data-testimonial-id` on a wrapper names a record rather
+    # than drawing it.
+    return bool(TESTIMONIAL_RX.search(at.get('class', '').lower())
+                or TESTIMONIAL_RX.search(at.get('id', '').lower()))
+
+
+def _testimonial_split(html):
+    """(the document with the quoted containers taken out, the text of each one taken out).
+
+    One pass over a stack, for the reasons written inside `_without_feeds`: the same scanner, the
+    same quoting rules, the same refusal to guess an end tag for a container the document never
+    closes. The two differences are that a `<figure>` becomes a container when a `<cite>` is found
+    INSIDE it, which the stack answers by marking the frame the cite is in, and that what is cut is
+    handed back rather than dropped.
+
+    Nested containers come back as one block. A `<div class="testimonials">` holding three
+    `<blockquote>`s is one quotation region, and three overlapping rows quoting parts of the same
+    region would say the page carried three findings where it carries one shape.
+    """
+    s = html or ''
+    if not s or not _QUOTED_HINT.search(s):
+        return s, []
+    cuts = []
+    stack = []
+    i, n = 0, len(s)
+    while i < n:
+        j = s.find('<', i)
+        if j < 0:
+            break
+        k = j + 1
+        closing = k < n and s[k] == '/'
+        at = k + 1 if closing else k
+        m = _TAG_NAME.match(s, at)
+        if m is None:
+            i = j + 1
+            continue
+        tag = m.group(0).lower()
+        after = _tag_end(s, m.end())
+        if not closing and tag in _RAW_TEXT:
+            close = _RAW_END[tag].search(s, after)
+            i = n if close is None else _tag_end(s, close.end())
+            continue
+        if closing:
+            for pos in range(len(stack) - 1, -1, -1):
+                if stack[pos][0] == tag:
+                    if stack[pos][2]:
+                        cuts.append((stack[pos][1], after))
+                    del stack[pos:]
+                    break
+        elif tag not in _VOID_TAGS:
+            attrs = s[m.end():max(m.end(), after - 1)]
+            stack.append([tag, j, _is_quoted_element(tag, attrs)])
+            if tag == QUOTED_FIGURE_CHILD:
+                # the figure this cite sits in, and the nearest one only: a figure inside a figure
+                # is the inner one's quotation
+                for pos in range(len(stack) - 1, -1, -1):
+                    if stack[pos][0] == 'figure':
+                        stack[pos][2] = True
+                        break
+        i = after
+    if not cuts:
+        return s, []
+    out, blocks, keep = [], [], 0
+    for a, b in sorted(cuts):
+        if a < keep:                 # a container inside a container that is already going
+            keep = max(keep, b)
+            continue
+        out.append(s[keep:a])
+        blocks.append(s[a:b])
+        keep = b
+    out.append(s[keep:])
+    return ''.join(out), blocks
+
+
+def _without_testimonials(html):
+    """The document with the quoted containers removed, bytes in and bytes out."""
+    return _testimonial_split(html)[0]
+
+
+def _testimonial_blocks(html):
+    """The readable text of each quoted container on this page, in the order they were published.
+
+    The feed containers go first, so a testimonial slider inside somebody else's embedded feed is
+    read as the feed it is in and not recorded twice.
+    """
+    return [t for t in (' '.join(_text_from_html(b).split())
+                        for b in _testimonial_split(_without_feeds(html))[1]) if t]
+
+
+def testimonial_evidence(url, html, exclude=()):
+    """One row per non-English language named inside a quoted container on this page, at rung 1.
+
+    NOTHING HERE CAN MOVE A CLASS, by three separate constructions, because a rule that suppresses
+    a reading has to be unable to create one. The mechanism is outside `OWN_MECHANISMS`, so
+    `counted_evidence` drops the row before `verdict_for`, `sufficiency_summary` or `languages`
+    ever see it, which is what `review.HAND_CODING` already relies on. The rung is recorded as
+    SUFF_TOKEN, below `SUFFICIENCY_COUNTS`, so a consumer that re-derives the axis from the row
+    gets the same answer. And the authorship is recorded as `none`: the axis says who produced the
+    text and it has no value for a visitor's words, so a row that guessed `authored` would put a
+    site's `authorship` field one rung up on the strength of a sentence the organization did not
+    write. A language seen only here is on `by_language` with rung 0 and off `languages`, which is
+    where a language on an archive page has always been.
+    """
+    out = []
+    for block in _testimonial_blocks(html):
+        for lg in languages_in(block, exclude=exclude, script_words=True):
+            # English decides nothing anywhere in this package and `Result.evidence` never receives
+            # a piece of it; see `_english_evidence`.
+            if lg == ENGLISH:
+                continue
+            out.append(Evidence(MECH_TESTIMONIAL, url, _quote(block, lg), lg,
+                                authorship=AUTHOR_NONE, sufficiency=SUFF_TOKEN, rules=[]))
+    return out
+
+
+def _collect_testimonials(out, seen, url, html, exclude=()):
+    """This page's quoted findings, appended once per language and quotation.
+
+    A testimonial slider in a footer is on every page of the site, and one row per page would bury
+    the evidence that decided the site under thirty copies of one quotation. The first address it
+    was found at is kept, which on a sitewide element is the home page.
+    """
+    for e in testimonial_evidence(url, html, exclude=exclude):
+        key = (e.language, e.quote)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(e)
+
+
+def _page_text(html):
+    """The readable text of one document, with the furniture named by vendor taken out of it first.
+
+    THE ONE READER. Every reading the instrument judges comes through here, on both sides of the
+    live/stored line: the live audit hands it `page.content()`, `rejudge` hands it the same bytes out
+    of the store, the plain-client rescue hands it the served document, and `_confirm_server_html`
+    hands it the no-JavaScript fetch. Before 0.2.0 the live audit read the browser's own
+    `inner_text` instead and the two readers disagreed, on 24 of the 1,992 addresses of the
+    2026-09-17 gold-frame capture, so an agreement figure computed from re-judged captures described
+    a reader the live audit was not using. One function applied to one document cannot do that.
+
+    `_text_from_html` stays what it is, a markup remover with nothing in it about what a page is
+    for, and the removals sit beside it rather than inside it. THE ORDER IS NOT ARBITRARY: the
+    containers go first (somebody else's feed, the builder's own empty states, the quoted
+    testimonial, the translation widget's furniture), because a container is found in the markup;
+    and the placeholder sentence list goes last, because it is applied to text and is the second
+    line for a page whose placeholder arrives without the attribute that names it. The quoted
+    containers come out of the counted text here and go back onto the record through
+    `testimonial_evidence`, which reads them off these same bytes.
+    """
+    return _without_placeholder_text(_text_from_html(_without_widget(
+        _without_testimonials(_without_placeholders(_without_feeds(html))))))
+
+
 def _text_from_html(html):
     """The readable text of a document fetched without a browser.
 
-    This hides no navigation and lays nothing out, which is the difference from the browser read
-    `_main_text` takes and which `REJUDGE_BROWSER_TEXT` states. What it does is remove markup, and
-    it removes markup the way a browser tokenizes it; see the note above for why that is a scanner.
+    This hides no navigation and lays nothing out, and from 0.2.0 that is true of every reading the
+    instrument judges: `_page_text` wraps it and both the live audit and `rejudge` read through
+    that. What it does is remove markup, and it removes markup the way a browser tokenizes it; see
+    the note above for why that is a scanner.
     """
     s = html or ''
     n = len(s)
@@ -3968,7 +5610,7 @@ async def _plain_fetch(ctx, url, timeout=15000, block_private_hosts=False):
     if block_private_hosts and _too_large(resp):
         return '', '', ''
     html = await resp.text()
-    raw = _text_from_html(html)
+    raw = _page_text(html)
     text = ' '.join(raw.split())
     # `is_wall` and not the ungated pattern: discarding this body is one of the ways a site ends up
     # unreachable, so the same gate that keeps a live contact form's captcha from deciding a verdict
@@ -4368,7 +6010,7 @@ async def _confirm_server_html(ctx, evidence, exclude=(), deadline=None, robots=
                 else:
                     e.server_plugin = True
             continue
-        served = set(languages_in(' '.join(_text_from_html(html).split()),
+        served = set(languages_in(' '.join(_page_text(html).split()),
                                   exclude=exclude, script_words=True))
         for e in es:
             if _ev_lang(e) in served:
@@ -4378,9 +6020,44 @@ async def _confirm_server_html(ctx, evidence, exclude=(), deadline=None, robots=
                     e.server_html = True
 
 
-WIDGET_SEL = ('#google_translate_element, .goog-te-menu-frame, .goog-te-menu2, .skiptranslate, '
-              '.gtranslate_wrapper, .gt_switcher, [class*="weglot"], [id*="weglot"], '
-              '[class*="conveythis"], [id*="conveythis"]')
+# ONE LIST, TWO READERS, the way `FEED_SEL` and `_without_feeds` are one list. `WIDGET_SEL` is what
+# the browser is handed and `_without_widget` is what the bytes go through, and both are built from
+# the three tuples below. The byte reader is not a convenience: the store keeps `page.content()`
+# taken BEFORE the DOM strip, so a Google Translate menu of language autonyms is in the stored
+# document, and `_page_text` is what `rejudge` reads with. Until the widget came out on the byte
+# side as well, a re-judge read that menu as the site's Russian content while the live audit did
+# not, which is a disagreement between two readers of one page and is the thing 0.2.0 removes.
+WIDGET_ID = ('google_translate_element',)
+WIDGET_CLASS = ('goog-te-menu-frame', 'goog-te-menu2', 'skiptranslate', 'gtranslate_wrapper',
+                'gt_switcher')
+# Matched anywhere in a `class` or an `id` and not as a whole token, because both vendors mint their
+# own suffixes per site (`weglot-container`, `country-selector weglot_here`).
+WIDGET_SUBSTRING = ('weglot', 'conveythis')
+WIDGET_SEL = ', '.join(
+    ['#%s' % i for i in WIDGET_ID]
+    + ['.%s' % c for c in WIDGET_CLASS]
+    + [s for p in WIDGET_SUBSTRING for s in ('[class*="%s"]' % p, '[id*="%s"]' % p)])
+_WIDGET_HINT = re.compile('|'.join(re.escape(x) for x in
+                                   (WIDGET_ID + WIDGET_CLASS + WIDGET_SUBSTRING)), re.I)
+
+
+def _is_widget_element(tag, attrs_text):
+    """Is this start tag the translation widget's own furniture?"""
+    at = _attr_map(attrs_text)
+    ident = at.get('id', '').strip().lower()
+    if ident in WIDGET_ID:
+        return True
+    cls = at.get('class', '').lower()
+    if any(c in WIDGET_CLASS for c in cls.split()):
+        return True
+    return any(p in cls or p in ident for p in WIDGET_SUBSTRING)
+
+
+def _without_widget(html):
+    """The document with the widget's own furniture removed. The byte half of `_strip_widget`."""
+    return _without_containers(html, _WIDGET_HINT, _is_widget_element)
+
+
 _STRIP_JS = 'sel => document.querySelectorAll(sel).forEach(n => n.remove())'
 
 
@@ -4389,6 +6066,77 @@ async def _strip_widget(page):
     list of language autonyms, and reading one counted a Google Translate menu as Russian content."""
     try:
         await page.evaluate(_STRIP_JS, WIDGET_SEL)
+    except Exception:
+        pass
+
+
+async def _strip_feeds(page):
+    """Take the embedded social feeds out of the page before reading it, the way the widget goes.
+
+    Removed and not hidden, which is what `_read` does with the widget: the text is read once, right
+    after, and nothing later in the audit clicks inside a feed. `FEED_SEL` and `_without_feeds` are
+    built from one list, so this and the reading of the stored bytes remove the same containers.
+    """
+    try:
+        await page.evaluate(_STRIP_JS, FEED_SEL)
+    except Exception:
+        pass
+
+
+# The browser's half of the quoted-container reader. It is handed `TESTIMONIAL_RX`'s own source and
+# `QUOTED_TAGS` rather than a selector string, because the boundary the pattern draws is the thing
+# CSS cannot express; see the block above `TESTIMONIAL_RX` for the measurement that decided that.
+# `closest` answers the figure question the same way the byte scanner's stack does: the nearest
+# enclosing figure of a `<cite>`, and no other.
+_QUOTED_JS = '''([src, tags, child, never]) => {
+  const rx = new RegExp(src);
+  const names = tags.map(t => t.toUpperCase());
+  const skip = never.map(t => t.toUpperCase());
+  const gone = [];
+  document.querySelectorAll('*').forEach(n => {
+    if (names.indexOf(n.tagName) >= 0) { gone.push(n); return; }
+    if (skip.indexOf(n.tagName) >= 0) return;
+    const cls = (n.getAttribute('class') || '').toLowerCase();
+    const id = (n.getAttribute('id') || '').toLowerCase();
+    if (rx.test(cls) || rx.test(id)) gone.push(n);
+  });
+  document.querySelectorAll(child).forEach(c => {
+    const f = c.closest('figure');
+    if (f) gone.push(f);
+  });
+  gone.forEach(n => { if (n.parentNode) n.parentNode.removeChild(n); });
+  return gone.length;
+}'''
+
+
+async def _lift_testimonials(page):
+    """Take the quoted containers out of the page before its text is read.
+
+    Out of the COUNTED text and not out of the record: `page.content()` has already been taken when
+    this runs, exactly as it has for `_strip_feeds`, so the stored document keeps every container
+    and `testimonial_evidence` reads each one off those bytes and puts it on the evidence list. The
+    live audit and a re-judge of its capture therefore count the same words and record the same
+    quotations.
+
+    `getAttribute` and not `className`, because an inline `<svg>` carries an `SVGAnimatedString`
+    there and a theme's quotation-mark icon is drawn in SVG.
+    """
+    try:
+        await page.evaluate(_QUOTED_JS, [TESTIMONIAL_RX.pattern, list(QUOTED_TAGS),
+                                         QUOTED_FIGURE_CHILD, list(QUOTED_NEVER)])
+    except Exception:
+        pass
+
+
+async def _strip_placeholders(page):
+    """The site builder's own empty states, out on the same terms and at the same moment.
+
+    `PLACEHOLDER_SEL` and `_without_placeholders` are built from the two tuples above, so the live
+    reader and a re-judge of the stored bytes remove the same containers, which is the property the
+    feed pair beside this one states and the only thing that keeps the two readings comparable.
+    """
+    try:
+        await page.evaluate(_STRIP_JS, PLACEHOLDER_SEL)
     except Exception:
         pass
 
@@ -4475,6 +6223,12 @@ async def _main_text(page):
     and the caller has to tell them apart: a page that could not be asked is read whole, exactly as
     it always was, while a page whose entire text IS the furniture has nothing to read and must not
     fall back to reading the furniture. The second is the case this exists for.
+
+    NOT THE PAGE READING ANY MORE, from 0.2.0 on. `_read` takes its reading off the document through
+    `_page_text`, because that is the function `rejudge` reads a stored page with and one reader is
+    the point. What is left here is the one question a stored document cannot be asked: what the page
+    said AFTER a language control was clicked. `_click_language_controls` calls it, nothing else
+    does, and rule 16 and the `language_control` evidence are the only things it decides.
     """
     try:
         got = await page.evaluate(_CHROME_JS, [CHROME_SEL, CHROME_LIST_MIN_ITEMS,
@@ -4484,7 +6238,54 @@ async def _main_text(page):
     return got if isinstance(got, str) else None
 
 
-async def _read(page, url, timeout=35000, retry_empty=False, deadline=None, keep=None, strip=True):
+async def _settle(page, cap_ms):
+    """Wait until the body has stopped growing, and never longer than `cap_ms`.
+
+    The signal is the document's own length and not the network, because `networkidle` fires while
+    a page is still writing: it was tried first and every difference it made was a LOSS, one site
+    coming back with 2,339 characters where the fixed wait had read 3,800. A wait that ends when
+    growth ends cannot stop before the content does.
+
+    Falls back to waiting the whole cap if the page will not answer, since a page that cannot be
+    measured has shown nothing about whether it is finished.
+    """
+    if not SETTLE_BY_GROWTH:
+        await page.wait_for_timeout(cap_ms)
+        return
+    import time as _t
+    t0 = _t.time()
+    last, stable = -1, 0
+    while (_t.time() - t0) * 1000.0 < cap_ms:
+        try:
+            n = await page.evaluate('document.body ? document.body.innerText.length : 0')
+        except Exception:
+            left = cap_ms - (_t.time() - t0) * 1000.0
+            if left > 0:
+                await page.wait_for_timeout(int(left))
+            return
+        if not isinstance(n, int):
+            # The docstring above promises the whole cap when the page will not answer, and that
+            # promise only held for an EXCEPTION. `page.evaluate` returning None - which is what a
+            # page with no body does, and what every test fake does - fell through to "not yet
+            # stable" and span the poll loop for the whole cap in real time. The suite went from
+            # 44 seconds to hours on it. A page that cannot be measured has shown nothing about
+            # whether it has finished, so wait out the cap and say so, exactly as on an exception.
+            left = cap_ms - (_t.time() - t0) * 1000.0
+            if left > 0:
+                await page.wait_for_timeout(int(left))
+            return
+        if n and n == last:
+            stable += 1
+            if stable >= 2:
+                return
+        else:
+            stable = 0
+        last = n
+        await page.wait_for_timeout(SETTLE_POLL_MS)
+
+
+async def _read(page, url, timeout=35000, retry_empty=False, deadline=None, keep=None, strip=True,
+                borrowed=False):
     """Read one page. `keep` is what the audit still needs after this read, in seconds.
 
     With `keep` given, the NAVIGATION is bounded by what is left of the clock less that much, so a
@@ -4494,12 +6295,21 @@ async def _read(page, url, timeout=35000, retry_empty=False, deadline=None, keep
     deliberately not bounded this way: a site whose home page is slow is a site being read, and
     cutting that read short is how a live site becomes `unreachable`.
 
-    `strip` says whether the translation widget's own furniture is taken out of the DOM at the end.
-    It has to be true wherever the returned text is used, because the widget's menu is a list of
-    language autonyms and one of them was counted as Russian content. It is false at exactly one
-    call site, the read that positions the throwaway context for `_click_language_controls`, which
-    discards everything returned here and needs the switcher still in the page to have anything to
-    click. `_click_language_controls` strips the page itself, after the click and before it reads.
+    `strip` says whether the translation widget's own furniture and the embedded social feeds are
+    taken out of the DOM at the end. That strip no longer decides the reading, which comes off the
+    document and through `_page_text`; what it decides is the BROWSER text, which is compared with
+    the text after a control is clicked, so the two sides of that comparison have to have had the
+    same furniture removed. It is false at exactly one call site, the read that positions the
+    throwaway context for `_click_language_controls`, which discards everything returned here and
+    needs the switcher still in the page to have anything to click. `_click_language_controls`
+    strips the page itself, after the click and before it reads.
+
+    `borrowed` says the browser is a person's own, attached over CDP by the retry, and it brings the
+    page to the front before the challenge poll below. A page in a background tab of a real browser
+    is throttled by that browser, and a challenge that runs in JavaScript may not finish while the
+    tab is not the one being looked at. Measured in the government session: of five walled sites
+    that had refused a 420-second wait, four came back with a page under this and the destroyed
+    context handled below, in a borrowed browser.
     """
     if keep is not None and deadline is not None:
         timeout = _budget_ms(deadline, timeout, keep=keep)
@@ -4508,16 +6318,39 @@ async def _read(page, url, timeout=35000, retry_empty=False, deadline=None, keep
     if PAGE_DELAY:
         await asyncio.sleep(PAGE_DELAY)
     resp = await page.goto(url, wait_until='domcontentloaded', timeout=timeout)
-    await page.wait_for_timeout(2200)
+    await _settle(page, HOME_SETTLE_MS)
     if retry_empty and not (await page.inner_text('body')).strip():
         # an empty body is often a slow one: the largest single failure reason in a deeper pass over
         # sites this tool had already called unreadable
         await page.wait_for_timeout(6000)
+    if borrowed:
+        # Two lines, and one of them is this. The browser belongs to a person and the page is in a
+        # tab they are not looking at, which that browser throttles; a challenge that has to run
+        # JavaScript to clear may not finish in a throttled tab at all. In a try/except because
+        # bringing a page to the front is a thing a browser may refuse and none of it is worth
+        # losing a read over.
+        try:
+            await page.bring_to_front()
+        except Exception:
+            pass
     # A Cloudflare interstitial is a wait, not a wall, when the browser looks ordinary: the challenge
     # clears itself in a few seconds. Give it that time before calling the site unreadable, since treating
     # a live site as dead is the more expensive mistake.
     for _ in range(4):
-        body = await page.inner_text('body')
+        try:
+            body = await page.inner_text('body')
+        except Exception as e:
+            # `Execution context was destroyed, most likely because of a navigation` is the
+            # challenge CLEARING: it navigated the page out from under the poll, which is the
+            # outcome the poll is waiting for, and the read failed on the good news. Only that
+            # message is caught; every other error out of `inner_text` is the page, and raising it
+            # is what tells the caller the read did not happen.
+            if 'execution context was destroyed' not in str(e).lower():
+                raise
+            if deadline is not None and deadline - _clock() <= TIME_BUDGET_RESERVE:
+                break
+            await page.wait_for_timeout(4000)
+            continue
         if not WALL_RX.search(body[:600]):
             break
         # sixteen seconds of waiting for a challenge is worth spending out of a whole audit and not
@@ -4526,22 +6359,46 @@ async def _read(page, url, timeout=35000, retry_empty=False, deadline=None, keep
             break
         await page.wait_for_timeout(4000)
     try:
-        await page.mouse.wheel(0, 5000); await page.wait_for_timeout(900)
+        await page.mouse.wheel(0, 5000)
+        await _settle(page, SCROLL_SETTLE_MS)
     except Exception:
         pass
     html = await page.content()          # kept whole: the widget marker is read out of it
     if strip:
         await _strip_widget(page)
-    # Three forms of the same text. The collapsed one is what the wall test, the parked-domain test
-    # and the same-page comparison were always taken on. The raw one keeps the line breaks the
-    # browser puts between block elements, which is the only record of where one block of the page
-    # ends and the next begins, and cross-page boilerplate removal has nothing to work with once
-    # they are gone. The third is the raw one with the furniture the markup names taken out, and it
-    # is the only one handed to `languages_in`.
+        # Somebody else's posts, out of the page on the same terms and at the same moment. After
+        # `page.content()`, so the stored document keeps them and `_without_feeds` takes them out of
+        # the stored bytes instead, which is what makes a re-judge read what the live audit read.
+        # The reading below goes through the byte side of both strips whatever this does; what these
+        # two calls govern is the browser text the click comparison is taken on.
+        await _strip_feeds(page)
+        # And the builder's own furniture, which is this page's text and not this organization's.
+        await _strip_placeholders(page)
+        # And the quoted containers, out of the counted text at the same moment and for a reason
+        # of their own: what they hold goes back on the record as `testimonial` evidence at rung 1.
+        await _lift_testimonials(page)
+    # Three forms, and the third is not a form of the other two. The collapsed browser text is what
+    # the wall test, the parked-domain test, the empty-body test and the same-page comparison were
+    # always taken on, and they stay on it: a hidden "coming soon" template must not make a live
+    # page parked, and a click's effect is measured against a text the browser laid out. The raw
+    # browser text keeps the line breaks `inner_text` puts between block elements.
+    #
+    # THE READING IS THE THIRD AND IT IS NOT A BROWSER TEXT AT ALL. `main` is `_page_text` of the
+    # document above, which is byte for byte the document `keep_pages` stores and therefore byte for
+    # byte the document `rejudge` reads; the two readers are one function applied to one document
+    # and cannot disagree. Until 0.2.0 this was the browser's `inner_text` with the chrome the
+    # markup names hidden, and the disagreement was measured: on the 1,992-address gold frame the
+    # live verdict and the re-judged verdict of the same bytes differed on 24 sites and their
+    # language lists on 13 more, with every published agreement figure computed from the re-judged
+    # side. `_page_text` reads what the server sent, so text the page does not lay out is in the
+    # reading: a `hidden` span of Spanish beside its English twin, a carousel slide that is not the
+    # visible one, a wizard step. A visitor reaches each of those without a translation.
+    #
+    # Its line breaks come from `_LINE_BREAK_TAGS` rather than from a layout, and they are what
+    # `_boilerplate` segments on; `rejudge` has segmented the same way since it existed.
     raw = await page.inner_text('body')
     text = ' '.join(raw.split())
-    main = await _main_text(page)
-    return (resp.status if resp else 0), html, text, raw, (raw if main is None else main)
+    return (resp.status if resp else 0), html, text, raw, _page_text(html)
 
 
 # How long a name is given to resolve before the answer is treated as unknown. A name that exists
@@ -4786,8 +6643,16 @@ def _store_result(path, r):
 # calls; there is no second copy of the rule, because a second copy is a second answer.
 #
 # Four steps of a live audit cannot be reproduced from stored HTML by anyone, and the honest thing
-# is to name them on the Result rather than quietly answer a slightly different question:
-REJUDGE_BROWSER_TEXT = 'browser_rendered_text'
+# is to name them on the Result rather than quietly answer a slightly different question.
+#
+# `browser_rendered_text` was the fifth and is gone from 0.2.0, because the thing it declared is no
+# longer true. The live audit read the browser's own `inner_text` with the blocks the markup calls
+# navigation hidden, this read `_text_from_html`, and the two were a different question asked of one
+# page: measured on the 1,992-address gold frame, the verdicts differed on 24 sites and the language
+# lists on 13 more. `_page_text` is now the reading on both sides and the live audit hands it the
+# same bytes the store keeps, so the reading is reproduced exactly and a reason code saying
+# otherwise would be false. A row written by an earlier release still carries the code in its own
+# `unreproducible` list, where it is the truth about that row.
 REJUDGE_SERVER_CONFIRMATION = 'server_html_confirmation'
 REJUDGE_CLICKED_CONTROLS = 'clicked_language_controls'
 REJUDGE_ROUTE_PROBE = 'locale_route_probe'
@@ -4795,29 +6660,6 @@ REJUDGE_PAGE_ORIGIN = 'page_origin'
 REJUDGE_ESCALATION = 'escalation'
 REJUDGE_NO_PAGES = 'no_pages_stored'
 REJUDGE_LIMITS = {
-    REJUDGE_BROWSER_TEXT: (
-        "The stored page is HTML. A live audit reads the browser's own inner_text, with the blocks "
-        'the markup calls navigation hidden first (`_main_text`), and neither the layout nor that '
-        'hiding survives into a stored document. The text re-read here is `_text_from_html`, which '
-        'is the same extractor the plain-HTTP rescue uses and which hides nothing and lays out '
-        'nothing. IT ALSO READS LONGER, by a measured amount rather than a guessed one: over the '
-        '379 sites of the 2026-08-05 sample whose served document and whose rendered main text both '
-        'clear 400 characters, the served text is 1.39 times the main text at the median, p10 1.06 '
-        'and p90 2.71, and it is the longer of the two on 357 of the 379. So this reader OVER-reads '
-        'far more often than it under-reads. The tag stripper repair of the same day moved that '
-        'from 1.40 on the same 379 pairs, which is to say the markup leak was a small part of it '
-        'and the rest is the navigation and the hidden panels a browser lays out and this does not. '
-        'THE TWO ALSO DISAGREE BY CLASS, not only by length. Measured on 2026-08-05 over seven '
-        'stored captures whose declared locale address the reader had found a language on: a '
-        're-judge reads a language off a page the live audit read nothing on, and the language is '
-        'in the navigation, in a menu list of short link labels, or in markup the browser never '
-        'laid out. Two of the seven are a locale page whose whole text is a translated menu and a '
-        'row of untranslated placeholders, where the live answer is the right one and this one is '
-        'wrong; one is a Chinese post list that CHROME_LABEL_MAX counts in characters, so an '
-        'eleven-character headline reads as a menu label and the live answer is the wrong one. '
-        'Neither direction is the safe one and this is not a bound in a single direction. Every '
-        'agreement figure this project publishes is computed from re-judged captures and inherits '
-        'it; LIMITATIONS.md says so beside the figure.'),
     REJUDGE_SERVER_CONFIRMATION: (
         'The decisive authored-against-widget test fetches the same address with no JavaScript and '
         "asks whether the language is in the server's response. A stored page is the RENDERED DOM, "
@@ -4944,8 +6786,10 @@ def rejudge(record, url=None):
     # bytes produced it. See the `judged_at` / `judged_version` note on `Result`.
     r.audited_at = rec.get('audited_at', '')
     r.tool_version = rec.get('tool_version', '')
+    r.tool_build = str(rec.get('tool_build', '') or '')
     r.judged_at = _utc_now()
     r.judged_version = _tool_version()
+    r.judged_build = build_id()
     r.note = rec.get('note', '')
     r.pages_read = int(rec.get('pages_read') or 0)
     # Carried, not re-derived. The search behind a stored capture is the search the run that wrote
@@ -4953,9 +6797,8 @@ def rejudge(record, url=None):
     # has its clock read off the note, which is where the live audit put it.
     r.read_quality = dict(rec.get('read_quality') or {}) or read_quality_of(
         r.pages_read, clock_exhausted='cut short by the time budget' in r.note)
-    r.unreproducible = [REJUDGE_BROWSER_TEXT, REJUDGE_SERVER_CONFIRMATION,
-                        REJUDGE_CLICKED_CONTROLS, REJUDGE_ROUTE_PROBE, REJUDGE_PAGE_ORIGIN,
-                        REJUDGE_ESCALATION]
+    r.unreproducible = [REJUDGE_SERVER_CONFIRMATION, REJUDGE_CLICKED_CONTROLS,
+                        REJUDGE_ROUTE_PROBE, REJUDGE_PAGE_ORIGIN, REJUDGE_ESCALATION]
 
     if not pages:
         # Nothing was read, so nothing can be re-read. A site that was never read has no authorship
@@ -5009,7 +6852,7 @@ def rejudge(record, url=None):
     r.declared_off_site = dict(declared_languages(home_html, r.url)[3])
     site_names = _site_names(home_html)
 
-    read_pages = [{'url': u, 'main': _text_from_html(h),
+    read_pages = [{'url': u, 'main': _page_text(h),
                    'home': u.rstrip('/').lower() == home_key} for u, h in pages.items()]
     boiler = _boilerplate([p['main'] for p in read_pages])
     home_ev, rest_ev, eng_ev = [], [], []
@@ -5079,7 +6922,14 @@ def rejudge(record, url=None):
                             server_html=_ev_server(e), server_plugin=_ev_plugin(e),
                             rules=list(_ev_recorded(e, 'rules') or
                                        (_evidence_rules(lg, 'language_control') if lg else []))))
-    r.evidence = home_ev + mid + rest_ev
+    # The quoted containers of every stored page, read off the same bytes the live audit stored and
+    # counted by nothing. Last in the list, after the findings that decided the site, because the
+    # hand-coding queue prints the first three rows and a quotation the verdict declined to count
+    # must not displace the finding it rests on.
+    quoted_ev, quoted_seen = [], set()
+    for u, h in pages.items():
+        _collect_testimonials(quoted_ev, quoted_seen, u, h, exclude=site_names)
+    r.evidence = home_ev + mid + rest_ev + quoted_ev
 
     # what the site ADVERTISES, read off the stored home document exactly as the crawl reads it off
     # the live one. `deep` only ever adds guesses, and a guess is excluded from this count either
@@ -5124,6 +6974,47 @@ def rejudge_store(path, urls=None):
             continue
         out.append(rejudge(rec))
     return out
+
+
+# ------------------------------------------------------------------ what a failed read is called
+#
+# The note on a site the crawl could not read used to be the exception's CLASS and nothing else, so
+# a Playwright error, which is one class for every network condition it reports, arrived as the
+# single word `Error`. Measured on the 144 addresses the gold-frame run recorded unreachable: 24 of
+# them carry `Error (home read retried once)` and the cause is in none of them, while a probe of the
+# same addresses the same day recovered the causes the class had thrown away,
+# net::ERR_HTTP2_PROTOCOL_ERROR on 7, a destroyed execution context on 2, and one each of
+# net::ERR_CONNECTION_CLOSED, net::ERR_NAME_NOT_RESOLVED and net::ERR_CONNECTION_TIMED_OUT. Those
+# are different failures with different answers, and `failure_kind` could not tell them apart
+# because the note did not hold them.
+#
+# The message is trimmed rather than pasted. Playwright prefixes its own message with the call that
+# raised, `Page.goto: `, and follows a network code with ` at <the address>`, which the Result
+# already carries in `url`; what is left after both is the cause. Bounded, because a note is read in
+# a terminal and in a table cell, and an unbounded one has carried a stack of a page's own
+# JavaScript before now.
+ERROR_NOTE_CHARS = 80
+# `Page.goto: `, `Browser.new_context: `, `Frame.inner_text: `: the API call, which says where the
+# read was rather than what went wrong, and which is the same for every cause.
+_PW_CALL_RX = re.compile(r'^[A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+:\s*')
+# A Chromium network code, and the address it was reported for, which is the address being audited.
+_NET_ERR_RX = re.compile(r'^(net::[A-Z0-9_]+)\b')
+
+
+def _error_note(exc, limit=ERROR_NOTE_CHARS):
+    """What an exception is called on a Result: `Error: net::ERR_HTTP2_PROTOCOL_ERROR`.
+
+    The class stays in front, because it is what every note of this shape has said since the
+    release and a stored capture is read against both. An exception with nothing to say answers
+    with the class alone, which is the string this used to write for every exception.
+    """
+    first = str(exc or '').strip().splitlines()
+    msg = _PW_CALL_RX.sub('', first[0].strip()) if first else ''
+    code = _NET_ERR_RX.match(msg)
+    if code:
+        msg = code.group(1)
+    msg = msg[:limit].strip()
+    return f'{type(exc).__name__}: {msg}' if msg else type(exc).__name__
 
 
 async def audit_async(url, max_pages=6, deep=False, timeout=None, keep_pages=False, *,
@@ -5172,8 +7063,17 @@ async def audit_async(url, max_pages=6, deep=False, timeout=None, keep_pages=Fal
 
 
 async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_private_hosts=False,
-                       browser=None, deadline=None, respect_robots=True, escalate=True):
+                       browser=None, deadline=None, respect_robots=True, escalate=True,
+                       borrowed_browser=False):
     """The audit itself. `browser`, when given, is a Chromium a caller already launched.
+
+    `borrowed_browser` means the browser is a PERSON'S, attached over CDP by the retry, and the
+    whole point of borrowing it is its own fingerprint: no context here may then override the
+    user agent, because a real browser's own string names the version and the platform it really
+    is, and writing UA over it puts a second, invented browser on a real profile. A shared batch
+    browser is not borrowed, which is why this is its own flag and not inferred from
+    `browser is not None`. Measured on 40 bot-walled sites: with the override 0 recovered; without
+    it, sites answered with full pages (krrcmichigan.org 403->200, nfmc.org aborted->200).
 
     A batch that audits thousands of sites spends a second or two and a few hundred megabytes per
     site launching a browser it throws away. Passing one in skips that. What isolates one site from
@@ -5182,12 +7082,18 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
     way. A browser handed in is not closed here, since the caller is still using it; the contexts
     opened here are.
     """
+    # every context this audit opens shares these; a borrowed browser keeps its own UA
+    _ctx_kw = dict(ignore_https_errors=True, locale='en-US',
+                   viewport={'width': 1366, 'height': 1100})
+    if not borrowed_browser:
+        _ctx_kw['user_agent'] = UA
     given = url                                     # before the scheme, before any redirect
     if not url.startswith('http'):
         url = 'https://' + url
     r = Result(url=url, requested_url=given)
     r.audited_at = r.judged_at = _utc_now()
     r.tool_version = r.judged_version = _tool_version()
+    r.tool_build = r.judged_build = build_id()
     advertised = 0
     # Whether any page read carried a control this package cannot name. Declared with `advertised`
     # rather than inside the crawl, because the crawl runs twice on an escalation and this is a fact
@@ -5230,8 +7136,7 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
         # reached only on the paths that ran to the end, and the early returns below each had
         # to remember to close for themselves.
         try:
-            ctx = await b.new_context(user_agent=UA, ignore_https_errors=True, locale='en-US',
-                                      viewport={'width': 1366, 'height': 1100})
+            ctx = await b.new_context(**_ctx_kw)
             if block_private_hosts:
                 await _install_host_guard(ctx, dns_cache)
             await ctx.add_init_script("Object.defineProperty(navigator,'webdriver',{get:()=>undefined});")
@@ -5256,7 +7161,8 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                         continue
                     try:
                         st, h1, t1, w1, m1 = await _read(pg, cand, retry_empty=deep,
-                                                         deadline=deadline)
+                                                         deadline=deadline,
+                                                         borrowed=borrowed_browser)
                         # A server refusing is not a page in English. One site answers with
                         # 145 characters of "403 Forbidden", and the site was reported english_only.
                         if st and st >= 400 and len(t1) < HTTP_ERROR_MAX_BODY:
@@ -5291,7 +7197,7 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                         r.note = ('bot wall' if WALL_RX.search(t1[:600])
                                   else f'empty body (HTTP {st})')
                     except Exception as e:
-                        r.note = f'{type(e).__name__}'
+                        r.note = _error_note(e)
                 return last_html, last_text, last_raw, last_main
 
             page = await ctx.new_page()
@@ -5317,9 +7223,7 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                     if deadline is not None and _left(deadline) <= TIME_BUDGET_RESERVE:
                         raise TimeoutError('no time left for the home retry')
                     await asyncio.sleep(4)
-                    spare = await b.new_context(user_agent=UA, ignore_https_errors=True,
-                                                locale='en-US',
-                                                viewport={'width': 1366, 'height': 1100})
+                    spare = await b.new_context(**_ctx_kw)
                     if block_private_hosts:
                         await _install_host_guard(spare, dns_cache)
                     await spare.add_init_script(
@@ -5327,7 +7231,7 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                     spare_page = await spare.new_page()
                     h2, t2, w2, m2 = await _read_home(spare_page, spare)
                 except Exception as e:
-                    r.note = f'{type(e).__name__}'
+                    r.note = _error_note(e)
                 r.note = (r.note + ' ' if r.note else '') + '(home read retried once)'
                 if t2:
                     home_html, home_text, home_raw, home_main = h2, t2, w2, m2
@@ -5352,6 +7256,15 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                 # checked again on the landed address, since the recorded one may have redirected
                 r.note = "a third-party directory profile, not the organization's own website"
                 return False
+            # WHERE IT LANDED, before the text is read at all. A domain that has gone to a
+            # registrar's marketplace forwards to that marketplace's host, and the page that
+            # arrives is the marketplace's, whatever its wording says this month. The same rule 2
+            # and the same note as the text test, because it is the same finding about the
+            # organization: the address on file is not a website the organization runs.
+            if _parked_host(r.url):
+                r.note = "a parked or expired domain, not the organization's own website"
+                r.rules = [2]
+                return False
             # The whole home text goes to both, not a slice. Each cuts its own window, 1,200 and 600
             # characters as before, and reads its length gates off the length of the whole read: a
             # 600-character slice can never reach the 1,500-character gate, so a call site that
@@ -5361,6 +7274,20 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                 r.rules = [2]
                 return False
             if not home_text or is_wall(home_text):
+                # Before recording a read failure, ask whether there was anything to read. A host
+                # the resolver says does not exist is a lapsed domain, which is a finding about the
+                # organization; every other failure here is ours. `failure_kind` separates the two
+                # and no verdict moves, because both remain `unreachable`.
+                if not home_text and not is_wall(home_text) and not _reached_the_host(r.note):
+                    # `_resolves` and not a second lookup: it already answers True / False / None,
+                    # and None is a resolver that did not say, which must not become a finding.
+                    # Only an outright False is written down.
+                    try:
+                        _h = urlsplit(r.url).hostname or ''
+                        if _h and await _resolves(_h, dns_cache) is False:
+                            r.note = ((r.note + ' ') if r.note else '') + NO_DNS_NOTE
+                    except Exception:
+                        pass
                 return False    # unreachable: the site was not read, which is not the same as English only
             # NOT guarded here, and the decision rests on a measurement over the study's county
             # captures: of the recorded county addresses that land on another domain, nearly all
@@ -5419,12 +7346,22 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
             # Every page read, kept whole, because the language reading now happens after the crawl:
             # a segment is furniture when it is on most of the pages, and that cannot be known while
             # the first page is still the only one in hand.
-            # `main` is taken as it comes and is NOT backed off to the whole body when it is empty:
-            # `_read` has already substituted the whole body for a page that could not be asked, so
-            # an empty one here means the page's entire text was furniture, which is a page with
-            # nothing on it to read rather than a page to read whole.
-            read_pages = [{'url': r.url, 'raw': home_raw or home_text, 'main': home_main,
-                           'home': True, 'sm': False}]
+            # `main` is the reading and it is `_page_text` of the document, which is the function
+            # `rejudge` reads the same page with; its own line breaks are what `_boilerplate`
+            # segments on, exactly as they are on a re-judge. It is taken as it comes and is NOT
+            # backed off to the browser text when it is empty: an empty one means the served
+            # document had no readable text in it, and substituting a different reader for those
+            # pages is the divergence this release removed. The browser's text does not travel in
+            # here at all any more, because nothing downstream read it: it decides the wall, the
+            # parked-domain and the click comparisons, and all three are made where it is taken.
+            read_pages = [{'url': r.url, 'main': home_main, 'home': True, 'sm': False}]
+            # The quoted containers of the home page. `_lift_testimonials` has already taken them
+            # out of the text above; this reads the SAME containers out of the document that was
+            # stored before the strip and puts each one on the record at rung 1. Kept in a list of
+            # its own so that it joins `r.evidence` last, and so that one sitewide testimonial
+            # slider is recorded once rather than once per page.
+            quoted_ev, quoted_seen = [], set()
+            _collect_testimonials(quoted_ev, quoted_seen, r.url, home_html, exclude=site_names)
             plugin_seen = CMS_RX.search(home_html)
             if plugin_seen:
                 r.evidence.append(Evidence('translation_plugin', r.url,
@@ -5436,8 +7373,7 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
             # afterwards came back translated, at the organization's own ordinary addresses, and rule 10
             # counted that as the organization's own writing. Three organizations were all
             # called multilingual off text their widget had produced.
-            cctx = await b.new_context(user_agent=UA, ignore_https_errors=True, locale='en-US',
-                                       viewport={'width': 1366, 'height': 1100})
+            cctx = await b.new_context(**_ctx_kw)
             if block_private_hosts:
                 await _install_host_guard(cctx, dns_cache)
             try:
@@ -5449,9 +7385,11 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                 # development regression frames: 157 language-labelled controls in the page before
                 # the strip and 51 after it, with 13 sites losing every control they had. This
                 # read's return value is discarded, so nothing downstream sees the unstripped text.
-                await _read(cpage, r.url, strip=False)
+                await _read(cpage, r.url, strip=False, borrowed=borrowed_browser)
+                control_scan = {}
                 worked, dead, stuck = await _click_language_controls(
-                    cpage, home_text, r.url, exclude=site_names, deadline=deadline)
+                    cpage, home_text, r.url, exclude=site_names, deadline=deadline,
+                    outcome=control_scan)
                 for lg, u, label, q in worked:
                     r.evidence.append(Evidence('language_control', u, q, lg,
                                                rules=_evidence_rules(lg, 'language_control')))
@@ -5477,6 +7415,32 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                 if dead and not any(_ev_lang(e) for e in r.evidence
                                     if _ev_mech(e) in ('language_control', 'translated_page')):
                     r.note = (r.note + '; ' if r.note else '') + CONTROL_DEAD_NOTE
+                    # And, where the scan did not finish, that it did not. The class is unchanged:
+                    # `control_dead` is a substring test for CONTROL_DEAD_NOTE, so a second
+                    # sentence after it moves no verdict. What it answers is the question this
+                    # observation could not be asked before, which is whether the control that
+                    # would have produced a language was simply never reached. See
+                    # CONTROL_SCAN_CUT_NOTE for the measurement that says this is not what put the
+                    # 33 gold-frame rows in the class, and for why the class is left alone until
+                    # the shape has a count.
+                    if control_scan.get('cut_short'):
+                        r.note = r.note + '; ' + CONTROL_SCAN_CUT_NOTE
+            except (TypeError, NameError):
+                # NOT swallowed, and these two only. A browser cannot raise them and neither can a
+                # network: a bad call or a name that is not there is a defect in this file, and
+                # this block is wide enough to hide one completely. It did. A test double of
+                # `_click_language_controls` written against the previous signature raised
+                # TypeError here on 2026-09-18, the whole control step was skipped, the note was
+                # never written, and the audit returned `machine_translate` on a fixture whose
+                # answer is `machine_translate_error`. Nothing failed and nothing was printed. The
+                # same shape is already recorded inside the step itself, where a two-value return
+                # met a three-value unpack and the ValueError went into the caller's guard.
+                #
+                # AttributeError is deliberately still swallowed. This file duck-types the page it
+                # is handed on purpose, `getattr(page, 'context', None)` being the pattern, so a
+                # borrowed browser or an older driver missing a method is a degradation this block
+                # exists to absorb rather than a defect to raise on.
+                raise
             except Exception:
                 pass
             finally:
@@ -5720,7 +7684,8 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                         # to navigate, and the audit was cancelled with the site read and unjudged.
                         st, ih, it, iw, im = await _read(
                             page, u, 25000, retry_empty=deeper, deadline=deadline,
-                            keep=TIME_BUDGET_RESERVE + READ_TAIL_RESERVE)
+                            keep=TIME_BUDGET_RESERVE + READ_TAIL_RESERVE,
+                            borrowed=borrowed_browser)
                     except _ClockExhausted:
                         # The audit's clock ran out before this read could begin, which is the budget
                         # spent and not a page that would not load. Recorded as the crawl being cut
@@ -5791,8 +7756,8 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                     if keep_pages:
                         r.pages[page.url] = ih
                     r.lang_declared[page.url] = page_language(ih)
-                    read_pages.append({'url': page.url, 'raw': iw or it, 'main': im,
-                                       'home': False, 'sm': k in _sm_keys})
+                    read_pages.append({'url': page.url, 'main': im, 'home': False,
+                                       'sm': k in _sm_keys})
                     # The widget scan runs over every page that was read, not over the front door
                     # alone. Measured on the census capture of July 2026, in the SERVER documents of
                     # 45,100 organizations: a home-page-only scan finds 1,768 of the 1,844
@@ -5806,6 +7771,9 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                     if not r.machine_translation:
                         r.machine_translation = widget_name(ih, r.url)
                     control_unnamed = control_unnamed or unnamed_control(ih)
+                    # this page's quoted containers, on the same terms as the home page's
+                    _collect_testimonials(quoted_ev, quoted_seen, page.url, ih,
+                                          exclude=site_names)
                     if not plugin_seen:
                         plugin_seen = CMS_RX.search(ih)
                         if plugin_seen:
@@ -6114,8 +8082,9 @@ async def _audit_async(url, max_pages=6, deep=False, keep_pages=False, block_pri
                 for e in home_ev:
                     e.server_plugin = True
             # the home page's own writing first, then the plugin marker and any control that was
-            # clicked, then the interior pages: the order the evidence was found in
-            r.evidence = home_ev + r.evidence + rest_ev
+            # clicked, then the interior pages, and last the quotations no class counts: the order
+            # the evidence was found in, with the uncounted rows after the ones that decided it
+            r.evidence = home_ev + r.evidence + rest_ev + quoted_ev
             if from_sitemap and not from_elsewhere:
                 r.note = ((r.note + ' ' if r.note else '')
                           + 'evidence only from sitemap-sourced pages')
@@ -6299,6 +8268,7 @@ LOCALE_ROUTE = re.compile(
     # and LOCALE_PARAM promises its caller the VALUE names the language, which this one never does.
     r'[?&](?:lang|language|lang_update|locale|hl)=|translate\.goog|_x_tr_sl=', re.I)
 
+
 # `en` is in ISO639, so LOCALE_ROUTE matches `/en/about`, `en.example.org` and `?lang=en` exactly as
 # it matches `/es/about`. That is right for LOCALE_ROUTE, which answers whether an address is a
 # locale route at all, and wrong for a record of what an ABSENCE claim skipped: the site's English
@@ -6442,7 +8412,9 @@ SWITCHER_ISO = {
     'es': 'Spanish', 'zh': 'Chinese', 'zh-cn': 'Chinese', 'zh-tw': 'Chinese', 'zh-hans': 'Chinese',
     'zh-hant': 'Chinese', 'yue': 'Chinese', 'ko': 'Korean', 'vi': 'Vietnamese', 'ar': 'Arabic',
     'ru': 'Russian', 'fr': 'French', 'ht': 'Haitian Creole', 'pt': 'Portuguese', 'so': 'Somali',
-    'am': 'Amharic', 'tl': 'Tagalog', 'fil': 'Tagalog', 'ja': 'Japanese', 'km': 'Khmer',
+    'am': 'Amharic', 'ti': 'Tigrinya', 'om': 'Oromo', 'tl': 'Tagalog', 'fil': 'Tagalog',
+    'ja': 'Japanese',
+    'km': 'Khmer',
     'ne': 'Nepali', 'hi': 'Hindi', 'bn': 'Bengali', 'th': 'Thai', 'he': 'Hebrew', 'iw': 'Hebrew',
     'de': 'German', 'it': 'Italian', 'pl': 'Polish', 'ro': 'Romanian', 'tr': 'Turkish',
     'hu': 'Hungarian', 'id': 'Indonesian', 'sq': 'Albanian', 'lv': 'Latvian', 'uk': 'Ukrainian',
@@ -6466,10 +8438,17 @@ SWITCHER_ISO = {
 # written in it, and a reader comparing the two fields has to know which gap is an instrument limit
 # rather than a fact about the site.
 #
-# Nepali has been in this state since the first version of the package, by accident: LANGNAME
-# matched नेपाली and `nepali` as switcher labels, and nothing ever read a Nepali page. It was pinned
-# here by name so that a second such addition had to be somebody's decision rather than a side
-# effect.
+# NEPALI WAS THE LAST MEMBER AND IS NOT ONE NOW, so the set is empty and the asymmetry it records
+# is, today, empty too. It had been in this state since the first version of the package, by
+# accident: LANGNAME matched नेपाली and `nepali` as switcher labels, and nothing ever read a Nepali
+# page. It was pinned here by name so that a second such addition had to be somebody's decision
+# rather than a side effect, and the pin did its work: it is what made the Devanagari resolution a
+# decision to take rather than a gap nobody could see. DEV_FUNC and `_devanagari_language` now
+# separate Nepali from Hindi and Marathi on their grammatical words, so `languages` can say Nepali.
+#
+# The set stays, empty, for the reason it was written. An empty frozenset is the honest statement
+# that every name the switcher vocabulary carries is a name the reader can also reach, and the next
+# switcher-only name will have to be added here by somebody who meant to.
 #
 # Kurdish was the second member from 2026-08-01 to 2026-08-02 and is NOT one now. The half of that
 # decision that changed and the half that did not are both recorded below, because the name has not
@@ -6489,7 +8468,7 @@ SWITCHER_ISO = {
 # So `Kurdish` in `switcher_languages` and absent from `languages` no longer proves the instrument
 # could not have read it: it may be a Kurmanji site, which is still invisible. That is a weaker
 # statement than the one this set makes, and it belongs in the limitations rather than here.
-SWITCHER_ONLY = frozenset({'Nepali'})
+SWITCHER_ONLY = frozenset()
 
 # The autonyms a switcher writes, mapped to the name the package reads that language under. This is
 # now the SOURCE of the click vocabulary rather than a copy of it: `_click_vocabulary` builds
@@ -6504,12 +8483,27 @@ SWITCHER_AUTONYM = {
     'kreyol': 'Haitian Creole', 'kreyòl ayisyen': 'Haitian Creole',
     'kreyol ayisyen': 'Haitian Creole', 'português': 'Portuguese', 'portugues': 'Portuguese',
     'soomaali': 'Somali', 'afsoomaali': 'Somali', 'af-soomaali': 'Somali',
-    'af soomaali': 'Somali', 'አማርኛ': 'Amharic', 'tagalog': 'Tagalog',
+    # ትግርኛ arrives with the Ethiopic resolution above. The exonym `Tigrinya` already resolved,
+    # because the click vocabulary is built from COVERED and the reader now names the language; the
+    # autonym and the code did not, so a menu written the way an Eritrean or Ethiopian organization
+    # writes it offered a language this package could read and could not hear offered.
+    'af soomaali': 'Somali', 'አማርኛ': 'Amharic', 'ትግርኛ': 'Tigrinya',
+    # both spellings a control carries, the bare name and the way the language names itself
+    'afaan oromoo': 'Oromo', 'oromoo': 'Oromo', 'tagalog': 'Tagalog',
     'नेपाली': 'Nepali', '日本語': 'Japanese', 'ខ្មែរ': 'Khmer', 'українська': 'Ukrainian',
     'deutsch': 'German', 'italiano': 'Italian', 'polski': 'Polish', 'português brasileiro':
     'Portuguese', 'shqip': 'Albanian', 'türkçe': 'Turkish', 'magyar': 'Hungarian',
     'فارسی': 'Persian', 'دری': 'Persian', 'עברית': 'Hebrew', 'ไทย': 'Thai', 'हिन्दी': 'Hindi',
-    'বাংলা': 'Bengali', 'bahasa indonesia': 'Indonesian', 'kiswahili': 'Swahili',
+    # অসমীয়া arrives with the Bengali-script resolution. The exonym and the code `as` already
+    # resolved, the first through COVERED and the second through AUX_ISO; the autonym did not, so a
+    # menu written the way an Assamese organization writes it offered a language the reader now
+    # names and the switcher could not hear offered.
+    # Four more autonyms with the four Brahmic script gates. Every one of these languages was
+    # already in the switcher vocabulary under its English name, through AUX_NAMES; what was
+    # missing is the spelling a community organization actually puts on the control.
+    'বাংলা': 'Bengali', 'অসমীয়া': 'Assamese', 'ਪੰਜਾਬੀ': 'Punjabi', 'ગુજરાતી': 'Gujarati',
+    'தமிழ்': 'Tamil', 'తెలుగు': 'Telugu', 'հայերեն': 'Armenian', 'ქართული': 'Georgian',
+    'bahasa indonesia': 'Indonesian', 'kiswahili': 'Swahili',
     'latviešu': 'Latvian', 'lietuvių': 'Lithuanian', 'română': 'Romanian', 'български': 'Bulgarian',
     # Added 2026-08-01. Read off the labels the stored captures actually carry rather than invented:
     # `Hmoob`, `پښتو` and `Kurdî (KU)` each appear in the label survey, and `မြန်မာဘာသာ` is
@@ -7534,11 +9528,24 @@ def class_for(authorship, sufficiency, widget=False, route_was_english=False,
                                                                  client_widget names a widget)
       none                      any (0)              yes         machine_translate
       none                      any (0)              no          english_only
-      any of the above that is not true_multilingual, with a route the site advertises coming
-      back in English and the widget having produced nothing:   english_only    (rule 15)
+      any of the above with a WIDGET that is not true_multilingual, with a route the site
+      advertises coming back in English and the widget having produced nothing:
+                                                                english_only    (rule 15)
       the same, but with the observation being a control that was CLICKED and changed
       nothing:                                       machine_translate_error    (rule 16)
     ---------------------------------------------------------------------------------------
+
+    Both overrides sit inside the `if widget:` branch, and the two rows above say so because the
+    table did not and was read as though they reached the no-widget rows. They do not, and rule
+    16's own criterion is why: it reads `a control of a NAMED WIDGET that was operated and changed
+    nothing`, so a site where no vendor marker matched has no widget for the class to be about, and
+    calling it machine_translate_error would name a machine translation nothing found. Over the
+    2,000-site gold frame, 88 readings record a dead control in the note and 33 are in the class.
+    Of the other 55, 40 are true_multilingual and 1 is machine_translate, where the observation is
+    correctly silent because the site published its own second language or the widget produced one
+    somewhere else; the remaining 14 are english_only with no vendor named, which is this branch.
+    The observation stays on the record as evidence with no language and rule 16 on it, and 10 of
+    those 14 are queued by nothing, which is a gap in `needs_human` and not in this function.
 
     `unreachable` is not here. It is decided before any of this, by whether the site was read at
     all, and a site that was not read has no authorship and no sufficiency to record.
@@ -7727,7 +9734,7 @@ def _aux_quote(text, lang, n=140):
     if _ft() is None:
         return ''
     for block in AUX_SPLIT.split(text)[:200]:
-        if len(block) < AUX_MIN_BLOCK:
+        if not _aux_asked(block):
             continue
         if _aux_name(_lid(block)[0], block) == lang:
             return _snip(block, 0, n)
@@ -8337,6 +10344,7 @@ def _failed(url, note):
     r = Result(url=url, requested_url=url, note=note[:200])
     r.audited_at = r.judged_at = _utc_now()
     r.tool_version = r.judged_version = _tool_version()
+    r.tool_build = r.judged_build = build_id()
     return r
 
 
@@ -8369,13 +10377,28 @@ def _failed(url, note):
 # say: a run whose drivers died on 2026-08-11 produced rows whose last attempt read `HTTP 403`, and
 # those were being counted as a property of the site. A study counting unread sites has to be able
 # to set them aside, so they carry their own name and it is tested FIRST, before the inherited text.
-FAILURE_KINDS = ('robots_disallow', 'directory_profile', 'bot_wall', 'http_403', 'http_404',
-                 'http_status', 'timeout', 'empty_body', 'malformed_address',
-                 'no_page_any_driver', 'unspecified_error', 'other')
+#
+# `protocol_error` and `connection_closed` arrived on 2026-09-18 with the notes that can say them.
+# Until that day the note on a failed read was the exception's class alone, so every Chromium
+# network condition reached this table as the bare word `Error` and fell into `unspecified_error`,
+# which is the name for a cause nobody wrote down and not the name for these. Both are transport
+# failures below HTTP: nothing was refused and nothing was served, the connection itself did not
+# hold, and a second read on a fresh browser is the answer to them, which `RETRY_PASS_KINDS` below
+# is. They are not `bot_wall`, because no wall was shown, and not `empty_body`, because no body
+# arrived to be empty.
+FAILURE_KINDS = ('no_dns', 'robots_disallow', 'directory_profile', 'parked_domain', 'bot_wall',
+                 'http_403', 'http_404', 'http_status', 'timeout', 'protocol_error',
+                 'connection_closed', 'empty_body', 'malformed_address', 'no_page_any_driver',
+                 'unspecified_error', 'other')
 
 # The fragment `written_off` writes into the note, named once so the note and the pattern that reads
 # it cannot drift apart, on the pattern CONTROL_DEAD_NOTE and ROUTE_ENGLISH_NOTE already keep.
 DEAD_DRIVER_NOTE = 'attempts across as many browser drivers'
+
+# The fragment written where the resolver says the host does not exist. `unreachable` answers whether
+# the site was read; this says the site is not there to read, which is a fact about the organization
+# and not about the crawl, and no better client recovers it.
+NO_DNS_NOTE = 'the domain does not resolve'
 
 # Ordered, and the order is all of the parsing: the first pattern that matches wins, so the
 # named mechanisms are tested before the catch-alls. `unspecified_error` is last but one because
@@ -8383,18 +10406,51 @@ DEAD_DRIVER_NOTE = 'attempts across as many browser drivers'
 # it would otherwise swallow every entry above it. `no_page_any_driver` is FIRST, because its note
 # carries the last attempt's words after its own and would otherwise be classed by them.
 _FAILURE_PATTERNS = (
+    # FIRST, and before `no_page_any_driver`: a dead domain is also read by every driver and
+    # would otherwise be classed by the driver note it carries beside this one.
+    ('no_dns', re.compile(re.escape(NO_DNS_NOTE), re.I)),
     ('no_page_any_driver', re.compile(re.escape(DEAD_DRIVER_NOTE), re.I)),
     ('robots_disallow', re.compile(r'robots\.txt', re.I)),
     ('directory_profile', re.compile(r'directory profile|social media page', re.I)),
+    # Beside `directory_profile`, which it belongs with: both say the address on file was never a
+    # website the organization runs. Rule 2 has written this note since the release and it landed
+    # in `other`, so the family a study most wants to set aside was the family it could not name.
+    ('parked_domain', re.compile(r'parked or expired domain', re.I)),
     ('bot_wall', re.compile(r'bot wall|captcha|cloudflare|challenge page', re.I)),
     ('malformed_address', re.compile(r'invalid\s+\S*\s*url|malformed', re.I)),
     ('empty_body', re.compile(r'empty body', re.I)),
-    ('timeout', re.compile(r'\btimeout|timed out\b', re.I)),
+    # The two transport failures, which became nameable on 2026-09-18 when the note began to carry
+    # the exception's message instead of its class. Both are tested before `unspecified_error` and
+    # after every named mechanism above, because a note carrying one of these carries the word
+    # `Error` as well and would otherwise be filed under the name for a cause nobody wrote down.
+    # Only the codes that have been observed on this project's own frames are here, for the reason
+    # the widget lists are kept that way: a name added off a vendor's or a browser's error table,
+    # with no row that produced it, is a pattern nobody can check. `net::ERR_NAME_NOT_RESOLVED` is
+    # deliberately NOT mapped to `no_dns`: that name is a claim about the organization, and the
+    # only evidence this package accepts for it is the resolver answering outright that the host
+    # does not exist, which `_resolves` asks separately and writes as NO_DNS_NOTE.
+    ('protocol_error', re.compile(r'net::ERR_(?:HTTP2_PROTOCOL_ERROR|EMPTY_RESPONSE)\b', re.I)),
+    ('connection_closed', re.compile(r'net::ERR_CONNECTION_CLOSED\b|\bconnection closed\b', re.I)),
+    # `timed[ _]out` and not `timed out`: Chromium spells it net::ERR_CONNECTION_TIMED_OUT, which
+    # read as an unspecified error for as long as no note could carry it.
+    ('timeout', re.compile(r'\btimeout|timed[ _]out\b', re.I)),
     ('http_403', re.compile(r'\bHTTP 403\b')),
     ('http_404', re.compile(r'\bHTTP 404\b')),
     ('http_status', re.compile(r'\bHTTP [1-5]\d\d\b')),
     ('unspecified_error', re.compile(r'\bError\b|Error\s*\(')),
 )
+
+
+# A note that proves the host answered. An HTTP status, a bot wall and a robots.txt response each
+# require a connection, so the host resolved and asking the resolver again can only contradict what
+# has already been observed: a fixture read `HTTP 404 on the home page ... the domain does not
+# resolve`, which cannot both be true. Where any of these is in the note, the DNS question is moot.
+_REACHED_RX = re.compile(r'HTTP\s+\d{3}|bot wall|captcha|cloudflare|challenge page|robots\.txt',
+                         re.I)
+
+
+def _reached_the_host(note):
+    return bool(_REACHED_RX.search(str(note or '')))
 
 
 def failure_kind(result):
@@ -8585,9 +10641,90 @@ def capture_acceptance(results):
             'why': '; '.join(why) or 'the reading is as deep as this code gives on a quiet machine'}
 
 
+# ------------------------------------------------------- reading the batch's own failures again
+#
+# Three of the families in FAILURE_KINDS say nothing about the site. The driver died, or the
+# connection did not hold, or the clock ran out while eight other sites were being read on the same
+# machine. Measured on the 144 addresses the gold-frame run of 2026-09-08 recorded unreachable, all
+# of which were probed once on 2026-09-18 at concurrency 2: of the 10 carrying
+# `Browser.new_context: Connection closed`, which is the shared browser dying under a site that was
+# then written down as unreadable, 9 answered the probe; of the 11 carrying a timeout, 10 answered
+# within 30 seconds, against the 240-second bound the run was given, so what ran out was the machine
+# under concurrency 8 and not the site. Reading those rows again on a browser of their own is the
+# repair, and it is cheap because the families are small.
+#
+# What is NOT here matters as much. `bot_wall`, `http_403` and the rest of the HTTP families are the
+# site answering, and answering the same way twice; `robots_disallow` is a host's instruction and a
+# second read would be a second fetch it asked not to have; `no_dns`, `parked_domain` and
+# `directory_profile` are settled facts about the address. A retry over those would be this package
+# reading sites that already said no, which is the one thing the conduct section promises it does
+# not do.
+#
+# `no_page_any_driver` is the harder absence and it is deliberate. That name is written by
+# `written_off`, which a row reaches only after AUDIT_MAX_ATTEMPTS whole drivers have read it and
+# returned nothing, and the run's own rule is that three drivers that read nothing are a broken
+# machine and not a frame of dead websites. Reading such a row here would open a fourth driver past
+# the point the run stops at, and the batch-teardown test in tests/test_engineering.py holds that
+# count. The driver that dies UNDER a site, rather than before the run gives up
+# on it, arrives as `connection_closed`: on the gold frame that is
+# `Browser.new_context: Connection closed`, carried by 10 of the 144, 9 of which answered the probe.
+RETRY_PASS_KINDS = ('connection_closed', 'protocol_error', 'timeout')
+# Two, and not the run's own concurrency. The rows in this pass are the rows a loaded machine
+# produced, so reading them back at the load that produced them is the one setting guaranteed to
+# reproduce the failure.
+RETRY_PASS_CONCURRENCY = 2
+# Written onto every row the pass touched, whichever reading is kept, so that a row read on the
+# second browser is legible as one in a store and a row that failed twice is legible as having been
+# offered a second chance rather than as having been left where it fell.
+RETRY_PASS_NOTE = 'retried on a fresh browser'
+# A timed-out row is read back on a DOUBLED clock, and it is the one kind in the pass that is.
+# The first version of this pass gave every row the clock the run was given, which for a timeout is
+# the clock that just ran out, and it recovered none of the 12 timed-out addresses it was offered on
+# the 144-address re-read of 2026-09-18. Those same 12, read again the same day with everything else
+# held identical and `--timeout` at 480 instead of 240, answered: 11 of the 12 read a page, at a
+# median of 15 pages, and the one that did not is the one whose failure was never the clock. The
+# organization-census runbook measures the same thing at scale, the 240-second bound cutting 51% of
+# crawls short against 10% at 480. So what those rows record is this package's clock and not the
+# site, and reading them back under the same clock asks the question that has already been answered.
+#
+# `connection_closed` and `protocol_error` stay on the run's own clock. Neither spent it: a
+# connection that did not hold fails in seconds, and giving those rows longer buys nothing and
+# spends a batch's tail on sites whose failure was instant.
+RETRY_PASS_SLOW_KINDS = ('timeout',)
+RETRY_PASS_CLOCK_FACTOR = 2
+# The doubling is bounded, because `timeout` is a per-site clock and a run set to 480 would
+# otherwise put 16 minutes into one address at the tail of every batch. 600 seconds is the ceiling
+# the census runbook uses for a single site and the point past which a site is not slow but gone.
+RETRY_PASS_CLOCK_CAP = 600.0
+
+
+def _retry_pass_eligible(result):
+    """Whether this reading is one the end-of-batch pass reads again. See `RETRY_PASS_KINDS`."""
+    return failure_kind(result) in RETRY_PASS_KINDS
+
+
+def _retry_pass_clock(result, timeout):
+    """The clock the pass gives this row: the run's own, doubled and capped for a timed-out site.
+
+    `timeout` of None is a run with no per-site bound, and there is nothing to double.
+    """
+    if not timeout or failure_kind(result) not in RETRY_PASS_SLOW_KINDS:
+        return timeout
+    return min(timeout * RETRY_PASS_CLOCK_FACTOR, RETRY_PASS_CLOCK_CAP)
+
+
+def _with_retry_pass_note(r):
+    """The same Result, with `RETRY_PASS_NOTE` appended once."""
+    note = r.note or ''
+    if RETRY_PASS_NOTE not in note:
+        r.note = (note + ' ' if note else '') + f'({RETRY_PASS_NOTE})'
+    return r
+
+
 async def audit_many_async(urls, concurrency=4, max_pages=6, deep=False, timeout=None,
                            keep_pages=False, *, block_private_hosts=False, respect_robots=True,
-                           store=None, on_result=None, escalate=True, retain=True, sectors=None):
+                           store=None, on_result=None, escalate=True, retain=True, sectors=None,
+                           retry_pass=True):
     """Audit a list of sites in batches, and return the results in the order given.
 
     A census run reads thousands of addresses, and `audit_async` launches and throws away a Chromium
@@ -8623,6 +10760,17 @@ async def audit_many_async(urls, concurrency=4, max_pages=6, deep=False, timeout
     each site's read quality that is kept whatever `retain` is.
 
     `escalate` means what it means on `audit_async`, and is ON.
+
+    `retry_pass` is ON, and is the end-of-batch second reading. When a batch has run to the end, the
+    rows it produced whose failure is one of `RETRY_PASS_KINDS` are read once more, on a browser
+    launched for them alone, at `RETRY_PASS_CONCURRENCY`, under the per-site `timeout` the run was
+    given, and under twice that, capped at `RETRY_PASS_CLOCK_CAP`, for a row whose failure was the
+    clock itself. The
+    second reading replaces the first only if it read at least one page, and either way the row
+    says `RETRY_PASS_NOTE`, so a store shows which rows were offered the pass. One pass and no
+    more: a row that failed the same way twice on two browsers is a row about the site. Only the
+    rows in that pass are settled late, so `on_result` and `store` still see one row per site and
+    see it once. Passing False is how a study measures what the pass recovers.
 
     When the run ends, `capture_acceptance` is applied to it and a run that fails raises a warning
     naming what failed. A warning and not an exception: the results are real results and throwing
@@ -8688,6 +10836,71 @@ async def audit_many_async(urls, concurrency=4, max_pages=6, deep=False, timeout
             note += f'. last attempt: {r.note}'
         return _failed(urls[i], note)
 
+    async def read_again(rows):
+        """One more reading of `rows` (index -> the batch's result), on a browser of their own.
+
+        A driver of its own as well as a browser of its own: this opens its own `_playwright()`,
+        which is the thing the batch boundary repairs and the thing `_fresh` inside a batch cannot.
+        The reading is the ordinary one, with the same pages and the same rules, so a row this
+        recovers is judged exactly as every other row in the run was judged. The clock is the one
+        thing that moves, and only for a timed-out row: see `_retry_pass_clock` for the measurement
+        that put it there. A row read on the longer clock read MORE pages than the run's own bound
+        allows, which is a reading no worse than another site's and better than most.
+
+        Returns index -> the Result to record, which is the second reading where it read a page and
+        the batch's own where it did not. A machine that cannot start a browser at all ends the
+        pass and returns the batch's results untouched: there is nothing to say about a site that
+        was not opened, and the rows are already honest rows.
+        """
+        out = dict(rows)
+        try:
+            async with _playwright() as pw:
+                b = await _launch(pw)
+                sem2 = asyncio.Semaphore(max(1, RETRY_PASS_CONCURRENCY))
+
+                async def again(i):
+                    async with sem2:
+                        # per ROW, because a timed-out row is read back on a doubled clock and
+                        # every other kind in the pass keeps the run's own. See
+                        # `_retry_pass_clock`.
+                        clock = _retry_pass_clock(rows[i], timeout)
+                        try:
+                            call = _audit_async(urls[i], max_pages, deep,
+                                                keep_pages or bool(store), block_private_hosts,
+                                                browser=b,
+                                                **_audit_extras(clock, respect_robots,
+                                                                escalate))
+                            return i, await (asyncio.wait_for(call, clock) if clock else call)
+                        except asyncio.TimeoutError:
+                            return i, _failed(urls[i], f'timed out after {clock}s')
+                        except Exception as e:
+                            return i, _failed(urls[i], _error_note(e))
+
+                tasks2 = [asyncio.ensure_future(again(i)) for i in sorted(rows)]
+                try:
+                    # gathered rather than taken as they complete: nothing streams out of this
+                    # pass, since every row in it was held back from `settle` until it ends, and
+                    # `return_exceptions` means one site that raises here leaves the rest alone
+                    # and leaves its own batch reading standing.
+                    for got in await asyncio.gather(*tasks2, return_exceptions=True):
+                        if isinstance(got, BaseException):
+                            continue
+                        i, r2 = got
+                        if r2.pages_read > 0:
+                            out[i] = r2
+                finally:
+                    for t in tasks2:
+                        if not t.done():
+                            t.cancel()
+                    await asyncio.gather(*tasks2, return_exceptions=True)
+                    try:
+                        await b.close()
+                    except BaseException:
+                        pass
+        except BrowserUnavailable:
+            return dict(rows)
+        return {i: _with_retry_pass_note(r) for i, r in out.items()}
+
     async def run_batch(chunk):
         """Read one chunk of indices inside ONE `async_playwright()`.
 
@@ -8695,9 +10908,23 @@ async def audit_many_async(urls, concurrency=4, max_pages=6, deep=False, timeout
         """
         sem = asyncio.Semaphore(max(1, concurrency))
         held = {}                # index -> a result too fast and too empty to be believed yet
+        later = {}               # index -> a failure the end-of-batch pass reads again
         settled = 0
         streak = 0
         torn = False
+
+        def record(i, r):
+            """Settle this reading now, or hold it for the end-of-batch pass.
+
+            Held and not settled twice: `settle` writes the row to `store` and hands it to
+            `on_result`, and a caller counting rows may not be given two for one site.
+            """
+            if retry_pass and _retry_pass_eligible(r):
+                later[i] = r
+                return 0
+            settle(i, r)
+            return 1
+
         async with _playwright() as pw:
             state = {'b': await _launch(pw)}
             relaunching = asyncio.Lock()
@@ -8778,8 +11005,7 @@ async def audit_many_async(urls, concurrency=4, max_pages=6, deep=False, timeout
                                 continue
                             r = written_off(i, r)
                         streak = 0
-                        settle(i, r)
-                        settled += 1
+                        settled += record(i, r)
             finally:
                 for t in tasks:
                     if not t.done():
@@ -8793,6 +11019,21 @@ async def audit_many_async(urls, concurrency=4, max_pages=6, deep=False, timeout
             # the batch ran to the end, so the held results were slow machinery and not a dead one
             for i in sorted(held):
                 r = held[i] if attempts[i] < AUDIT_MAX_ATTEMPTS else written_off(i, held[i])
+                settled += record(i, r)
+            # and the failures that say nothing about the site get one reading on a browser of
+            # their own. A TORN batch gets none: its rows go back in the queue for a whole driver
+            # of their own, which is the stronger repair, and reading them here would spend the
+            # pass on a machine that has just been shown to be broken.
+            if later:
+                for i, r in sorted((await read_again(later)).items()):
+                    settle(i, r)
+                    settled += 1
+        elif later:
+            # Settled as they stand, exactly as they were before the pass existed. They are not
+            # returned unsettled to be offered another batch: that would make a torn batch mean
+            # something different for these rows than for every other row in it, and the
+            # difference would be invisible in the output.
+            for i, r in sorted(later.items()):
                 settle(i, r)
                 settled += 1
         return [i for i in chunk if results[i] is None], torn, settled
@@ -8847,7 +11088,7 @@ def _warn_if_thin(results):
 
 def audit_many(urls, concurrency=4, max_pages=6, deep=False, timeout=None, keep_pages=False, *,
                block_private_hosts=False, respect_robots=True, store=None, on_result=None,
-               escalate=True, retain=True, sectors=None):
+               escalate=True, retain=True, sectors=None, retry_pass=True):
     """The blocking form of `audit_many_async`, for a script or a notebook.
 
     Same thread fallback as `audit`: a notebook already has a loop running and `asyncio.run` will
@@ -8856,13 +11097,14 @@ def audit_many(urls, concurrency=4, max_pages=6, deep=False, timeout=None, keep_
     `on_result` and `retain` mean what they mean on `audit_many_async`: a per-site callback as each
     site settles, and whether to hold every reading in the returned list or free it once it has gone
     to `store` and `on_result`. A script writing its own output as it goes can turn both to use.
+    `retry_pass` is the end-of-batch second reading, and is ON.
     """
     def go():
         return asyncio.run(audit_many_async(urls, concurrency, max_pages, deep, timeout,
                                             keep_pages, block_private_hosts=block_private_hosts,
                                             respect_robots=respect_robots, store=store,
                                             on_result=on_result, escalate=escalate, retain=retain,
-                                            sectors=sectors))
+                                            sectors=sectors, retry_pass=retry_pass))
     try:
         asyncio.get_running_loop()
     except RuntimeError:

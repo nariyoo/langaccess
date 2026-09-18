@@ -40,10 +40,11 @@ WHAT IT CANNOT CATCH, which is the honest half.
   Anything the fake browser cannot do. These pages are served from a map, so no capture here goes
   through a real layout, a real click on a collapsed switcher, a real challenge wait, a real DNS
   answer or a real robots.txt. OPEN_CLICK_MS and OPEN_SETTLE_MS, the two constants missed on
-  2026-08-01, decide a reading on a live site and decide nothing here. One fixture is read through a
-  browser that answers the chrome-removal script off its own markup, so the SELECTOR that decides
-  what `_main_text` hides is exercised; the script itself is JavaScript and is exercised in
-  `tests/test_live.py`.
+  2026-08-01, decide a reading on a live site and decide nothing here. Nor does the chrome removal:
+  from 0.2.0 it decides only what a page says after a language control is CLICKED, this corpus's
+  browser has nothing to click, and the selector is held against a second implementation of the
+  script in `test_the_chrome_selector_still_names_what_it_was_written_to_name` while the script
+  itself runs against a real browser in `tests/test_live.py`.
 
   A change that moves a reading on a real site while these stay put. Thirty-one sites is
   thirty-one sites. This says a change is not inert; it never says a change is safe. Three changes
@@ -73,7 +74,7 @@ from html.parser import HTMLParser
 import pytest
 
 from langaccess import core as LA
-from test_engineering import _MapBrowser, _MapCtx, _MapPage, _PlainClient
+from test_engineering import _MapBrowser, _PlainClient
 
 _FIXTURE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
 _CORPUS_PATH = os.path.join(_FIXTURE_DIR, 'reading_corpus.json')
@@ -91,29 +92,26 @@ CORPUS_BY_NAME = {f['name']: f for f in CORPUS}
 _PLATFORM_HOSTS = ('www.guidestar.org', 'www.facebook.com')
 
 
-# ------------------------------------------------------------------ a browser with a document in it
+# ------------------------------------------------------------- a second reading of the chrome script
 #
-# WHY THIS EXISTS. `_main_text` hands the browser a script, and every fake page in this suite answers
-# `evaluate` with None, which is the value that means "this page could not be asked" and sends the
-# audit back to reading the whole body. So the chrome removal ran 364 times over these fixtures and
-# decided nothing, and the defect that motivated the whole gate was invisible to it: CHROME_SEL
-# written without the leading `a` matches `id="wp--skip-link--target"`, the id WordPress block themes
-# put on the `<main>` that wraps the page, and the selector then hid the document and returned the
-# empty string. Substituting the defective selector into a run of this file moved nothing.
+# WHY THIS EXISTS. The defect that motivated the whole gate was invisible to an audit of these
+# fixtures: CHROME_SEL written without the leading `a` matches `id="wp--skip-link--target"`, the id
+# WordPress block themes put on the `<main>` that wraps the page, and the selector then hid the
+# document and returned the empty string. Substituting the defective selector into a run of this
+# file moved nothing, because every fake page here answers `evaluate` with None.
+#
+# WHAT THE SCRIPT STILL DECIDES. Not a page reading, from 0.2.0 on: `_read` takes that off the
+# served document through `_page_text`, which is the function `rejudge` reads a stored page with,
+# and it calls no script. What is left is the text a page reports AFTER a language control has been
+# clicked, which `_click_language_controls` asks `_main_text` for, and the defect above is still
+# reachable there: a hidden document is a control read as dead, which is rule 16.
 #
 # WHAT IS REAL HERE AND WHAT IS NOT. The four constants the script is called with arrive from
-# `langaccess.core` through the `evaluate` argument, and the skip-link phrase list is read out of
-# `_CHROME_JS` itself, so the things a change would move are the things this reads. The ALGORITHM is
-# a second implementation of the same three steps and can drift from the JavaScript; what it is here
-# to answer is which elements a selector reaches, which is where the defect was. The JavaScript is
-# exercised against a real browser in `tests/test_live.py`.
-#
-# WHY ONE FIXTURE AND NOT ALL OF THEM. A fixture records the browser's text beside its HTML and
-# the two do not agree on the rest: `english_only` keeps a `<a href="/services">Services</a>`
-# in its markup that its recorded text does not carry. Deriving the text from the document would
-# move readings that have nothing to do with the chrome rule, so a fixture asks for this by carrying
-# `dom`, and the one that does is written so that its recorded text is what this returns with
-# nothing hidden.
+# `langaccess.core`, and the skip-link phrase list is read out of `_CHROME_JS` itself, so the things
+# a change would move are the things this reads. The ALGORITHM is a second implementation of the
+# same three steps and can drift from the JavaScript; what it is here to answer is which elements a
+# selector reaches, which is where the defect was. The JavaScript is exercised against a real
+# browser in `tests/test_live.py`, where a click is a click.
 _SKIP_PHRASES = re.compile(re.search(r'const SKIP = /(.*?)/i;', LA._CHROME_JS).group(1), re.I)
 _VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param',
          'source', 'track', 'wbr'}
@@ -255,28 +253,6 @@ def _chrome_free_text(html, selector, min_items, share, label_max):
     return _inner_text(root.find('body') or root, hidden)
 
 
-class _DomPage(_MapPage):
-    """A map page that answers the chrome-removal script off the document it is serving."""
-
-    async def evaluate(self, script, arg=None):
-        if not (isinstance(script, str) and 'laHidden' in script):
-            return None
-        selector, min_items, share, label_max = arg
-        return _chrome_free_text(self._html, selector, min_items, share, label_max)
-
-
-class _DomCtx(_MapCtx):
-    async def new_page(self):
-        return _DomPage(self)
-
-
-class _DomBrowser(_MapBrowser):
-    async def new_context(self, **k):
-        ctx = _DomCtx(self)
-        self.contexts.append(ctx)
-        return ctx
-
-
 def _read(fixture):
     """Audit one fixture through the fake browser, with the resolver answered from the fixture.
 
@@ -286,9 +262,10 @@ def _read(fixture):
     map instead, which is deterministic and still exercises the subdomain path for a fixture that
     declares one.
 
-    A fixture carrying `dom` is read through the browser above, which answers the chrome-removal
-    script off its own markup; every other fixture is read through the browser that declines to
-    answer it, which is what all twenty were recorded under.
+    Every fixture is read through the same browser. A fixture used to be able to ask for one that
+    answered the chrome-removal script off its own markup, and that browser is gone with the reading
+    it served: from 0.2.0 `_read` takes the page reading off the document through `_page_text` and
+    calls no script at all, so the two browsers had become one and the flag decided nothing.
     """
     pages = {u: tuple(v) for u, v in fixture['pages'].items()}
     hosts = {u.split('/')[2] for u in pages}
@@ -299,8 +276,7 @@ def _read(fixture):
     real = LA._resolves
     LA._resolves = resolves
     try:
-        make = _DomBrowser if fixture.get('dom') else _MapBrowser
-        browser = make(pages, plain=_PlainClient(dict(fixture.get('plain', {}))))
+        browser = _MapBrowser(pages, plain=_PlainClient(dict(fixture.get('plain', {}))))
         return asyncio.run(LA._audit_async(fixture['url'], browser=browser))
     finally:
         LA._resolves = real
@@ -310,8 +286,12 @@ def _reading(r):
     """Everything about a Result that describes the SITE.
 
     `audited_at` and `tool_version` describe the run and are left out: a clock that moved is not a
-    reading that moved, and a version bump would otherwise re-record this gate for nothing. `pages`
-    is left out because it is the input echoed back.
+    reading that moved, and a version bump would otherwise re-record this gate for nothing.
+    `tool_build` and `judged_build` are left out on the same ground and for one more reason of their
+    own: they are the sha256 of `core.py`, so a comment edited anywhere in that file would move them
+    and re-record a gate whose subject is what the instrument READS. The record is an allowlist
+    rather than a list of exclusions, so a field added to `Result` stays out of the digest until
+    somebody names it here. `pages` is left out because it is the input echoed back.
     """
     return {
         'verdict': r.verdict,
@@ -369,7 +349,95 @@ def _digest(readings):
 # `test_every_fixture_reads_as_it_did` prints the field-level difference, so the note can be written
 # from the failure output. Re-record by running the suite once with LANGACCESS_RECORD_READINGS=1,
 # which rewrites tests/fixtures/reading_expected.json, and then pasting the digest it reports.
-READINGS = '99859d1d637ff286fbb0b43e974fb9d7180e3aaa684b20456ff31fa7b382b193'
+# 2026-09-17, Ethiopic. One record was added, `tigrinya_pages`, and no existing fixture moved: the
+# diff of reading_expected.json is that record and nothing else. The site reads true_multilingual
+# on English and Tigrinya where the same pages read english_only before, because the Ethiopic range
+# could only answer Amharic and a Tigrinya paragraph carries no Amharic particle.
+#
+# 2026-09-17, Devanagari. One record was added, `nepali_pages`, and again no existing fixture moved,
+# which is the half worth checking here: the same commit changes how SCRIPT_FUNC['Hindi'] is
+# matched, from a boundary that could only see fragments to the script's own edge, and no page in
+# this corpus was carrying a Devanagari reading for that to disturb. The new site reads English and
+# Nepali where the same pages read English and Hindi before.
+#
+# 2026-09-17, the Bengali script. One record added, `assamese_pages`, and no existing fixture moved.
+# The site reads English and Assamese where the same pages read English and Bengali before.
+#
+# 2026-09-17, four Brahmic ranges. One record added, `south_asian_locale_tree`, and no existing
+# fixture moved. It reads true_multilingual over five pages in English, Punjabi, Gujarati, Tamil
+# and Telugu, where the same five pages read english_only before: each notice is one sentence and
+# the identifier's gate wants two of 140 characters.
+#
+# 2026-09-17, Armenian and Georgian. One record added, `armenian_pages`, and no existing fixture
+# moved. Georgian has no fixture, because no invented Georgian page was written for this corpus;
+# its range and its list are held by unit tests alone, which is the weaker of the two and is stated
+# rather than papered over.
+#
+# 2026-09-17, Oromo. One record added, `oromo_word_gate`, and no existing fixture moved, which is
+# the check a new Latin-script word list most needs: a list that fired on somebody else's page
+# would move a reading here rather than only adding one.
+#
+# 2026-09-17, Lithuanian. One record added, `lithuanian_help_notice`, and no existing fixture
+# moved. It is the first fixture here whose non-English page is a single short notice rather than a
+# paragraph, which is the shape a thin word list loses.
+# 2026-09-17, the merge of the recall and language branches: forty-one records, the thirty-three
+# of the base plus the one the recall branch added and the seven the language branch added; every
+# record was checked equal to the branch that wrote it and no earlier record moved.
+#
+# 2026-09-17, codebook rule 9 inside a script. One record added, `armenian_event_subtitles`, and no
+# existing fixture moved, which is the half that matters here: this commit makes a gate STRICTER,
+# so a fixture moving would have been a reading lost. The 41 that existed, including the Armenian,
+# Tigrinya, Nepali, Assamese and four-script South Asian pages added earlier today, all still read
+# what they read. The new record reads english_only on three verbless bilingual subtitles joined by
+# a conjunction, which is the shape that moved one real site off its settled class.
+#
+# 2026-09-18, one reader for the live audit and the re-judge. No record was added and 11 of the 42
+# moved: armenian_pages, assamese_pages, granicus_lang_update, lithuanian_help_notice,
+# nepali_pages, onsite_alternate_declares, oromo_word_gate, persian_mission_page,
+# south_asian_locale_tree, swahili_word_gate and urdu_arabic_full_stop.
+#
+# WHAT MOVED ON ALL ELEVEN IS THE QUOTE AND ONLY THE QUOTE. The diff of reading_expected.json is
+# `evidence[n]['quote']` on those eleven and nothing else: no verdict, no language, no rule number,
+# no authorship, no rung, no note, no page count. Each quote now opens one word earlier, with the
+# document's own `<title>` ("Huduma", "Center", "केन्द्र") in front of the paragraph it always
+# quoted. The reading is `_page_text` of the served document now, which is the function `rejudge`
+# has always read a stored page with, and `_text_from_html` takes the title because a title is text
+# in the document; `inner_text('body')`, which the live audit read before, does not. So the eleven
+# are the live reader arriving at the reading every published agreement figure was computed on.
+#
+# THE TITLE IS NOT A NEW HAZARD AND IS NOT DEFENDED AGAINST. A title alone cannot produce a
+# reading: rule 6 wants four distinct function words inside one 500-character window of connected
+# prose, and rule 8 puts the home document's own title in `_site_names`, which `languages_in`
+# excludes. What it can do is sit at the left edge of a quote, which is what these eleven records
+# show, and a consumer reading `evidence` sees it there.
+#
+# 2026-09-18, the shapes a browser does not lay out. Three records were added and no existing
+# record moved. `hidden_language_span_pair` and `display_none_language_panel` read
+# true_multilingual in English and Spanish, with the Spanish quoted and `server_html` true on it,
+# where the same two pages read english_only under the reader this release replaced: their browser
+# text is the English half and the document carries both. `hidden_english_mobile_menu` is their
+# control and reads english_only with no evidence at all, which is what says the new reader finds
+# the Spanish on those two and does not manufacture a language out of any unrendered text it meets.
+# The three are the corpus's first fixtures whose recorded browser text is deliberately NARROWER
+# than their document; every other fixture's two halves agree or differ only in furniture.
+# 2026-09-18, the same merge: the reader branch's three fixtures join, and every earlier record
+# reads as the branch that last wrote it (the eleven quote shifts the reader branch recorded,
+# the placeholder branch's untouched records).
+# 2026-09-18, a quoted testimonial is recorded and not counted. TWO records added,
+# `quoted_testimonial_only` and `own_paragraph_beside_testimonials`, and no existing fixture
+# moved: the diff of reading_expected.json is those two records and nothing else. That is the half
+# worth checking here, because this commit takes text OUT of the counted stream and a fixture
+# moving would have been a reading lost. The first site reads english_only with the Spanish
+# testimonial on the record as a `testimonial` row at rung 1, where the same pages read
+# true_multilingual before. The second is the boundary: its own Spanish paragraph sits beside the
+# same two testimonial cards, is counted at rung 2, and the site still reads true_multilingual,
+# which is the shape that refused a rule over the TEXT in September 2026. Measured figures: no
+# accuracy figure in LIMITATIONS 1 is recomputed, because the 2,000-site gold standard is not
+# coded in this tree; what the change moves on the two captures is in LIMITATIONS 7.2 and in the
+# commit message.
+# 2026-09-18, the same merge: the testimonial branch's two fixtures join (forty-seven records) and
+# every record equals the branch that last wrote it.
+READINGS = 'b704aac2f4bd1be35c39073d975e166a239d66a6cb445ca503c615066aed6ab7'
 
 
 def _expected():
@@ -398,6 +466,19 @@ def test_the_readings_digest_has_not_moved():
         'the instrument reads these pages differently than it did. Run the suite once with '
         'LANGACCESS_RECORD_READINGS=1 to rewrite the expected file, read the diff of that file, and '
         'record the new digest with a note saying which reading moved and why.')
+
+
+def test_the_run_fields_are_not_in_the_record():
+    """The gate is over readings, so nothing that describes the RUN may enter it. The two builds
+    are the field this test was written for: they are the hash of `core.py`, and a gate that held
+    them would have to be re-recorded by every edit to a comment in that file, which is how a gate
+    stops being read."""
+    r = _read(CORPUS[0])
+    assert r.tool_build and r.tool_build == r.judged_build, 'the fixture audit has to stamp them'
+    record = _reading(r)
+    for f in ('audited_at', 'tool_version', 'tool_build', 'judged_at', 'judged_version',
+              'judged_build', 'pages'):
+        assert f not in record, '%s describes the run, not the site' % f
 
 
 def test_the_corpus_covers_the_classes_it_was_built_from():
@@ -449,8 +530,20 @@ def test_the_corpus_covers_the_classes_it_was_built_from():
     # Swahili joined 2026-08-06 with `swahili_word_gate`: the first language here the package's
     # own word lists cannot express, read through langid and the closed-class word gate, so the
     # auxiliary path finally has a fixture on its positive side.
+    # Tigrinya joined with `tigrinya_pages`. It is the second language of a script the corpus
+    # already carried, so what it adds is not a script but the resolution inside one: before
+    # ETHIOPIC the Ethiopic range could only answer Amharic, and a Tigrinya page answered nothing.
+    # Nepali joined with `nepali_pages`, and it is the first Devanagari page here at all, so the
+    # boundary SCRIPT_FUNC_EDGE fixes is exercised by a reading and not only by a unit test.
+    # Assamese joined with `assamese_pages`, the first Bengali-script page here, so the boundary is
+    # exercised by a reading in that script too.
+    # Punjabi, Gujarati, Tamil and Telugu joined together with `south_asian_locale_tree`, one site
+    # publishing the same notice on four locale routes, which is the shape the four Brahmic ranges
+    # were added for.
     assert languages == {'English', 'Spanish', 'Japanese', 'Chinese', 'Ukrainian', 'Persian',
-                         'Urdu', 'Swahili'}, (
+                         'Urdu', 'Swahili', 'Tigrinya', 'Nepali', 'Assamese',
+                         'Punjabi', 'Gujarati', 'Tamil', 'Telugu', 'Armenian', 'Oromo',
+                         'Lithuanian'}, (
         'the corpus no longer reads these languages: %s' % sorted(languages))
 
 
@@ -473,17 +566,21 @@ def test_the_corpus_holds_a_reading_the_review_queue_asks_a_person_about_for_its
     assert control['declared_off_site'] == {'alternates': 0, 'languages': []}
 
 
-def test_the_corpus_reads_a_page_the_markup_says_is_mostly_furniture():
-    """`_main_text` is a reading path and a corpus that cannot reach it does not freeze it.
+def test_the_chrome_selector_still_names_what_it_was_written_to_name():
+    """The selector is no longer a page reading and it still has to be right.
 
-    Two things are held. The audit of `skip_link_target_wrapper` has to ask the browser for the
-    chrome-free text and get an ANSWER, since a fixture whose browser returns None sends the audit
-    back to reading the whole body and takes the selector out of the gate without moving the digest.
-    And the answer has to be narrower than the body, since a chrome-free text identical to the body
-    would pass the first half while hiding nothing.
+    `_CHROME_JS` decides one thing from 0.2.0 on: the text a page reports after a language control
+    is clicked. This corpus's browser has no control to click, so nothing here exercises it through
+    an audit, and asserting that it did would be the pretence this file exists to refuse. What is
+    held instead is the selector, against the second implementation above, over the one fixture
+    written for the shape that broke it: the answer has to be narrower than the body, since a
+    chrome-free text identical to the body would hide nothing, and the wrapper the defect was about
+    has to survive with its Spanish in it.
+
+    The last two lines are the other half. The same page's READING is taken the other way now, off
+    the served document, and the Spanish under the wrapper has to come through that as well.
     """
     fixture = CORPUS_BY_NAME['skip_link_target_wrapper']
-    assert fixture.get('dom'), 'the fixture no longer asks for a browser that answers the script'
     html, body = fixture['pages'][fixture['url']][0], fixture['pages'][fixture['url']][1]
     main = _chrome_free_text(html, LA.CHROME_SEL, LA.CHROME_LIST_MIN_ITEMS, LA.CHROME_LIST_SHARE,
                              LA.CHROME_LABEL_MAX)
@@ -566,6 +663,123 @@ def test_the_corpus_holds_a_site_of_each_shape_the_english_reading_can_take():
         'axis is derived from' % stray)
     assert only_english['verdict'] == 'english_only'
     assert rd['authored_spanish_page']['verdict'] == 'true_multilingual'
+
+
+def test_the_corpus_holds_a_page_whose_second_language_is_inside_a_social_feed():
+    """A feed embed is somebody else's writing, and the container is what says so.
+
+    Three things are held, because asserting the verdict alone would pass on a corpus whose feed
+    carried no Spanish at all. The document HAS the Spanish; the reader that takes the containers
+    out does not find it; and the site reads `english_only` on that reading. The DOM half of the
+    same strip is not exercised here: this corpus's fake browser answers every `evaluate` with
+    None, so the reading comes through the plain-client rescue, which is the one route where the
+    markup decides the text. `tests/test_core.py` holds the selector and the byte reader to one
+    list of containers.
+    """
+    fixture = CORPUS_BY_NAME['social_feed_container']
+    doc = list(fixture['plain'].values())[0]
+    assert 'id="sb_instagram"' in doc and 'class="sbi_item"' in doc, (
+        'the fixture no longer carries a feed container, so nothing in it is a feed')
+    assert 'Spanish' in LA.languages_in(LA._text_from_html(doc)), (
+        'the feed in this fixture carries no Spanish, so removing it proves nothing')
+    assert 'Spanish' not in LA.languages_in(LA._page_text(doc))
+    reading = _readings()['social_feed_container']
+    assert reading['verdict'] == 'english_only' and reading['languages'] == ['English']
+
+
+def test_the_corpus_holds_the_shapes_a_browser_does_not_lay_out():
+    """The reading is the served document from 0.2.0, and these three fixtures are what that buys.
+
+    Four things are held on each of the two positive fixtures, because asserting the verdict alone
+    would pass on a fixture whose hidden half carried no Spanish. The document HAS the Spanish; the
+    browser text recorded beside it does NOT, which is the fixture modelling a page whose markup
+    keeps that half out of the layout; the reading finds it; and the site reads true_multilingual
+    with the Spanish quoted and confirmed against the server document.
+
+    The third is the control, and it is the half that keeps this honest. Reading text a browser did
+    not lay out could have been a licence to read anything, and a hidden English mobile menu is
+    what a theme leaves in nearly every document there is. That site reads english_only with no
+    evidence on it at all.
+
+    These are the two mechanisms a reviewer confirmed on real sites: paired language-tagged spans
+    and a panel behind `display:none`, which is also what a tab, an accordion and a carousel slide
+    that is not the visible one leave in a document.
+    """
+    rd = _readings()
+    for name, host in (('hidden_language_span_pair', 'hidden-span'),
+                       ('display_none_language_panel', 'hidden-panel')):
+        fixture = CORPUS_BY_NAME[name]
+        doc, browser_text = fixture['pages'][fixture['url']][:2]
+        assert 'Nuestro centro' in doc, (
+            '%s no longer carries Spanish in its document, so hiding it proves nothing' % name)
+        assert 'Nuestro centro' not in browser_text, (
+            '%s records a browser text that already carried the Spanish, so the fixture no longer '
+            'models a page whose markup keeps it out of the layout' % name)
+        assert 'Nuestro centro' in LA._page_text(doc)
+        reading = rd[name]
+        assert reading['verdict'] == 'true_multilingual'
+        assert reading['languages'] == ['English', 'Spanish']
+        quoted = [e for e in reading['evidence'] if e['language'] == 'Spanish']
+        assert len(quoted) == 1 and 'Nuestro centro' in quoted[0]['quote']
+        assert quoted[0]['server_html'], 'the server ships it, which is what authorship turns on'
+
+    control = CORPUS_BY_NAME['hidden_english_mobile_menu']
+    doc = control['pages'][control['url']][0]
+    assert 'display:none' in doc and 'Volunteer' in doc, (
+        'the control no longer carries a hidden menu, so it controls for nothing')
+    assert 'Volunteer' in LA._page_text(doc), 'the reader does read it; that is the point'
+    assert rd['hidden_english_mobile_menu']['verdict'] == 'english_only'
+    assert rd['hidden_english_mobile_menu']['languages'] == ['English']
+    assert rd['hidden_english_mobile_menu']['evidence'] == []
+
+
+def test_the_corpus_holds_a_page_whose_only_second_language_is_a_quoted_testimonial():
+    """A testimonial is somebody else's writing and the container is what says so.
+
+    Four things are held, because asserting the verdict alone would pass on a corpus whose
+    testimonial carried no Spanish at all. The document HAS the Spanish; the reader that takes the
+    containers out does not find it; the site reads `english_only` on that reading; and the
+    quotation is ON THE RECORD at rung 1, which is the half that separates this from the feed
+    strip, where a removed container leaves no trace. The DOM half of the same strip is not
+    exercised here, for the reason the feed test above gives.
+    """
+    fixture = CORPUS_BY_NAME['quoted_testimonial_only']
+    doc = list(fixture['plain'].values())[0]
+    assert 'class="testimonial-card"' in doc, (
+        'the fixture no longer carries a testimonial container, so nothing in it is a testimonial')
+    assert 'Spanish' in LA.languages_in(LA._text_from_html(doc)), (
+        'the testimonial in this fixture carries no Spanish, so removing it proves nothing')
+    assert 'Spanish' not in LA.languages_in(LA._page_text(doc))
+    reading = _readings()['quoted_testimonial_only']
+    assert reading['verdict'] == 'english_only' and reading['languages'] == ['English']
+    quoted = [e for e in reading['evidence'] if e['mechanism'] == LA.MECH_TESTIMONIAL]
+    assert [(e['language'], e['sufficiency'], e['authorship']) for e in quoted] == [
+        ('Spanish', LA.SUFF_TOKEN, LA.AUTHOR_NONE)], (
+        'the quotation has to stay on the record, or this is a reading that vanished')
+    assert reading['by_language']['Spanish']['sufficiency'] == LA.SUFF_NONE
+
+
+def test_the_corpus_holds_the_page_the_container_rule_must_not_take():
+    """The boundary, and the case that refused a rule over the TEXT in September 2026.
+
+    One organization of the reviewed sample publishes four participant testimonials in Spanish AND
+    its own Spanish paragraph about its programme on the same page, and it does publish in
+    Spanish. This fixture is that shape: the paragraph is outside the containers, so it is counted
+    and the site stays `true_multilingual` while the quotations beside it are recorded and counted
+    by nothing. A change that widened a container until it swallowed the paragraph would move this
+    fixture, which is what it is here for.
+    """
+    fixture = CORPUS_BY_NAME['own_paragraph_beside_testimonials']
+    doc = list(fixture['plain'].values())[0]
+    assert 'class="testimonial-card"' in doc and 'Nuestro centro ofrece' in doc
+    reading = _readings()['own_paragraph_beside_testimonials']
+    assert reading['verdict'] == 'true_multilingual'
+    assert reading['languages'] == ['English', 'Spanish']
+    counted = [e for e in reading['evidence'] if e['mechanism'] == 'inline_text']
+    assert [e['language'] for e in counted] == ['Spanish'], (
+        "the organization's own paragraph is what the verdict rests on")
+    assert 'Nuestro centro ofrece' in counted[0]['quote']
+    assert any(e['mechanism'] == LA.MECH_TESTIMONIAL for e in reading['evidence'])
 
 
 def test_every_address_in_the_corpus_is_a_reserved_one():

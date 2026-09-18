@@ -396,7 +396,6 @@
   "why": "A language menu the site draws itself, including one label this package has no name for. It fills switcher_languages and switcher_unresolved and must move no verdict."
  },
  {
-  "dom": true,
   "name": "skip_link_target_wrapper",
   "pages": {
    "https://skiptarget.example/": [
@@ -779,5 +778,273 @@
   "plain": {},
   "url": "https://swahili-services.example/",
   "why": "Real Swahili prose on an ordinary address with no widget anywhere. Swahili is langid's to find and plain ASCII, so the 2026-08-06 word gate is the only thing between it and silence: the blocks carry kwa, katika, kila, bila, wetu and kuhusu, clear the two-distinct-items bar with room, and the reading survives. The gate's negative side is unit-tested on _script_allows, where langid's n-gram caprice is not in the loop."
+ },
+ {
+  "name": "social_feed_container",
+  "pages": {
+   "https://riverbend-centre.example/": [
+    "<html><body>Forbidden</body></html>",
+    "Forbidden",
+    403
+   ]
+  },
+  "plain": {
+   "https://riverbend-centre.example": "<html><head><title>Riverbend Family Centre</title></head><body><p>Our centre helps families with school enrolment, housing questions and legal appointments every weekday morning. Staff meet parents at the office, walk them through the forms the county asks for, and book an interpreter when one is needed. A caseworker can also visit a school with a parent when a meeting has been called. There is no charge for any of this and no appointment is needed before a first visit to the front desk. </p><div id=\"sb_instagram\"><div class=\"sbi_item\"><p>Gracias a todos los que nos ayudaron durante nuestra fiesta de verano en el parque; fue una tarde muy bonita para nuestra comunidad y para cada familia que vino con nosotros hasta el final de la jornada, cuando pudimos compartir la comida que trajeron desde sus casas.</p></div></div></body></html>"
+  },
+  "url": "https://riverbend-centre.example/",
+  "why": "A Smash Balloon Instagram feed carrying a member's Spanish post, inside an English page. The feed container is somebody else's writing rendered into this page, so `_without_feeds` removes it before the text is read and the site stays english_only. The reading comes through the plain-client rescue because that is the one route in this corpus where the markup decides the text: the fake browser answers every evaluate with None, so the DOM half of the same strip decides nothing here and is unit-tested in tests/test_core.py instead."
+ },
+ {
+  "name": "tigrinya_pages",
+  "pages": {
+   "https://tigrinya-center.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/tigrinya\">ትግርኛ</a><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school.</p></body></html>",
+    "ትግርኛ Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school.",
+    200
+   ],
+   "https://tigrinya-center.example/tigrinya": [
+    "<html><head><title>ማእከል</title></head><body><p>ማእከልና ኣብ ነፍሲ ወከፍ ሰሙን ንስደተኛታት ስድራቤታት ነጻ ሕጋዊ ምኽሪ ይህብ። ኣገልግሎት ክፍሊት የብሉን ከምኡውን ብዛዕባ ናይ መንበሪ ኩነታት ኣይንሓትትን።</p><p>ቤት ጽሕፈት ካብ ሰኑይ ክሳብ ዓርቢ ክፉት እዩ ድማ ኣብ መቐበሊ ትግርኛ ዝዛረብ ሰብ ኩሉ ግዜ ኣሎ። ተርጓሚ እንተደሊኹም ቅድሚ ክልተ መዓልቲ ክትሓቱ ትኽእሉ ኢኹም።</p></body></html>",
+    "ማእከልና ኣብ ነፍሲ ወከፍ ሰሙን ንስደተኛታት ስድራቤታት ነጻ ሕጋዊ ምኽሪ ይህብ። ኣገልግሎት ክፍሊት የብሉን ከምኡውን ብዛዕባ ናይ መንበሪ ኩነታት ኣይንሓትትን። ቤት ጽሕፈት ካብ ሰኑይ ክሳብ ዓርቢ ክፉት እዩ ድማ ኣብ መቐበሊ ትግርኛ ዝዛረብ ሰብ ኩሉ ግዜ ኣሎ። ተርጓሚ እንተደሊኹም ቅድሚ ክልተ መዓልቲ ክትሓቱ ትኽእሉ ኢኹም።",
+    200
+   ]
+  },
+  "plain": {
+   "https://tigrinya-center.example/tigrinya": "<html><head><title>ማእከል</title></head><body><p>ማእከልና ኣብ ነፍሲ ወከፍ ሰሙን ንስደተኛታት ስድራቤታት ነጻ ሕጋዊ ምኽሪ ይህብ። ኣገልግሎት ክፍሊት የብሉን ከምኡውን ብዛዕባ ናይ መንበሪ ኩነታት ኣይንሓትትን።</p><p>ቤት ጽሕፈት ካብ ሰኑይ ክሳብ ዓርቢ ክፉት እዩ ድማ ኣብ መቐበሊ ትግርኛ ዝዛረብ ሰብ ኩሉ ግዜ ኣሎ። ተርጓሚ እንተደሊኹም ቅድሚ ክልተ መዓልቲ ክትሓቱ ትኽእሉ ኢኹም።</p></body></html>"
+  },
+  "url": "https://tigrinya-center.example/",
+  "why": "Invented Tigrinya prose on a locale page, beside an English home page. Ethiopic is one range and two languages, and the SCRIPTS entry is named Amharic, so before ETHIOPIC this page carried no Amharic particle, the run test refused it and the site read english_only. It is the second language of the Ethiopic script to reach this corpus, and its second paragraph carries መቐበሊ, so the letter half of the resolution is on a page here and not only in a unit test."
+ },
+ {
+  "name": "nepali_pages",
+  "pages": {
+   "https://nepali-center.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/nepali\">नेपाली</a><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school.</p></body></html>",
+    "नेपाली Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school.",
+    200
+   ],
+   "https://nepali-center.example/nepali": [
+    "<html><head><title>केन्द्र</title></head><body><p>हाम्रो संस्थाले हरेक हप्ता आप्रवासी परिवारहरूलाई निःशुल्क कानुनी सल्लाह दिन्छ। सल्लाह निःशुल्क छ र हामी तपाईंलाई अवस्थाबारे सोध्दैनौं।</p><p>कार्यालय सोमबारदेखि शुक्रबारसम्म खुला रहन्छ र स्वागत कक्षमा नेपाली बोल्ने कोही हुनुहुन्छ। दोभाषे आवश्यक भएमा दुई दिन अगाडि अनुरोध गर्न सक्नुहुन्छ।</p></body></html>",
+    "हाम्रो संस्थाले हरेक हप्ता आप्रवासी परिवारहरूलाई निःशुल्क कानुनी सल्लाह दिन्छ। सल्लाह निःशुल्क छ र हामी तपाईंलाई अवस्थाबारे सोध्दैनौं। कार्यालय सोमबारदेखि शुक्रबारसम्म खुला रहन्छ र स्वागत कक्षमा नेपाली बोल्ने कोही हुनुहुन्छ। दोभाषे आवश्यक भएमा दुई दिन अगाडि अनुरोध गर्न सक्नुहुन्छ।",
+    200
+   ]
+  },
+  "plain": {
+   "https://nepali-center.example/nepali": "<html><head><title>केन्द्र</title></head><body><p>हाम्रो संस्थाले हरेक हप्ता आप्रवासी परिवारहरूलाई निःशुल्क कानुनी सल्लाह दिन्छ। सल्लाह निःशुल्क छ र हामी तपाईंलाई अवस्थाबारे सोध्दैनौं।</p><p>कार्यालय सोमबारदेखि शुक्रबारसम्म खुला रहन्छ र स्वागत कक्षमा नेपाली बोल्ने कोही हुनुहुन्छ। दोभाषे आवश्यक भएमा दुई दिन अगाडि अनुरोध गर्न सक्नुहुन्छ।</p></body></html>"
+  },
+  "url": "https://nepali-center.example/",
+  "why": "Invented Nepali prose on a locale page, beside an English home page. Devanagari is one alphabet and three languages, and the SCRIPTS entry is named Hindi, so before DEV_FUNC this site read English and Hindi: not a missed language but one community's name on another's page, which is the failure CYRILLIC exists for in the other shared script. It is also the first Devanagari page in this corpus, so the boundary that SCRIPT_FUNC_EDGE fixes is exercised by a reading here and not only by a unit test."
+ },
+ {
+  "name": "assamese_pages",
+  "pages": {
+   "https://assamese-center.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/assamese\">অসমীয়া</a><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school.</p></body></html>",
+    "অসমীয়া Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school.",
+    200
+   ],
+   "https://assamese-center.example/assamese": [
+    "<html><head><title>কেন্দ্ৰ</title></head><body><p>আমাৰ সংস্থাই প্ৰতি সপ্তাহত প্ৰব্ৰজনকাৰী পৰিয়ালৰ বাবে বিনামূলীয়া আইনী পৰামৰ্শ দিয়ে। পৰামৰ্শ বিনামূলীয়া আৰু আমি আপোনাক অৱস্থাৰ বিষয়ে একো নুসুধোঁ।</p><p>কাৰ্যালয় সোমবাৰৰ পৰা শুকুৰবাৰলৈ মুকলি থাকে আৰু আদৰণি কক্ষত অসমীয়া কোৱা কোনোবা থাকে। দোভাষীৰ প্ৰয়োজন হলে দুদিন আগতে অনুৰোধ কৰিব পাৰে।</p></body></html>",
+    "আমাৰ সংস্থাই প্ৰতি সপ্তাহত প্ৰব্ৰজনকাৰী পৰিয়ালৰ বাবে বিনামূলীয়া আইনী পৰামৰ্শ দিয়ে। পৰামৰ্শ বিনামূলীয়া আৰু আমি আপোনাক অৱস্থাৰ বিষয়ে একো নুসুধোঁ। কাৰ্যালয় সোমবাৰৰ পৰা শুকুৰবাৰলৈ মুকলি থাকে আৰু আদৰণি কক্ষত অসমীয়া কোৱা কোনোবা থাকে। দোভাষীৰ প্ৰয়োজন হলে দুদিন আগতে অনুৰোধ কৰিব পাৰে।",
+    200
+   ]
+  },
+  "plain": {
+   "https://assamese-center.example/assamese": "<html><head><title>কেন্দ্ৰ</title></head><body><p>আমাৰ সংস্থাই প্ৰতি সপ্তাহত প্ৰব্ৰজনকাৰী পৰিয়ালৰ বাবে বিনামূলীয়া আইনী পৰামৰ্শ দিয়ে। পৰামৰ্শ বিনামূলীয়া আৰু আমি আপোনাক অৱস্থাৰ বিষয়ে একো নুসুধোঁ।</p><p>কাৰ্যালয় সোমবাৰৰ পৰা শুকুৰবাৰলৈ মুকলি থাকে আৰু আদৰণি কক্ষত অসমীয়া কোৱা কোনোবা থাকে। দোভাষীৰ প্ৰয়োজন হলে দুদিন আগতে অনুৰোধ কৰিব পাৰে।</p></body></html>"
+  },
+  "url": "https://assamese-center.example/",
+  "why": "Invented Assamese prose on a locale page, beside an English home page. The Bengali range is written by two languages and the SCRIPTS entry is named Bengali, so this page read as Bengali: a language the site does not publish in, on evidence that belongs to the other one. It is the first page in this corpus that the letter ৰ decides, and the first Bengali-script page here at all, so the boundary SCRIPT_FUNC_EDGE fixes in that script is exercised by a reading."
+ },
+ {
+  "name": "south_asian_locale_tree",
+  "pages": {
+   "https://south-asian-center.example/": [
+    "<html><head><title>Center</title></head><body><ul><li><a href=\"/pa\">ਪੰਜਾਬੀ</a></li><li><a href=\"/gu\">ગુજરાતી</a></li><li><a href=\"/ta\">தமிழ்</a></li><li><a href=\"/te\">తెలుగు</a></li></ul><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.</p></body></html>",
+    "ਪੰਜਾਬੀ ગુજરાતી தமிழ் తెలుగు Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.",
+    200
+   ],
+   "https://south-asian-center.example/pa": [
+    "<html><head><title>ਕੇਂਦਰ</title></head><body><p>ਸਾਡੀ ਸੰਸਥਾ ਹਰ ਹਫ਼ਤੇ ਪਰਵਾਸੀ ਪਰਿਵਾਰਾਂ ਨੂੰ ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਸਲਾਹ ਦਿੰਦੀ ਹੈ ਅਤੇ ਅਸੀਂ ਤੁਹਾਨੂੰ ਕਿਸੇ ਵੀ ਹਾਲਤ ਬਾਰੇ ਨਹੀਂ ਪੁੱਛਦੇ। ਦਫ਼ਤਰ ਸੋਮਵਾਰ ਤੋਂ ਸ਼ੁੱਕਰਵਾਰ ਤੱਕ ਖੁੱਲ੍ਹਾ ਰਹਿੰਦਾ ਹੈ ਅਤੇ ਸਵਾਗਤ ਕਮਰੇ ਵਿੱਚ ਕੋਈ ਨਾ ਕੋਈ ਹੁੰਦਾ ਹੈ।</p></body></html>",
+    "ਸਾਡੀ ਸੰਸਥਾ ਹਰ ਹਫ਼ਤੇ ਪਰਵਾਸੀ ਪਰਿਵਾਰਾਂ ਨੂੰ ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਸਲਾਹ ਦਿੰਦੀ ਹੈ ਅਤੇ ਅਸੀਂ ਤੁਹਾਨੂੰ ਕਿਸੇ ਵੀ ਹਾਲਤ ਬਾਰੇ ਨਹੀਂ ਪੁੱਛਦੇ। ਦਫ਼ਤਰ ਸੋਮਵਾਰ ਤੋਂ ਸ਼ੁੱਕਰਵਾਰ ਤੱਕ ਖੁੱਲ੍ਹਾ ਰਹਿੰਦਾ ਹੈ ਅਤੇ ਸਵਾਗਤ ਕਮਰੇ ਵਿੱਚ ਕੋਈ ਨਾ ਕੋਈ ਹੁੰਦਾ ਹੈ।",
+    200
+   ],
+   "https://south-asian-center.example/gu": [
+    "<html><head><title>કેન્દ્ર</title></head><body><p>અમારી સંસ્થા દર અઠવાડિયે સ્થળાંતરિત પરિવારો માટે મફત કાનૂની સલાહ આપે છે અને અમે તમને કોઈ પણ સ્થિતિ વિશે પૂછતા નથી. કાર્યાલય સોમવારથી શુક્રવાર સુધી ખુલ્લું રહે છે અને સ્વાગત કક્ષમાં કોઈ હોય છે.</p></body></html>",
+    "અમારી સંસ્થા દર અઠવાડિયે સ્થળાંતરિત પરિવારો માટે મફત કાનૂની સલાહ આપે છે અને અમે તમને કોઈ પણ સ્થિતિ વિશે પૂછતા નથી. કાર્યાલય સોમવારથી શુક્રવાર સુધી ખુલ્લું રહે છે અને સ્વાગત કક્ષમાં કોઈ હોય છે.",
+    200
+   ],
+   "https://south-asian-center.example/ta": [
+    "<html><head><title>மையம்</title></head><body><p>எங்கள் அமைப்பு ஒவ்வொரு வாரமும் குடிபெயர்ந்த குடும்பங்களுக்கு இலவச சட்ட ஆலோசனை வழங்குகிறது மற்றும் உங்கள் நிலை பற்றி நாங்கள் கேட்பதில்லை. அலுவலகம் திங்கள் முதல் வெள்ளி வரை திறந்திருக்கும், இந்த ஆலோசனை இலவசம்.</p></body></html>",
+    "எங்கள் அமைப்பு ஒவ்வொரு வாரமும் குடிபெயர்ந்த குடும்பங்களுக்கு இலவச சட்ட ஆலோசனை வழங்குகிறது மற்றும் உங்கள் நிலை பற்றி நாங்கள் கேட்பதில்லை. அலுவலகம் திங்கள் முதல் வெள்ளி வரை திறந்திருக்கும், இந்த ஆலோசனை இலவசம்.",
+    200
+   ],
+   "https://south-asian-center.example/te": [
+    "<html><head><title>కేంద్రం</title></head><body><p>మా సంస్థ ప్రతి వారం వలస కుటుంబాల కోసం ఉచిత న్యాయ సలహా ఇస్తుంది మరియు మీ స్థితి గురించి మేము అడగము. కార్యాలయం సోమవారం నుండి శుక్రవారం వరకు తెరిచి ఉంటుంది కానీ మీకు సమయం కావాలి.</p></body></html>",
+    "మా సంస్థ ప్రతి వారం వలస కుటుంబాల కోసం ఉచిత న్యాయ సలహా ఇస్తుంది మరియు మీ స్థితి గురించి మేము అడగము. కార్యాలయం సోమవారం నుండి శుక్రవారం వరకు తెరిచి ఉంటుంది కానీ మీకు సమయం కావాలి.",
+    200
+   ]
+  },
+  "plain": {
+   "https://south-asian-center.example/pa": "<html><head><title>ਕੇਂਦਰ</title></head><body><p>ਸਾਡੀ ਸੰਸਥਾ ਹਰ ਹਫ਼ਤੇ ਪਰਵਾਸੀ ਪਰਿਵਾਰਾਂ ਨੂੰ ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਸਲਾਹ ਦਿੰਦੀ ਹੈ ਅਤੇ ਅਸੀਂ ਤੁਹਾਨੂੰ ਕਿਸੇ ਵੀ ਹਾਲਤ ਬਾਰੇ ਨਹੀਂ ਪੁੱਛਦੇ। ਦਫ਼ਤਰ ਸੋਮਵਾਰ ਤੋਂ ਸ਼ੁੱਕਰਵਾਰ ਤੱਕ ਖੁੱਲ੍ਹਾ ਰਹਿੰਦਾ ਹੈ ਅਤੇ ਸਵਾਗਤ ਕਮਰੇ ਵਿੱਚ ਕੋਈ ਨਾ ਕੋਈ ਹੁੰਦਾ ਹੈ।</p></body></html>",
+   "https://south-asian-center.example/gu": "<html><head><title>કેન્દ્ર</title></head><body><p>અમારી સંસ્થા દર અઠવાડિયે સ્થળાંતરિત પરિવારો માટે મફત કાનૂની સલાહ આપે છે અને અમે તમને કોઈ પણ સ્થિતિ વિશે પૂછતા નથી. કાર્યાલય સોમવારથી શુક્રવાર સુધી ખુલ્લું રહે છે અને સ્વાગત કક્ષમાં કોઈ હોય છે.</p></body></html>",
+   "https://south-asian-center.example/ta": "<html><head><title>மையம்</title></head><body><p>எங்கள் அமைப்பு ஒவ்வொரு வாரமும் குடிபெயர்ந்த குடும்பங்களுக்கு இலவச சட்ட ஆலோசனை வழங்குகிறது மற்றும் உங்கள் நிலை பற்றி நாங்கள் கேட்பதில்லை. அலுவலகம் திங்கள் முதல் வெள்ளி வரை திறந்திருக்கும், இந்த ஆலோசனை இலவசம்.</p></body></html>",
+   "https://south-asian-center.example/te": "<html><head><title>కేంద్రం</title></head><body><p>మా సంస్థ ప్రతి వారం వలస కుటుంబాల కోసం ఉచిత న్యాయ సలహా ఇస్తుంది మరియు మీ స్థితి గురించి మేము అడగము. కార్యాలయం సోమవారం నుండి శుక్రవారం వరకు తెరిచి ఉంటుంది కానీ మీకు సమయం కావాలి.</p></body></html>"
+  },
+  "url": "https://south-asian-center.example/",
+  "why": "One invented community centre publishing the same invented notice in four South Asian languages on four locale routes, which is the shape the Brahmic script gates were added for. Each of the four writes a range nothing else in these inventories claims, and each was reachable before only through the identifier behind a gate that wants two sentences of 140 characters each, so a notice this length read as nothing. The home page also carries the four autonyms as a switcher row, so the label side is exercised beside the prose side."
+ },
+ {
+  "name": "armenian_pages",
+  "pages": {
+   "https://armenian-center.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/hy\">Հայերեն</a><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.</p></body></html>",
+    "Հայերեն Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.",
+    200
+   ],
+   "https://armenian-center.example/hy": [
+    "<html><head><title>Կենտրոն</title></head><body><p>Մեր կազմակերպությունը ամեն շաբաթ ներգաղթյալ ընտանիքների համար անվճար իրավաբանական խորհրդատվություն է տրամադրում, և մենք ձեզ ձեր կարգավիճակի մասին չենք հարցնում։</p><p>Գրասենյակը բաց է երկուշաբթիից ուրբաթ, իսկ ընդունարանում միշտ կա մեկը, որ խոսում է հայերեն։ Թարգմանիչ պետք լինելու դեպքում կարող եք խնդրել երկու օր առաջ։</p></body></html>",
+    "Մեր կազմակերպությունը ամեն շաբաթ ներգաղթյալ ընտանիքների համար անվճար իրավաբանական խորհրդատվություն է տրամադրում, և մենք ձեզ ձեր կարգավիճակի մասին չենք հարցնում։ Գրասենյակը բաց է երկուշաբթիից ուրբաթ, իսկ ընդունարանում միշտ կա մեկը, որ խոսում է հայերեն։ Թարգմանիչ պետք լինելու դեպքում կարող եք խնդրել երկու օր առաջ։",
+    200
+   ]
+  },
+  "plain": {
+   "https://armenian-center.example/hy": "<html><head><title>Կենտրոն</title></head><body><p>Մեր կազմակերպությունը ամեն շաբաթ ներգաղթյալ ընտանիքների համար անվճար իրավաբանական խորհրդատվություն է տրամադրում, և մենք ձեզ ձեր կարգավիճակի մասին չենք հարցնում։</p><p>Գրասենյակը բաց է երկուշաբթիից ուրբաթ, իսկ ընդունարանում միշտ կա մեկը, որ խոսում է հայերեն։ Թարգմանիչ պետք լինելու դեպքում կարող եք խնդրել երկու օր առաջ։</p></body></html>"
+  },
+  "url": "https://armenian-center.example/",
+  "why": "Invented Armenian prose on a locale page, beside an English home page whose switcher control carries the autonym. Armenian is on the reviewer's list of languages found on pages read as english_only, and its alphabet is written by one language and nothing else, so the range is evidence in the way the Khmer and Thai ranges already were. Before this range it was reachable only through the identifier, behind a gate that wants two sentences of 140 characters each."
+ },
+ {
+  "name": "oromo_word_gate",
+  "pages": {
+   "https://oromo-center.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/om\">Afaan Oromoo</a><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.</p></body></html>",
+    "Afaan Oromoo Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.",
+    200
+   ],
+   "https://oromo-center.example/om": [
+    "<html><head><title>Wiirtuu</title></head><body><p>Dhaabbanni keenya torbee hunda maatii godaansaaf gorsa seeraa kaffaltii malee kenna. Gorsi kun bilisa yoo taane illee nuti haala godaansa keessan hin gaafannu, akkasumas waajjirri keenya guyyaa shan banaa dha.</p><p>Yoo gargaarsa barbaaddan, waaree dura bilbilaa. Abukaatoo waliin dubbachuuf hanga waaree booda eegaa, iddoo simannaa nama Afaan Oromoo dubbatu qabna.</p></body></html>",
+    "Dhaabbanni keenya torbee hunda maatii godaansaaf gorsa seeraa kaffaltii malee kenna. Gorsi kun bilisa yoo taane illee nuti haala godaansa keessan hin gaafannu, akkasumas waajjirri keenya guyyaa shan banaa dha. Yoo gargaarsa barbaaddan, waaree dura bilbilaa. Abukaatoo waliin dubbachuuf hanga waaree booda eegaa, iddoo simannaa nama Afaan Oromoo dubbatu qabna.",
+    200
+   ]
+  },
+  "plain": {
+   "https://oromo-center.example/om": "<html><head><title>Wiirtuu</title></head><body><p>Dhaabbanni keenya torbee hunda maatii godaansaaf gorsa seeraa kaffaltii malee kenna. Gorsi kun bilisa yoo taane illee nuti haala godaansa keessan hin gaafannu, akkasumas waajjirri keenya guyyaa shan banaa dha.</p><p>Yoo gargaarsa barbaaddan, waaree dura bilbilaa. Abukaatoo waliin dubbachuuf hanga waaree booda eegaa, iddoo simannaa nama Afaan Oromoo dubbatu qabna.</p></body></html>"
+  },
+  "url": "https://oromo-center.example/",
+  "why": "Invented Oromo prose on a locale page, beside an English home page whose control carries the autonym. Oromo is Latin script, so there is no range to fall back on, and lid.176 answers Finnish under the confidence floor on real Oromo prose, so the identifier route is closed too: the function-word list is the only way to this language and this is the page that holds it. The Hmong entry is the same shape and the same argument."
+ },
+ {
+  "name": "lithuanian_help_notice",
+  "pages": {
+   "https://lithuanian-center.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/lt\">Lietuvių</a><p>Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.</p></body></html>",
+    "Lietuvių Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons, English classes for adults three evenings a week, and a homework club for children in primary school. Our community center helps families who arrived in this county in the last two years. We offer free legal advice on Tuesday afternoons and English classes for adults three evenings a week.",
+    200
+   ],
+   "https://lithuanian-center.example/lt": [
+    "<html><head><title>Centras</title></head><body><p>Pranešimas: jei jums reikia pagalbos lietuvių kalba, ateikite į registratūrą nuo pirmadienio iki penktadienio. Konsultacija nemokama ir mes neklausiame apie jūsų statusą. Norėdami pasikalbėti su advokatu, skambinkite iki vidudienio.</p></body></html>",
+    "Pranešimas: jei jums reikia pagalbos lietuvių kalba, ateikite į registratūrą nuo pirmadienio iki penktadienio. Konsultacija nemokama ir mes neklausiame apie jūsų statusą. Norėdami pasikalbėti su advokatu, skambinkite iki vidudienio.",
+    200
+   ]
+  },
+  "plain": {
+   "https://lithuanian-center.example/lt": "<html><head><title>Centras</title></head><body><p>Pranešimas: jei jums reikia pagalbos lietuvių kalba, ateikite į registratūrą nuo pirmadienio iki penktadienio. Konsultacija nemokama ir mes neklausiame apie jūsų statusą. Norėdami pasikalbėti su advokatu, skambinkite iki vidudienio.</p></body></html>"
+  },
+  "url": "https://lithuanian-center.example/",
+  "why": "An invented help notice of 232 characters and nothing else on the locale page, which is the shape a thin word list loses and the shape that most directly is the provision this instrument measures. The list held two of this notice's words against a bar of four, so the site read english_only. It is the first fixture here whose non-English page is a single short notice rather than a paragraph of prose."
+ },
+ {
+  "name": "armenian_event_subtitles",
+  "pages": {
+   "https://armenian-events.example/": [
+    "<html><head><title>Center</title></head><body><a href=\"/events\">Events</a><p>Our cultural centre runs a reading room, a Saturday language school and a film series through the autumn. The building is open on weekday afternoons and anyone in the county is welcome to come in and ask a question. Our cultural centre runs a reading room, a Saturday language school and a film series through the autumn.</p></body></html>",
+    "Events Our cultural centre runs a reading room, a Saturday language school and a film series through the autumn. The building is open on weekday afternoons and anyone in the county is welcome to come in and ask a question. Our cultural centre runs a reading room, a Saturday language school and a film series through the autumn.",
+    200
+   ],
+   "https://armenian-events.example/events": [
+    "<html><head><title>Events</title></head><body><h2>Graphic Novels from Two Cities</h2><p>հայկական գրաֆիկական վեպեր Բեյրութից եւ Ստամբուլից</p><h2>Board Games Evening</h2><p>նարդի, թղթախաղ եւ շախմատի պատմությունը Հայաստանում</p><h2>Writing Workshop</h2><p>գրելու աշխատանոց Աննա Գալաչյանի եւ Ալեքսիա Հաթունի ուղեկցութեամբ</p><p>All events are free and open to the public. Doors open at six in the evening and the reading room stays open until nine.</p></body></html>",
+    "Graphic Novels from Two Cities հայկական գրաֆիկական վեպեր Բեյրութից եւ Ստամբուլից Board Games Evening նարդի, թղթախաղ եւ շախմատի պատմությունը Հայաստանում Writing Workshop գրելու աշխատանոց Աննա Գալաչյանի եւ Ալեքսիա Հաթունի ուղեկցութեամբ All events are free and open to the public. Doors open at six in the evening and the reading room stays open until nine.",
+    200
+   ]
+  },
+  "plain": {
+   "https://armenian-events.example/events": "<html><head><title>Events</title></head><body><h2>Graphic Novels from Two Cities</h2><p>հայկական գրաֆիկական վեպեր Բեյրութից եւ Ստամբուլից</p><h2>Board Games Evening</h2><p>նարդի, թղթախաղ եւ շախմատի պատմությունը Հայաստանում</p><h2>Writing Workshop</h2><p>գրելու աշխատանոց Աննա Գալաչյանի եւ Ալեքսիա Հաթունի ուղեկցութեամբ</p><p>All events are free and open to the public. Doors open at six in the evening and the reading room stays open until nine.</p></body></html>"
+  },
+  "url": "https://armenian-events.example/",
+  "why": "The regression the Armenian range introduced and the rule that closes it. Three invented event subtitles, each an Armenian noun phrase beside its English twin, 48 to 62 characters, no verb, joined by the conjunction. Every run clears SCRIPT_RUN_DEFAULT and the conjunction clears SCRIPT_FUNC_MIN, so before SCRIPT_CONNECTIVE the site read true_multilingual on Armenian; codebook rule 9 says a bilingual line with a verb meets the paragraph standard and a verbless label does not, and in a script the particle stands in for the verb, so a coordinator can no longer be the only particle. It reads english_only. The real site this shape came from is a gold-frame organization whose settled class is english_only, and none of its text is here."
+ },
+ {
+  "name": "hidden_language_span_pair",
+  "why": "A bilingual page built as paired `<span data-lang=\"en\">` and `<span data-lang=\"es\" hidden>` twins that a script swaps on a click. The server ships both and the browser lays out one, so the reading the live audit took before 0.2.0 carried no Spanish at all while a re-judge of the same bytes carried it. This is the commonest of the five shapes a reviewer confirmed the instrument was missing on real sites, and it is here so that a reader going back to the rendered text would have to move a fixture.",
+  "url": "https://hidden-span.example/",
+  "pages": {
+   "https://hidden-span.example/": [
+    "<html><head><title>Clearwater Center</title></head><body><p><span data-lang=\"en\">Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.</span><span data-lang=\"es\" hidden>Nuestro centro ayuda a las familias con preguntas de vivienda, inscripcion escolar y citas con un abogado todos los dias de la semana. El personal puede reunirse con usted en la oficina o por telefono, y la primera cita no tiene ningun costo. Llame antes si necesita un interprete para la visita.</span></p></body></html>",
+    "Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.",
+    200
+   ]
+  },
+  "plain": {
+   "https://hidden-span.example": "<html><head><title>Clearwater Center</title></head><body><p><span data-lang=\"en\">Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.</span><span data-lang=\"es\" hidden>Nuestro centro ayuda a las familias con preguntas de vivienda, inscripcion escolar y citas con un abogado todos los dias de la semana. El personal puede reunirse con usted en la oficina o por telefono, y la primera cita no tiene ningun costo. Llame antes si necesita un interprete para la visita.</span></p></body></html>"
+  }
+ },
+ {
+  "name": "display_none_language_panel",
+  "why": "The same absence by a different mechanism: a whole Spanish panel behind an inline `display:none`, which is what a tab, an accordion and a carousel slide that is not the visible one all leave in the document. `_page_text` reads what the server sent and knows nothing about style, so the panel is in the reading, and a visitor reaches it with a click and no translation.",
+  "url": "https://hidden-panel.example/",
+  "pages": {
+   "https://hidden-panel.example/": [
+    "<html><head><title>Northgate Center</title></head><body><p>Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.</p><div class=\"lang-panel\" style=\"display:none\"><p>Nuestro centro ayuda a las familias con preguntas de vivienda, inscripcion escolar y citas con un abogado todos los dias de la semana. El personal puede reunirse con usted en la oficina o por telefono, y la primera cita no tiene ningun costo. Llame antes si necesita un interprete para la visita.</p></div></body></html>",
+    "Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.",
+    200
+   ]
+  },
+  "plain": {
+   "https://hidden-panel.example": "<html><head><title>Northgate Center</title></head><body><p>Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.</p><div class=\"lang-panel\" style=\"display:none\"><p>Nuestro centro ayuda a las familias con preguntas de vivienda, inscripcion escolar y citas con un abogado todos los dias de la semana. El personal puede reunirse con usted en la oficina o por telefono, y la primera cita no tiene ningun costo. Llame antes si necesita un interprete para la visita.</p></div></body></html>"
+  }
+ },
+ {
+  "name": "hidden_english_mobile_menu",
+  "why": "The control for the two above. A page whose only unrendered text is a hidden English mobile menu, twelve link labels a theme draws for a narrow screen. Reading what the browser did not lay out has to find the Spanish on those two and nothing here: this site is english_only, and the menu adds no language, no rung and no piece of evidence.",
+  "url": "https://hidden-menu.example/",
+  "pages": {
+   "https://hidden-menu.example/": [
+    "<html><head><title>Eastfield Center</title></head><body><p>Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.</p><nav class=\"mobile-menu\" style=\"display:none\"><ul><li><a href=\"/0\">Home</a></li><li><a href=\"/1\">Services</a></li><li><a href=\"/2\">Programs</a></li><li><a href=\"/3\">Events</a></li><li><a href=\"/4\">Donate</a></li><li><a href=\"/5\">Volunteer</a></li><li><a href=\"/6\">Contact</a></li><li><a href=\"/7\">Careers</a></li><li><a href=\"/8\">Newsletter</a></li><li><a href=\"/9\">Board</a></li><li><a href=\"/10\">Reports</a></li><li><a href=\"/11\">Privacy</a></li></ul></nav></body></html>",
+    "Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.",
+    200
+   ]
+  },
+  "plain": {
+   "https://hidden-menu.example": "<html><head><title>Eastfield Center</title></head><body><p>Our center helps families with housing questions, school enrollment and appointments with a lawyer every day of the week. Staff can meet you at the office or by telephone, and there is no charge for a first appointment. Call ahead if you need an interpreter for the visit.</p><nav class=\"mobile-menu\" style=\"display:none\"><ul><li><a href=\"/0\">Home</a></li><li><a href=\"/1\">Services</a></li><li><a href=\"/2\">Programs</a></li><li><a href=\"/3\">Events</a></li><li><a href=\"/4\">Donate</a></li><li><a href=\"/5\">Volunteer</a></li><li><a href=\"/6\">Contact</a></li><li><a href=\"/7\">Careers</a></li><li><a href=\"/8\">Newsletter</a></li><li><a href=\"/9\">Board</a></li><li><a href=\"/10\">Reports</a></li><li><a href=\"/11\">Privacy</a></li></ul></nav></body></html>"
+  }
+ },
+ {
+  "name": "quoted_testimonial_only",
+  "pages": {
+   "https://northgate-welcome.example/": [
+    "<html><body>Forbidden</body></html>",
+    "Forbidden",
+    403
+   ]
+  },
+  "plain": {
+   "https://northgate-welcome.example": "<html><head><title>Northgate Welcome Centre</title></head><body><p>The centre works with families who have just arrived in the county. Staff sit down with parents over the school enrolment forms, answer questions about a lease or a rent increase, and come along to an appointment with a lawyer when one has been arranged. Nothing here is charged for and the front desk takes walk-in visits every weekday morning, so a parent who has nowhere else to ask can come in on the day and be seen by somebody who has time for the question. The office is on the ground floor of the old mill building, next to the library, and the bus that runs along the river stops outside the door every twenty minutes until six in the evening.</p><div class=\"testimonials\"><div class=\"testimonial-card\"><p>Before I came here I did not know where to begin with the school forms, and somebody sat with me for an hour and read every line of them out loud.</p><p>- Dana R.</p></div><div class=\"testimonial-card\"><p>Cuando llegamos a esta ciudad nadie de nosotros sabia donde pedir ayuda, pero en este centro nos recibieron muy bien y nos dieron toda la informacion que hacia falta para la escuela de los ninos; tambien nos acompanaron a una cita con la abogada y nunca nos hicieron sentir mal.</p><p>- Yolanda P.</p></div></div></body></html>"
+  },
+  "url": "https://northgate-welcome.example/",
+  "why": "A signed client testimonial in Spanish inside a `.testimonial-card`, in a row with an English one, on a page whose own prose is all English. The container is what says the words are a visitor's, so the text leaves the counted stream and the site reads english_only, and the quotation goes on the record as a `testimonial` row at rung 1 with no authorship, where a reader of the record can see it and `counted_evidence` cannot count it. The reading comes through the plain-client rescue because that is the one route in this corpus where the markup decides the text: the fake browser answers every evaluate with None, so the DOM half of the same strip decides nothing here and is unit-tested in tests/test_core.py instead."
+ },
+ {
+  "name": "own_paragraph_beside_testimonials",
+  "pages": {
+   "https://rivermill-family.example/": [
+    "<html><body>Forbidden</body></html>",
+    "Forbidden",
+    403
+   ]
+  },
+  "plain": {
+   "https://rivermill-family.example": "<html><head><title>Rivermill Family Centre</title></head><body><p>The centre works with families who have just arrived in the county. Staff sit down with parents over the school enrolment forms, answer questions about a lease or a rent increase, and come along to an appointment with a lawyer when one has been arranged. Nothing here is charged for and the front desk takes walk-in visits every weekday morning, so a parent who has nowhere else to ask can come in on the day and be seen by somebody who has time for the question. The office is on the ground floor of the old mill building, next to the library, and the bus that runs along the river stops outside the door every twenty minutes until six in the evening.</p><p>Nuestro centro ofrece servicios a las familias que acaban de llegar: podemos ayudar con la informacion de la escuela, con las preguntas sobre la vivienda y con las citas legales, y tambien puede pedir un interprete cuando usted lo necesite. Nuestros servicios no tienen ningun costo.</p><div class=\"testimonials\"><div class=\"testimonial-card\"><p>Before I came here I did not know where to begin with the school forms, and somebody sat with me for an hour and read every line of them out loud.</p><p>- Dana R.</p></div><div class=\"testimonial-card\"><p>Cuando llegamos a esta ciudad nadie de nosotros sabia donde pedir ayuda, pero en este centro nos recibieron muy bien y nos dieron toda la informacion que hacia falta para la escuela de los ninos; tambien nos acompanaron a una cita con la abogada y nunca nos hicieron sentir mal.</p><p>- Yolanda P.</p></div></div></body></html>"
+  },
+  "url": "https://rivermill-family.example/",
+  "why": "The boundary of the container rule, and the shape that refused a text rule in September 2026: one organization publishes participant testimonials in Spanish AND its own Spanish paragraph about its programme on the same page, and it does publish in Spanish. Here the paragraph sits outside the testimonial containers, so it is counted and the site reads true_multilingual on it while the quotations beside it are recorded at rung 1 and counted by nothing. A rule that read the TEXT could not separate these two blocks; the container can. What it cannot do is separate them when the organization writes its own paragraph INSIDE the testimonial container, which LIMITATIONS 7.2 states."
  }
 ]

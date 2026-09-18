@@ -49,8 +49,8 @@ import gzip
 import os
 import json
 
-from .core import (AUTHOR_UNKNOWN_WIDGET, MT_ERROR, READ_ENOUGH_PAGES, SWITCHER_ENGLISH, _snip,
-                   _ev_lang, _ev_quote, _ev_url, _utc_now, read_store)
+from .core import (AUTHOR_UNKNOWN_WIDGET, CONTROL_DEAD_NOTE, MT_ERROR, READ_ENOUGH_PAGES,
+                   SWITCHER_ENGLISH, _snip, _ev_lang, _ev_quote, _ev_url, _utc_now, read_store)
 # One definition of each, rather than a second copy that can answer differently. `_key` is the form
 # two stored addresses are compared on everywhere in this package, and `_field` is how a Result and
 # the dict a stored run holds are read through one expression.
@@ -78,12 +78,27 @@ NO_CLASS = 'no_class'
 UNNAMED_CONTROL = 'unnamed_control'
 OFF_SITE_DECLARATION = 'off_site_declaration'
 DEAD_CONTROL = 'dead_control'
+# The same observation as DEAD_CONTROL on a site where no vendor pattern matched, which is a
+# different row and needs a different sentence. Rule 16 reads `a control of a NAMED WIDGET that was
+# operated and changed nothing`, so where nothing named a widget the class cannot be
+# machine_translate_error, and the reading falls through to `english_only`: an ABSENCE claim
+# standing on a site where a control a visitor can see was clicked and did nothing. The
+# observation was on the record as evidence and in the note and decided nothing, and nothing
+# queued it either, so the one class that asserts an absence was asserting it over the top of the
+# clearest reason to doubt it. Counted over the 2,000-site gold frame on 2026-09-18: 88 readings
+# record a dead control, 33 are machine_translate_error, 40 are true_multilingual and 1 is
+# machine_translate, where the observation is correctly silent because the site published its own
+# second language or the widget produced one elsewhere, and 14 are this row. 4 of the 14 were
+# already queued for a thin search and keep the stronger of the two sentences; 10 were queued by
+# nothing.
+DEAD_CONTROL_NO_VENDOR = 'dead_control_no_vendor'
 KIND_TITLE = {
     UNREAD: 'the site was not read',
     THIN_ABSENCE: 'english_only on a search too thin to rest it on',
     NO_CLASS: 'no class this package defines',
     UNNAMED_CONTROL: 'a translation control this package cannot name',
     DEAD_CONTROL: 'a translation control that was worked and changed nothing',
+    DEAD_CONTROL_NO_VENDOR: 'english_only, and a language control was worked and did nothing',
     OFF_SITE_DECLARATION: 'the only non-English language is declared at another site',
 }
 # The order the summary prints them in, and the roll `review_text` iterates. It is a name and not a
@@ -91,8 +106,8 @@ KIND_TITLE = {
 # hand-written tuple of four: the site went into the sheet, the sheet was right, and the line a
 # person reads did not mention it. A queue that hides one of its own kinds is this project's most
 # frequent bug wearing a different coat. `test_every_queue_kind_is_printed` holds the two together.
-KIND_ORDER = (UNREAD, DEAD_CONTROL, THIN_ABSENCE, NO_CLASS, UNNAMED_CONTROL,
-              OFF_SITE_DECLARATION)
+KIND_ORDER = (UNREAD, DEAD_CONTROL, DEAD_CONTROL_NO_VENDOR, THIN_ABSENCE, NO_CLASS,
+              UNNAMED_CONTROL, OFF_SITE_DECLARATION)
 
 # Why a SETTLED reading is nonetheless worth a second look. A different question from the six
 # above, so a different vocabulary and a bucket the queue never mixes into `unsettled`: these
@@ -206,11 +221,13 @@ def _stopped_by(q, pages_stated=False):
 
 
 def unsettled_kind(r):
-    """Which of the six the reading is, or '' when a person is not needed.
+    """Which of the seven the reading is, or '' when a person is not needed.
 
     `r` is a Result from `audit` or `rejudge`, or the dict a stored run holds. Only `verdict`,
-    `read_quality`, `authorship` and `declared_off_site` are read; see `needs_human` for what the
-    six are and what they leave alone.
+    `read_quality`, `authorship`, `declared_off_site`, `note` and `machine_translation` are read;
+    see `needs_human` for what the seven are and what they leave alone. The last two are read for
+    `dead_control_no_vendor` alone, off the same note sentence the three verdict derivations read
+    rule 16 off, so the queue and the class cannot disagree about whether a control was worked.
     """
     verdict = str(_field(r, 'verdict', '') or '')
     if verdict == UNREACHABLE:
@@ -222,6 +239,21 @@ def unsettled_kind(r):
     # the narrower observation and the one a coder settles in a single look.
     if verdict == MT_ERROR:
         return DEAD_CONTROL
+    # The same observation where nothing named a vendor, which rule 16 cannot class and which was
+    # therefore reaching nobody. Restricted to `english_only` on purpose, and the restriction is
+    # the whole of the judgement: `true_multilingual` and `machine_translate` rest on something
+    # FOUND, so a dead control beside them settles nothing and this predicate leaves them alone,
+    # exactly as it leaves their thin searches alone. Over the gold frame that boundary is 40
+    # true_multilingual readings and 1 machine_translate one kept out, against 14 taken in.
+    # Restricted to no vendor for the second reason: where a vendor IS named and the verdict is
+    # still `english_only`, rule 15 put it there on the server's own answer to an advertised
+    # locale route, which is the stronger observation and a settled reading.
+    # Before UNNAMED_CONTROL for the reason DEAD_CONTROL is before it: a control that was clicked
+    # and did nothing is what one look settles.
+    if (verdict == ENGLISH_ONLY
+            and not str(_field(r, 'machine_translation', '') or '')
+            and CONTROL_DEAD_NOTE in str(_field(r, 'note', '') or '')):
+        return DEAD_CONTROL_NO_VENDOR
     if str(_field(r, 'authorship', '') or '') == AUTHOR_UNKNOWN_WIDGET:
         return UNNAMED_CONTROL
     # Before the thin-search kind, and for the reason `UNNAMED_CONTROL` is: a site in this state is
@@ -303,6 +335,24 @@ def unsettled_reason(r):
                 'and one government site in this state translates for a visitor on a phone. '
                 'Open the address, operate the control, and record whether a visitor gets '
                 'another language.' % (' (%s)' % note if note else ''))
+    if kind == DEAD_CONTROL_NO_VENDOR:
+        # The thin-search clause travels the same way it does for UNNAMED_CONTROL below, and for
+        # the same reason: 4 of the 14 sites this kind names on the gold frame were queued for a
+        # thin search before it existed, and a coder who is told only one of the two facts has
+        # been told the wrong half.
+        q = dict(_field(r, 'read_quality', {}) or {})
+        note = str(_field(r, 'note', '') or '')
+        thin = ('' if q.get('sufficient') else
+                ' The search behind the absence is also too thin to rest it on: %d pages read, %s.'
+                % (_count(q, 'pages_read') or int(_field(r, 'pages_read', 0) or 0),
+                   _stopped_by(q, pages_stated=True)))
+        return ('a control naming a language was clicked on this site and the page did not '
+                'change%s, and no vendor pattern here named a translation widget. Because nothing '
+                'named a widget the reading falls to english_only, which is the one class that '
+                'asserts an absence, and it is asserting it over a control a visitor can see. '
+                'Open the address, operate the control, and record whether a visitor gets another '
+                'language and who wrote it.%s'
+                % (' (%s)' % note if note else '', thin))
     if kind == UNNAMED_CONTROL:
         # A site can be in this state AND resting its absence claim on too thin a search, and a
         # coder needs both facts. This kind is reported first because the control is the thing one
@@ -344,8 +394,8 @@ def unsettled_reason(r):
 def needs_human(r):
     """Does this reading need a person to settle it.
 
-    Six states, read off the verdict, `read_quality`, `authorship` and `declared_off_site` and off
-    nothing else:
+    Seven states, read off the verdict, `read_quality`, `authorship`, `declared_off_site`, `note`
+    and `machine_translation` and off nothing else:
 
       unreachable       always. The site was not read at all, so the record holds no reading to
                         disagree with, and a person opening the address is the only thing that
@@ -361,6 +411,18 @@ def needs_human(r):
                         the site. A person opening the address and operating the control is the
                         only thing that settles it, and one government site in the class translates
                         for a visitor on a phone.
+      dead control,     the same observation on a site where no vendor pattern matched. Rule 16
+      no vendor         reads `a control of a NAMED WIDGET`, so with nothing to name the class
+                        cannot be `machine_translate_error` and the reading falls to
+                        `english_only`, which is the one class that asserts an absence. The
+                        absence is then standing over the clearest reason to doubt it, and until
+                        this kind existed the observation sat on the record as evidence and in
+                        the note and reached nobody. Counted over the 2,000-site gold frame on
+                        2026-09-18: 14 readings, of which 4 were already queued for a thin search
+                        and 10 were queued by nothing. Restricted to `english_only`, because a
+                        dead control beside `true_multilingual` or `machine_translate` settles
+                        nothing about a verdict that rests on something found, which is 41 more
+                        readings on that frame and every one of them left alone.
       no class          a verdict outside those this package defines, the empty string included.
                         The run did not settle on a class, and a blank read as a class is how a
                         gap becomes a finding.
