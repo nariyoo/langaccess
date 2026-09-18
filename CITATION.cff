@@ -1,8 +1,12 @@
 # Citation File Format 1.2.0. https://citation-file-format.github.io/
 #
-# There is deliberately no .zenodo.json beside this file. Zenodo reads both, and where both are
-# present only .zenodo.json is used and this file is ignored entirely
-# (https://help.zenodo.org/docs/github/describe-software/).
+# `.zenodo.json` sits beside this file and it is the one Zenodo reads. Where both are present
+# Zenodo uses `.zenodo.json` alone and ignores this file entirely
+# (https://help.zenodo.org/docs/github/describe-software/), so `.zenodo.json` carries the whole
+# record: title, description, creator with ORCID, licence, version, keywords and the related
+# identifiers for the PyPI release and the GitHub tag. The two files hold the same facts in two
+# vocabularies and are edited together. An edit made here and not there reaches a reader of this
+# repository and never reaches the archive.
 #
 # `doi` is absent on purpose. It is known only once a GitHub Release has been archived by Zenodo,
 # and a placeholder would be an invalid value rather than a missing one. Add the VERSION doi, not
