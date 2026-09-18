@@ -1,17 +1,18 @@
 # Citation File Format 1.2.0. https://citation-file-format.github.io/
 #
-# `.zenodo.json` sits beside this file and it is the one Zenodo reads. Where both are present
-# Zenodo uses `.zenodo.json` alone and ignores this file entirely
-# (https://help.zenodo.org/docs/github/describe-software/), so `.zenodo.json` carries the whole
-# record: title, description, creator with ORCID, licence, version, keywords and the related
-# identifiers for the PyPI release and the GitHub tag. The two files hold the same facts in two
-# vocabularies and are edited together. An edit made here and not there reaches a reader of this
-# repository and never reaches the archive.
+# There is no `doi` field. This software has no DOI and none should be cited for it. Release 0.2.0
+# is archived as the GitHub release `v0.2.0` at
+# https://github.com/nariyoo/langaccess/releases/tag/v0.2.0 and as the PyPI distribution
+# https://pypi.org/project/langaccess/0.2.0/.
 #
-# `doi` is the VERSION doi and not the concept doi: a verdict is the output of one rule set, so a
-# citation that does not name the version has not said which instrument produced its numbers. It
-# was reserved on the Zenodo deposition for 0.2.0 on 2026-09-18 and resolves once that deposition
-# is published. Reserve the next one the same way and move this field with the version.
+# The version belongs in the citation: a verdict is the output of one rule set, so a citation that
+# does not name the version has not said which instrument produced its numbers.
+#
+# `.zenodo.json` sits beside this file. Zenodo is the only reader of it, and only if this
+# repository is ever connected to Zenodo. It is not connected, and nothing here is deposited there.
+# Where both files are present Zenodo uses `.zenodo.json` alone and ignores this file entirely
+# (https://help.zenodo.org/docs/github/describe-software/), so the two files hold the same facts in
+# two vocabularies and are edited together.
 #
 # `date-released` is the date of the CHANGELOG section this version ships under, and it moves when
 # the version does.
@@ -34,7 +35,6 @@ authors:
 version: 0.2.0
 date-released: 2026-09-18
 repository-code: "https://github.com/nariyoo/langaccess"
-doi: "10.5281/zenodo.22837242"
 license:
   - MIT
   - CC-BY-SA-3.0
